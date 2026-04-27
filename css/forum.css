@@ -1,0 +1,38 @@
+/* Forum Page Styles */
+.forum-page { padding: var(--space-2xl) 0; }
+.forum-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md); }
+.forum-header h1 { font-size: var(--text-3xl); }
+.forum-filters { display: flex; gap: var(--space-sm); margin-bottom: var(--space-xl); flex-wrap: wrap; }
+.thread-list { display: flex; flex-direction: column; gap: var(--space-md); }
+.thread-card {
+  background: var(--bg-tertiary); border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg); padding: var(--space-xl);
+  cursor: pointer; transition: all var(--duration-fast) ease;
+}
+.thread-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.thread-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-sm); }
+.thread-card h3 { font-size: var(--text-lg); flex: 1; }
+.thread-card-meta { display: flex; align-items: center; gap: var(--space-lg); font-size: var(--text-sm); color: var(--text-tertiary); }
+.thread-card-meta span { display: flex; align-items: center; gap: 4px; }
+.thread-detail { margin-bottom: var(--space-2xl); }
+.thread-detail-header { margin-bottom: var(--space-xl); }
+.thread-detail-header h2 { font-size: var(--text-2xl); margin-bottom: var(--space-sm); }
+.thread-body { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-xl); margin-bottom: var(--space-xl); }
+.thread-body-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md); }
+.reply-list { display: flex; flex-direction: column; gap: var(--space-md); }
+.reply-card {
+  background: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-lg);
+  border-left: 3px solid var(--accent-blue);
+}
+.reply-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-sm); font-size: var(--text-sm); }
+.reply-form { margin-top: var(--space-xl); }
+.reply-form h4 { margin-bottom: var(--space-md); }
+
+/* New Thread Modal */
+.new-thread-form { display: none; }
+.new-thread-form.active { display: block; }
+
+@media (max-width: 768px) {
+  .forum-header { flex-direction: column; align-items: flex-start; }
+  .thread-card-meta { flex-wrap: wrap; gap: var(--space-sm); }
+}

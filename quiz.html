@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learn — Mathlings</title>
+  <meta name="description" content="Interactive abacus learning and formula exercises on Mathlings.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/quiz.css">
+</head>
+<body>
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="index.html" class="navbar-brand"><img src="favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
+    <div class="navbar-nav" id="main-nav"></div>
+    <div class="navbar-actions">
+      <button class="audio-toggle" id="audio-toggle" aria-label="Toggle audio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      </button>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
+    </div>
+  </div></nav>
+  <div class="mobile-nav" id="mobile-nav"></div>
+
+  <main class="main">
+    <div class="quiz-layout">
+      <!-- Sidebar -->
+      <aside class="quiz-sidebar">
+        <div class="formula-badge" id="formula-badge">
+          <h3 id="formula-name">SF+4</h3>
+          <div class="formula-rule" id="formula-rule">= +5 − 1</div>
+        </div>
+        <div class="module-nav" id="module-nav"></div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="quiz-main" id="quiz-main"></div>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div class="feedback-overlay" id="feedback-overlay">
+      <div class="feedback-card">
+        <div class="feedback-icon" id="feedback-icon">🎉</div>
+        <h3 class="feedback-title" id="feedback-title">Correct!</h3>
+        <p class="feedback-text" id="feedback-text">Great job!</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/abacus.js"></script>
+  <script src="js/quiz.js"></script>
+</body>
+</html>

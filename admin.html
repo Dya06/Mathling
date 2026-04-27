@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Mathlings</title>
+  <meta name="description" content="Admin dashboard for managing the Mathlings platform.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="index.html" class="navbar-brand"><img src="favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
+    <div class="navbar-nav" id="main-nav"></div>
+    <div class="navbar-actions">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
+    </div>
+  </div></nav>
+  <div class="mobile-nav" id="mobile-nav"></div>
+
+  <main class="main">
+    <div class="admin-page container">
+      <div class="admin-header">
+        <h1>🏠 Admin Dashboard</h1>
+        <p style="color:var(--text-secondary)">Platform overview and management tools</p>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="admin-stats" id="admin-stats"></div>
+
+      <!-- Charts & Activity -->
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>📊 Weekly Activity</h3>
+          <div class="activity-chart-wrap"><canvas id="bar-chart"></canvas></div>
+        </div>
+        <div class="admin-card">
+          <h3>🔔 Recent Activity</h3>
+          <div class="activity-list" id="activity-feed"></div>
+        </div>
+      </div>
+
+      <!-- Users & Feedback -->
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>👥 User Management</h3>
+          <div id="user-list"></div>
+          <div style="margin-top:var(--space-md);display:flex;gap:var(--space-sm)">
+            <a href="progress.html" class="btn btn-secondary btn-sm" style="flex:1">View Reports</a>
+            <a href="moderate.html" class="btn btn-secondary btn-sm" style="flex:1">Moderate Content</a>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3>💬 Recent Feedback</h3>
+          <div id="feedback-list"></div>
+        </div>
+      </div>
+
+      <!-- System Info -->
+      <div class="admin-card" style="margin-top:var(--space-xl)">
+        <h3>⚙️ System Status</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-lg);margin-top:var(--space-md)">
+          <div style="text-align:center">
+            <div style="font-size:2rem;margin-bottom:var(--space-sm)">🟢</div>
+            <div style="font-weight:700;font-size:var(--text-sm)">All Systems Online</div>
+            <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Uptime: 99.9%</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:2rem;margin-bottom:var(--space-sm)">📦</div>
+            <div style="font-weight:700;font-size:var(--text-sm)">Storage</div>
+            <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Using localStorage</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:2rem;margin-bottom:var(--space-sm)">🔐</div>
+            <div style="font-weight:700;font-size:var(--text-sm)">Security</div>
+            <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Client-side demo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
