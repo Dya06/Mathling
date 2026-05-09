@@ -265,6 +265,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Content Include="App_Data\MathlingDB_Schema.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
