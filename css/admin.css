@@ -1,0 +1,64 @@
+/* Admin Dashboard Styles */
+.admin-page { padding: var(--space-2xl) 0; }
+.admin-header { margin-bottom: var(--space-2xl); }
+.admin-header h1 { font-size: var(--text-3xl); margin-bottom: var(--space-sm); }
+
+.admin-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+.admin-stat {
+  background: var(--bg-tertiary); border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg); padding: var(--space-xl);
+  display: flex; align-items: center; gap: var(--space-lg);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+.admin-stat:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.admin-stat-icon {
+  width: 56px; height: 56px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.admin-stat-value {
+  font-family: var(--font-heading); font-size: var(--text-2xl); font-weight: 800;
+}
+.admin-stat-label { font-size: var(--text-sm); color: var(--text-tertiary); }
+
+.admin-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl);
+  margin-bottom: var(--space-2xl);
+}
+.admin-card {
+  background: var(--bg-tertiary); border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg); padding: var(--space-xl);
+}
+.admin-card h3 { font-size: var(--text-lg); margin-bottom: var(--space-lg); }
+
+.user-row {
+  display: flex; align-items: center; gap: var(--space-md);
+  padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-color);
+  font-size: var(--text-sm);
+}
+.user-row:last-child { border-bottom: none; }
+.user-row .user-name { flex: 1; font-weight: 600; }
+
+.feedback-item {
+  padding: var(--space-md); background: var(--bg-secondary);
+  border-radius: var(--radius-md); margin-bottom: var(--space-sm);
+  font-size: var(--text-sm);
+}
+.feedback-item .feedback-meta {
+  display: flex; justify-content: space-between; margin-top: var(--space-xs);
+  font-size: var(--text-xs); color: var(--text-tertiary);
+}
+
+.activity-chart-wrap { margin-bottom: var(--space-xl); }
+.activity-chart-wrap canvas { width: 100% !important; }
+
+@media (max-width: 1024px) {
+  .admin-stats { grid-template-columns: repeat(2, 1fr); }
+  .admin-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .admin-stats { grid-template-columns: 1fr; }
+}

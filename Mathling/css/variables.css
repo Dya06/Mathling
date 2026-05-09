@@ -1,0 +1,138 @@
+/* ============================================
+   MATHLINGS — Design Tokens & Dark Mode
+   ============================================ */
+
+:root {
+  /* ---- Color Palette (Light Mode) ---- */
+  --bg-primary: #FAFAF8;
+  --bg-secondary: #F5F0EB;
+  --bg-tertiary: #FFFFFF;
+  --bg-nav: rgba(255, 255, 255, 0.85);
+
+  --text-primary: #2C2C2C;
+  --text-secondary: #6B6B6B;
+  --text-tertiary: #9A9A9A;
+  --text-inverse: #FFFFFF;
+
+  --accent-yellow: #FFD43B;
+  --accent-yellow-light: #FFF3BF;
+  --accent-yellow-dark: #E6A800;
+  --accent-red: #FF6B6B;
+  --accent-red-light: #FFE0E0;
+  --accent-red-dark: #E03E3E;
+  --accent-blue: #4DABF7;
+  --accent-blue-light: #D0EBFF;
+  --accent-blue-dark: #1C7ED6;
+  --accent-green: #51CF66;
+  --accent-green-light: #D3F9D8;
+  --accent-green-dark: #2F9E44;
+  --accent-purple: #B197FC;
+  --accent-purple-light: #E5DBFF;
+  --accent-orange: #FF922B;
+  --accent-orange-light: #FFE8CC;
+
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-color-strong: rgba(0, 0, 0, 0.15);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 16px 50px rgba(0, 0, 0, 0.1);
+  --shadow-glow-yellow: 0 0 20px rgba(255, 212, 59, 0.3);
+  --shadow-glow-blue: 0 0 20px rgba(77, 171, 247, 0.3);
+  --shadow-glow-green: 0 0 20px rgba(81, 207, 102, 0.3);
+
+  /* ---- Spacing ---- */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+
+  /* ---- Typography ---- */
+  --font-heading: 'Nunito', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
+  --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
+  --text-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
+  --text-lg: clamp(1.05rem, 1rem + 0.25vw, 1.125rem);
+  --text-xl: clamp(1.15rem, 1.05rem + 0.5vw, 1.25rem);
+  --text-2xl: clamp(1.35rem, 1.2rem + 0.75vw, 1.5rem);
+  --text-3xl: clamp(1.6rem, 1.35rem + 1.25vw, 1.875rem);
+  --text-4xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+  --text-5xl: clamp(2.5rem, 2rem + 2.5vw, 3.25rem);
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+  --letter-tight: -0.02em;
+  --letter-normal: 0;
+
+  /* ---- Borders ---- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ---- Transitions ---- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* ---- Z-index ---- */
+  --z-dropdown: 100;
+  --z-nav: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+  --z-tooltip: 500;
+
+  /* ---- Layout ---- */
+  --max-width: 1200px;
+  --nav-height: 72px;
+  --sidebar-width: 280px;
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+[data-theme="dark"] {
+  --bg-primary: #13131F;
+  --bg-secondary: #1C1C30;
+  --bg-tertiary: #242442;
+  --bg-nav: rgba(19, 19, 31, 0.9);
+
+  --text-primary: #F0F0F5;
+  --text-secondary: #A0A0BC;
+  --text-tertiary: #6B6B88;
+  --text-inverse: #1A1A2E;
+
+  --accent-yellow: #FFD43B;
+  --accent-yellow-light: rgba(255, 212, 59, 0.15);
+  --accent-red: #FF8787;
+  --accent-red-light: rgba(255, 107, 107, 0.15);
+  --accent-blue: #74C0FC;
+  --accent-blue-light: rgba(77, 171, 247, 0.15);
+  --accent-green: #69DB7C;
+  --accent-green-light: rgba(81, 207, 102, 0.15);
+  --accent-purple: #B197FC;
+  --accent-purple-light: rgba(177, 151, 252, 0.15);
+  --accent-orange: #FFA94D;
+  --accent-orange-light: rgba(255, 146, 43, 0.15);
+
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-color-strong: rgba(255, 255, 255, 0.15);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 16px 50px rgba(0, 0, 0, 0.4);
+  --shadow-glow-yellow: 0 0 25px rgba(255, 212, 59, 0.2);
+  --shadow-glow-blue: 0 0 25px rgba(116, 192, 252, 0.2);
+  --shadow-glow-green: 0 0 25px rgba(105, 219, 124, 0.2);
+}
