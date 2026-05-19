@@ -293,20 +293,20 @@
   border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .abacus-heaven-bead, .abacus-earth-bead {
-  width: 48px; height: 28px; border-radius: 14px; border: none; cursor: pointer;
+  width: 48px; height: 28px; border-radius: 14px; border: none; cursor: default;
   position: relative; z-index: 1;
   background: linear-gradient(180deg, #8B7355, #6B5540);
   box-shadow: 0 2px 6px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
   transition: all var(--duration-normal) var(--ease-bounce);
 }
-.abacus-heaven-bead { margin-top: auto; }
+.abacus-heaven-bead { margin-bottom: auto; }
 .abacus-heaven-bead:hover, .abacus-earth-bead:hover {
   transform: scale(1.08); box-shadow: 0 3px 10px rgba(0,0,0,0.25);
 }
 .abacus-heaven-bead.active {
   background: linear-gradient(180deg, #FF6B6B, #E03E3E);
   box-shadow: 0 3px 12px rgba(255,107,107,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
-  margin-top: 0; margin-bottom: auto;
+  margin-top: auto; margin-bottom: 0;
 }
 .abacus-earth-bead.active {
   background: linear-gradient(180deg, #4DABF7, #1C7ED6);
