@@ -186,6 +186,18 @@
 .instruction-card h3 { font-size: var(--text-xl); margin-bottom: var(--space-md); }
 .instruction-card p { color: var(--text-secondary); margin-bottom: var(--space-lg); }
 
+/* Abacus Demo Widget */
+.abacus-demo-widget { text-align: center; }
+.abacus-step-info {
+  background: linear-gradient(135deg, var(--accent-blue-light), var(--accent-purple-light));
+  border: 2px solid var(--accent-blue);
+  border-radius: var(--radius-lg); padding: 12px 20px;
+  font-size: var(--text-sm); font-weight: 700; color: var(--accent-blue-dark);
+  margin-bottom: var(--space-md); text-align: center;
+  min-height: 44px; display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+}
+
 /* Numpad */
 .numpad {
   display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-sm);

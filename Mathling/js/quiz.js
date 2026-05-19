@@ -331,7 +331,11 @@ const Quiz = {
 
     let abacusHTML = '';
     if (m.useAbacus) {
-      abacusHTML = '<div id="abacus-container"></div>';
+      abacusHTML = `<div class="abacus-demo-area">
+        <div class="abacus-demo-title">🧮 Abacus Demo — Watch how the beads move!</div>
+        <div id="abacus-container"></div>
+        <button class="btn btn-ghost btn-sm" id="replay-abacus" style="margin:var(--space-md) auto 0;display:block">↺ Replay Animation</button>
+      </div>`;
     }
 
     main.innerHTML = `
@@ -368,13 +372,18 @@ const Quiz = {
 
     // Setup interactions
     this.setupNumpad();
-    if (m.useAbacus) this.initAbacus();
 
     // Render the question
     if (set.mode === 'flash') {
       this.renderFlashQuestion(q);
     } else {
       this.renderStaticQuestion(q);
+    }
+
+    // Init abacus AFTER question renders, then auto-animate
+    if (m.useAbacus) {
+      this.initAbacus();
+      this.animateAbacusForQuestion(q);
     }
 
     // Start timer for assessment
@@ -444,11 +453,30 @@ const Quiz = {
     }, 1200);
   },
 
-  /* ---- Abacus ---- */
+  /* ---- Abacus Animation ---- */
   initAbacus() {
     const container = document.getElementById('abacus-container');
     if (!container) return;
-    this.abacus = new Abacus(container, { rods: 4 });
+    this.abacus = new Abacus(container, { rods: 1 });
+
+    // Replay button
+    const replayBtn = document.getElementById('replay-abacus');
+    if (replayBtn) {
+      replayBtn.addEventListener('click', () => {
+        const m = this.formula.modules[this.moduleKey];
+        const set = m.sets[this.setKey];
+        const q = set.questions[this.questionIndex];
+        if (q && this.abacus) this.abacus.animateQuestion(q.rows);
+      });
+    }
+  },
+
+  animateAbacusForQuestion(q) {
+    if (!this.abacus || !q) return;
+    // Small delay so the UI renders first
+    setTimeout(() => {
+      this.abacus.animateQuestion(q.rows);
+    }, 500);
   },
 
   /* ---- Numpad ---- */
