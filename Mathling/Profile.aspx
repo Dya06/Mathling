@@ -1,12 +1,12 @@
 <%@ Page Title="Profile" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Profile.aspx.cs" Inherits="Mathling.Profile" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
-    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="/css/profile.css">
 </asp:Content>
 
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
   <nav class="navbar"><div class="navbar-inner">
-    <a href="Default.aspx" class="navbar-brand"><img src="favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
+    <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
     <div class="navbar-nav" id="main-nav"></div>
     <div class="navbar-actions">
       <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
@@ -18,7 +18,7 @@
   <main class="main">
     <section class="profile-hero">
       <div class="container">
-        <div class="profile-avatar" id="profile-avatar">👤</div>
+        <div class="profile-avatar" id="profile-avatar">ðŸ‘¤</div>
         <h1 class="profile-name" id="profile-name">User</h1>
         <span class="badge badge-blue profile-role" id="profile-role-badge">User</span>
         <div class="profile-level-bar" id="level-section" style="display:none">
@@ -47,6 +47,6 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="js/app.js"></script>
-    <script src="js/profile.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/profile.js"></script>
 </asp:Content>

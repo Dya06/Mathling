@@ -1,12 +1,12 @@
 <%@ Page Title="Learn" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
-    <link rel="stylesheet" href="css/quiz.css">
+    <link rel="stylesheet" href="/css/quiz.css">
 </asp:Content>
 
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
   <nav class="navbar"><div class="navbar-inner">
-    <a href="Default.aspx" class="navbar-brand"><img src="favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
+    <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
     <div class="navbar-nav" id="main-nav"></div>
     <div class="navbar-actions">
       <button class="audio-toggle" id="audio-toggle" aria-label="Toggle audio">
@@ -24,7 +24,7 @@
       <aside class="quiz-sidebar">
         <div class="formula-badge" id="formula-badge">
           <h3 id="formula-name">SF+4</h3>
-          <div class="formula-rule" id="formula-rule">= +5 − 1</div>
+          <div class="formula-rule" id="formula-rule">= +5 âˆ’ 1</div>
         </div>
         <div class="module-nav" id="module-nav"></div>
       </aside>
@@ -36,7 +36,7 @@
     <!-- Feedback Overlay -->
     <div class="feedback-overlay" id="feedback-overlay">
       <div class="feedback-card">
-        <div class="feedback-icon" id="feedback-icon">🎉</div>
+        <div class="feedback-icon" id="feedback-icon">ðŸŽ‰</div>
         <h3 class="feedback-title" id="feedback-title">Correct!</h3>
         <p class="feedback-text" id="feedback-text">Great job!</p>
       </div>
@@ -45,7 +45,7 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="js/app.js"></script>
-    <script src="js/abacus.js"></script>
-    <script src="js/quiz.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/abacus.js"></script>
+    <script src="/js/quiz.js"></script>
 </asp:Content>

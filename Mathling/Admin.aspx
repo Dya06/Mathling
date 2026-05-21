@@ -1,13 +1,13 @@
 <%@ Page Title="Admin Dashboard" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Admin.aspx.cs" Inherits="Mathling.Admin" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/profile.css">
 </asp:Content>
 
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
   <nav class="navbar"><div class="navbar-inner">
-    <a href="Default.aspx" class="navbar-brand"><img src="favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
+    <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
     <div class="navbar-nav" id="main-nav"></div>
     <div class="navbar-actions">
       <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
@@ -19,7 +19,7 @@
   <main class="main">
     <div class="admin-page container">
       <div class="admin-header">
-        <h1>🏠 Admin Dashboard</h1>
+        <h1>ðŸ  Admin Dashboard</h1>
         <p style="color:var(--text-secondary)">Platform overview and management tools</p>
       </div>
 
@@ -29,11 +29,11 @@
       <!-- Charts & Activity -->
       <div class="admin-grid">
         <div class="admin-card">
-          <h3>📊 Weekly Activity</h3>
+          <h3>ðŸ“Š Weekly Activity</h3>
           <div class="activity-chart-wrap"><canvas id="bar-chart"></canvas></div>
         </div>
         <div class="admin-card">
-          <h3>🔔 Recent Activity</h3>
+          <h3>ðŸ”” Recent Activity</h3>
           <div class="activity-list" id="activity-feed"></div>
         </div>
       </div>
@@ -41,7 +41,7 @@
       <!-- Users & Feedback -->
       <div class="admin-grid">
         <div class="admin-card">
-          <h3>👥 User Management</h3>
+          <h3>ðŸ‘¥ User Management</h3>
           <div id="user-list"></div>
           <div style="margin-top:var(--space-md);display:flex;gap:var(--space-sm)">
             <a href="progress.aspx" class="btn btn-secondary btn-sm" style="flex:1">View Reports</a>
@@ -49,27 +49,27 @@
           </div>
         </div>
         <div class="admin-card">
-          <h3>💬 Recent Feedback</h3>
+          <h3>ðŸ’¬ Recent Feedback</h3>
           <div id="feedback-list"></div>
         </div>
       </div>
 
       <!-- System Info -->
       <div class="admin-card" style="margin-top:var(--space-xl)">
-        <h3>⚙️ System Status</h3>
+        <h3>âš™ï¸ System Status</h3>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-lg);margin-top:var(--space-md)">
           <div style="text-align:center">
-            <div style="font-size:2rem;margin-bottom:var(--space-sm)">🟢</div>
+            <div style="font-size:2rem;margin-bottom:var(--space-sm)">ðŸŸ¢</div>
             <div style="font-weight:700;font-size:var(--text-sm)">All Systems Online</div>
             <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Uptime: 99.9%</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:2rem;margin-bottom:var(--space-sm)">📦</div>
+            <div style="font-size:2rem;margin-bottom:var(--space-sm)">ðŸ“¦</div>
             <div style="font-weight:700;font-size:var(--text-sm)">Storage</div>
             <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Using localStorage</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:2rem;margin-bottom:var(--space-sm)">🔐</div>
+            <div style="font-size:2rem;margin-bottom:var(--space-sm)">ðŸ”</div>
             <div style="font-weight:700;font-size:var(--text-sm)">Security</div>
             <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Client-side demo</div>
           </div>
@@ -80,6 +80,6 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="js/app.js"></script>
-    <script src="js/admin.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/admin.js"></script>
 </asp:Content>

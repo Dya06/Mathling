@@ -1,7 +1,7 @@
 <%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Mathling.Login" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
-    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="/css/login.css">
 </asp:Content>
 
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
@@ -9,7 +9,7 @@
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="Default.aspx" class="navbar-brand">
-        <img src="favicon.svg" alt="Mathlings" class="navbar-logo">
+        <img src="/favicon.svg" alt="Mathlings" class="navbar-logo">
         <span class="navbar-title">Math<span>lings</span></span>
       </a>
       <div class="navbar-actions">
@@ -64,19 +64,19 @@
             <label class="form-label">I am a...</label>
             <div class="role-grid">
               <div class="role-option" data-role="student">
-                <span class="role-emoji">🧒</span>
+                <span class="role-emoji">ðŸ§’</span>
                 <span class="role-name">Student</span>
               </div>
               <div class="role-option" data-role="parent">
-                <span class="role-emoji">👩</span>
+                <span class="role-emoji">ðŸ‘©</span>
                 <span class="role-name">Parent</span>
               </div>
               <div class="role-option" data-role="instructor">
-                <span class="role-emoji">👨‍🏫</span>
+                <span class="role-emoji">ðŸ‘¨â€ðŸ«</span>
                 <span class="role-name">Instructor</span>
               </div>
               <div class="role-option" data-role="admin">
-                <span class="role-emoji">🛡️</span>
+                <span class="role-emoji">ðŸ›¡ï¸</span>
                 <span class="role-name">Admin</span>
               </div>
             </div>
@@ -87,7 +87,7 @@
 
       <!-- Demo Accounts -->
       <div class="demo-accounts">
-        <h4>🎮 Try Demo Accounts</h4>
+        <h4>ðŸŽ® Try Demo Accounts</h4>
         <div class="demo-account">
           <span class="demo-role">Student</span>
           <span>student@demo.com</span>
@@ -111,15 +111,15 @@
       </div>
 
       <div class="auth-footer">
-        <a href="Default.aspx">← Back to Home</a>
+        <a href="Default.aspx">â† Back to Home</a>
       </div>
     </div>
   </main>
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="js/app.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/auth.js"></script>
     <script>
       function fillDemo(email, password) {
         // Switch to login tab

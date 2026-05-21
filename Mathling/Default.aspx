@@ -1,7 +1,7 @@
 <%@ Page Title="Home" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Mathling._Default" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
-    <link rel="stylesheet" href="css/home.css" />
+    <link rel="stylesheet" href="/css/home.css" />
 </asp:Content>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
@@ -10,7 +10,7 @@
   <nav class="navbar" id="navbar">
     <div class="navbar-inner">
       <a href="Default.aspx" class="navbar-brand">
-        <img src="favicon.svg" alt="Mathlings" class="navbar-logo" />
+        <img src="/favicon.svg" alt="Mathlings" class="navbar-logo" />
         <span class="navbar-title">Math<span>lings</span></span>
       </a>
       <div class="navbar-nav" id="main-nav"></div>
@@ -34,7 +34,7 @@
       <div class="container">
         <div class="hero-content">
           <div class="hero-text">
-            <div class="hero-badge">&#x1F9D2; For ages 4–11</div>
+            <div class="hero-badge">&#x1F9D2; For ages 4â€“11</div>
             <h1>Make Math <span class="highlight">Magical</span> with the Abacus</h1>
             <p class="hero-desc">Mathlings turns mental arithmetic into an exciting adventure. Watch your child master numbers through interactive abacus exercises, fun quizzes, and rewarding challenges.</p>
             <div class="hero-buttons">
@@ -131,7 +131,7 @@
           <div class="feature-card" data-animate>
             <div class="feature-icon red">&#x1F3AF;</div>
             <h3>Structured Chapters</h3>
-            <p>Step-by-step curriculum from basic counting to advanced mental arithmetic — at your child's pace.</p>
+            <p>Step-by-step curriculum from basic counting to advanced mental arithmetic â€” at your child's pace.</p>
           </div>
           <div class="feature-card" data-animate>
             <div class="feature-icon purple">&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;</div>
@@ -255,7 +255,7 @@
       <div class="footer-grid" style="grid-template-columns: 2fr 1fr 1fr;">
         <div>
           <div class="footer-brand">
-            <img src="favicon.svg" alt="Mathlings" width="32" height="32" />
+            <img src="/favicon.svg" alt="Mathlings" width="32" height="32" />
             <span class="navbar-title">Math<span>lings</span></span>
           </div>
           <p class="footer-desc">Making mental arithmetic fun and accessible for every child through the timeless power of the abacus.</p>
@@ -280,7 +280,7 @@
 </asp:Content>
 
 <asp:Content ID="Scripts" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="js/app.js"></script>
+    <script src="/js/app.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('[data-count]').forEach(function(el) {
