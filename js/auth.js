@@ -121,8 +121,8 @@ const Auth = {
         App.login(user);
         App.showToast(`Welcome back, ${user.name}! 🎉`, 'success');
         setTimeout(() => {
-          const dest = { student: 'quiz.html', parent: 'progress.html', instructor: 'forum.html', admin: 'admin.html' };
-          window.location.href = dest[user.role] || 'index.html';
+          const dest = { student: 'Quiz.aspx', parent: 'Progress.aspx', instructor: 'Forum.aspx', admin: 'Admin.aspx' };
+          window.location.href = dest[user.role] || 'Default.aspx';
         }, 800);
       } else {
         this.showError('login-email', 'Invalid email or password');
@@ -191,8 +191,8 @@ const Auth = {
       App.confetti();
       
       setTimeout(() => {
-        const dest = { student: 'quiz.html', parent: 'progress.html', instructor: 'forum.html', admin: 'admin.html' };
-        window.location.href = dest[role] || 'index.html';
+        const dest = { student: 'Quiz.aspx', parent: 'Progress.aspx', instructor: 'Forum.aspx', admin: 'Admin.aspx' };
+        window.location.href = dest[role] || 'Default.aspx';
       }, 1500);
     });
   },
