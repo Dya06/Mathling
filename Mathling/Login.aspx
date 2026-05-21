@@ -33,33 +33,33 @@
 
       <div class="auth-card" id="auth-form">
         <!-- Login Form -->
-        <form id="login-form">
+        <div id="login-form">
           <div class="form-group">
             <label class="form-label" for="login-email">Email</label>
-            <input type="email" id="login-email" class="form-input" placeholder="Enter your email" required>
+            <input type="email" id="login-email" class="form-input" placeholder="Enter your email" />
           </div>
           <div class="form-group">
             <label class="form-label" for="login-password">Password</label>
-            <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
+            <input type="password" id="login-password" class="form-input" placeholder="Enter your password" />
           </div>
-          <button type="submit" class="btn btn-primary btn-lg" style="width:100%">Log In</button>
-        </form>
+          <button type="button" class="btn btn-primary btn-lg" id="login-submit-btn" style="width:100%">Log In</button>
+        </div>
 
         <!-- Register Form (hidden) -->
-        <form id="register-form" style="display:none">
+        <div id="register-form" style="display:none">
           <div class="form-group">
             <label class="form-label" for="reg-name">Full Name</label>
-            <input type="text" id="reg-name" class="form-input" placeholder="Enter your name" required>
+            <input type="text" id="reg-name" class="form-input" placeholder="Enter your name" />
           </div>
           <div class="form-group">
             <label class="form-label" for="reg-email">Email</label>
-            <input type="email" id="reg-email" class="form-input" placeholder="Enter your email" required>
+            <input type="email" id="reg-email" class="form-input" placeholder="Enter your email" />
           </div>
           <div class="form-group">
             <label class="form-label" for="reg-password">Password</label>
-            <input type="password" id="reg-password" class="form-input" placeholder="Create a password" required>
+            <input type="password" id="reg-password" class="form-input" placeholder="Create a password" />
           </div>
-          <input type="hidden" id="selected-role" value="">
+          <input type="hidden" id="selected-role" value="" />
           <div class="role-selector">
             <label class="form-label">I am a...</label>
             <div class="role-grid">
@@ -81,8 +81,8 @@
               </div>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary btn-lg" style="width:100%">Create Account</button>
-        </form>
+          <button type="button" class="btn btn-primary btn-lg" id="register-submit-btn" style="width:100%">Create Account</button>
+        </div>
       </div>
 
       <!-- Demo Accounts -->

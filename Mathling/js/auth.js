@@ -90,7 +90,7 @@ const Auth = {
 
   setupForm() {
     // Login
-    document.getElementById('login-form')?.addEventListener('submit', (e) => {
+    document.getElementById('login-submit-btn')?.addEventListener('click', (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
@@ -131,7 +131,7 @@ const Auth = {
     });
 
     // Register
-    document.getElementById('register-form')?.addEventListener('submit', (e) => {
+    document.getElementById('register-submit-btn')?.addEventListener('click', (e) => {
       e.preventDefault();
       const name = document.getElementById('reg-name').value.trim();
       const email = document.getElementById('reg-email').value.trim();
