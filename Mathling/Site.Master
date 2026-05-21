@@ -6,7 +6,7 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%: Page.Title %> — Mathlings</title>
+    <title><%: Page.Title %> - Mathlings</title>
 
     <link rel="icon" type="image/svg+xml" href="<%=ResolveUrl("~/favicon.svg")%>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
