@@ -64,19 +64,19 @@
             <label class="form-label">I am a...</label>
             <div class="role-grid">
               <div class="role-option" data-role="student">
-                <span class="role-emoji">ðŸ§’</span>
+                <span class="role-emoji">Ã°Å¸Â§â€™</span>
                 <span class="role-name">Student</span>
               </div>
               <div class="role-option" data-role="parent">
-                <span class="role-emoji">ðŸ‘©</span>
+                <span class="role-emoji">Ã°Å¸â€˜Â©</span>
                 <span class="role-name">Parent</span>
               </div>
               <div class="role-option" data-role="instructor">
-                <span class="role-emoji">ðŸ‘¨â€ðŸ«</span>
+                <span class="role-emoji">Ã°Å¸â€˜Â¨Ã¢â‚¬ÂÃ°Å¸ÂÂ«</span>
                 <span class="role-name">Instructor</span>
               </div>
               <div class="role-option" data-role="admin">
-                <span class="role-emoji">ðŸ›¡ï¸</span>
+                <span class="role-emoji">Ã°Å¸â€ºÂ¡Ã¯Â¸Â</span>
                 <span class="role-name">Admin</span>
               </div>
             </div>
@@ -87,7 +87,7 @@
 
       <!-- Demo Accounts -->
       <div class="demo-accounts">
-        <h4>ðŸŽ® Try Demo Accounts</h4>
+        <h4>Ã°Å¸Å½Â® Try Demo Accounts</h4>
         <div class="demo-account">
           <span class="demo-role">Student</span>
           <span>student@demo.com</span>
@@ -111,15 +111,15 @@
       </div>
 
       <div class="auth-footer">
-        <a href="Default.aspx">â† Back to Home</a>
+        <a href="Default.aspx">Ã¢â€ Â Back to Home</a>
       </div>
     </div>
   </main>
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js"></script>
-    <script src="/js/auth.js"></script>
+    <script src="/js/app.js?v=2"></script>
+    <script src="/js/auth.js?v=2"></script>
     <script>
       function fillDemo(email, password) {
         // Switch to login tab

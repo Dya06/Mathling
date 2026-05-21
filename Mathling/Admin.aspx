@@ -19,7 +19,7 @@
   <main class="main">
     <div class="admin-page container">
       <div class="admin-header">
-        <h1>ðŸ  Admin Dashboard</h1>
+        <h1>Ã°Å¸ÂÂ  Admin Dashboard</h1>
         <p style="color:var(--text-secondary)">Platform overview and management tools</p>
       </div>
 
@@ -29,11 +29,11 @@
       <!-- Charts & Activity -->
       <div class="admin-grid">
         <div class="admin-card">
-          <h3>ðŸ“Š Weekly Activity</h3>
+          <h3>Ã°Å¸â€œÅ  Weekly Activity</h3>
           <div class="activity-chart-wrap"><canvas id="bar-chart"></canvas></div>
         </div>
         <div class="admin-card">
-          <h3>ðŸ”” Recent Activity</h3>
+          <h3>Ã°Å¸â€â€ Recent Activity</h3>
           <div class="activity-list" id="activity-feed"></div>
         </div>
       </div>
@@ -41,7 +41,7 @@
       <!-- Users & Feedback -->
       <div class="admin-grid">
         <div class="admin-card">
-          <h3>ðŸ‘¥ User Management</h3>
+          <h3>Ã°Å¸â€˜Â¥ User Management</h3>
           <div id="user-list"></div>
           <div style="margin-top:var(--space-md);display:flex;gap:var(--space-sm)">
             <a href="progress.aspx" class="btn btn-secondary btn-sm" style="flex:1">View Reports</a>
@@ -49,27 +49,27 @@
           </div>
         </div>
         <div class="admin-card">
-          <h3>ðŸ’¬ Recent Feedback</h3>
+          <h3>Ã°Å¸â€™Â¬ Recent Feedback</h3>
           <div id="feedback-list"></div>
         </div>
       </div>
 
       <!-- System Info -->
       <div class="admin-card" style="margin-top:var(--space-xl)">
-        <h3>âš™ï¸ System Status</h3>
+        <h3>Ã¢Å¡â„¢Ã¯Â¸Â System Status</h3>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-lg);margin-top:var(--space-md)">
           <div style="text-align:center">
-            <div style="font-size:2rem;margin-bottom:var(--space-sm)">ðŸŸ¢</div>
+            <div style="font-size:2rem;margin-bottom:var(--space-sm)">Ã°Å¸Å¸Â¢</div>
             <div style="font-weight:700;font-size:var(--text-sm)">All Systems Online</div>
             <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Uptime: 99.9%</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:2rem;margin-bottom:var(--space-sm)">ðŸ“¦</div>
+            <div style="font-size:2rem;margin-bottom:var(--space-sm)">Ã°Å¸â€œÂ¦</div>
             <div style="font-weight:700;font-size:var(--text-sm)">Storage</div>
             <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Using localStorage</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:2rem;margin-bottom:var(--space-sm)">ðŸ”</div>
+            <div style="font-size:2rem;margin-bottom:var(--space-sm)">Ã°Å¸â€Â</div>
             <div style="font-weight:700;font-size:var(--text-sm)">Security</div>
             <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Client-side demo</div>
           </div>
@@ -80,6 +80,6 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js"></script>
+    <script src="/js/app.js?v=2"></script>
     <script src="/js/admin.js"></script>
 </asp:Content>
