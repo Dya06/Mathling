@@ -1,4 +1,4 @@
-<%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Mathling.Login" %>
+﻿<%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Mathling.Login" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/login.css">
@@ -13,7 +13,7 @@
         <span class="navbar-title">Math<span>lings</span></span>
       </a>
       <div class="navbar-actions">
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
       </div>
     </div>
   </nav>
@@ -27,8 +27,8 @@
 
       <!-- Tabs -->
       <div class="auth-tabs">
-        <button class="auth-tab active" data-mode="login">Log In</button>
-        <button class="auth-tab" data-mode="register">Register</button>
+        <button type="button" class="auth-tab active" data-mode="login">Log In</button>
+        <button type="button" class="auth-tab" data-mode="register">Register</button>
       </div>
 
       <div class="auth-card" id="auth-form">
@@ -64,19 +64,19 @@
             <label class="form-label">I am a...</label>
             <div class="role-grid">
               <div class="role-option" data-role="student">
-                <span class="role-emoji">Ã°Å¸Â§â€™</span>
+                <span class="role-emoji">🧒</span>
                 <span class="role-name">Student</span>
               </div>
               <div class="role-option" data-role="parent">
-                <span class="role-emoji">Ã°Å¸â€˜Â©</span>
+                <span class="role-emoji">👩</span>
                 <span class="role-name">Parent</span>
               </div>
               <div class="role-option" data-role="instructor">
-                <span class="role-emoji">Ã°Å¸â€˜Â¨Ã¢â‚¬ÂÃ°Å¸ÂÂ«</span>
+                <span class="role-emoji">👨‍🏫</span>
                 <span class="role-name">Instructor</span>
               </div>
               <div class="role-option" data-role="admin">
-                <span class="role-emoji">Ã°Å¸â€ºÂ¡Ã¯Â¸Â</span>
+                <span class="role-emoji">🛡️</span>
                 <span class="role-name">Admin</span>
               </div>
             </div>
@@ -87,39 +87,39 @@
 
       <!-- Demo Accounts -->
       <div class="demo-accounts">
-        <h4>Ã°Å¸Å½Â® Try Demo Accounts</h4>
+        <h4>🎮 Try Demo Accounts</h4>
         <div class="demo-account">
           <span class="demo-role">Student</span>
           <span>student@demo.com</span>
-          <button class="demo-fill" onclick="fillDemo('student@demo.com','demo123')">Fill</button>
+          <button type="button" class="demo-fill" onclick="fillDemo('student@demo.com','demo123')">Fill</button>
         </div>
         <div class="demo-account">
           <span class="demo-role">Parent</span>
           <span>parent@demo.com</span>
-          <button class="demo-fill" onclick="fillDemo('parent@demo.com','demo123')">Fill</button>
+          <button type="button" class="demo-fill" onclick="fillDemo('parent@demo.com','demo123')">Fill</button>
         </div>
         <div class="demo-account">
           <span class="demo-role">Instructor</span>
           <span>instructor@demo.com</span>
-          <button class="demo-fill" onclick="fillDemo('instructor@demo.com','demo123')">Fill</button>
+          <button type="button" class="demo-fill" onclick="fillDemo('instructor@demo.com','demo123')">Fill</button>
         </div>
         <div class="demo-account">
           <span class="demo-role">Admin</span>
           <span>admin@demo.com</span>
-          <button class="demo-fill" onclick="fillDemo('admin@demo.com','demo123')">Fill</button>
+          <button type="button" class="demo-fill" onclick="fillDemo('admin@demo.com','demo123')">Fill</button>
         </div>
       </div>
 
       <div class="auth-footer">
-        <a href="Default.aspx">Ã¢â€ Â Back to Home</a>
+        <a href="Default.aspx">← Back to Home</a>
       </div>
     </div>
   </main>
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=2"></script>
-    <script src="/js/auth.js?v=2"></script>
+    <script src="/js/app.js?v=3"></script>
+    <script src="/js/auth.js?v=3"></script>
     <script>
       function fillDemo(email, password) {
         // Switch to login tab

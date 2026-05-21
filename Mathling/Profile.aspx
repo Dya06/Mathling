@@ -1,4 +1,4 @@
-<%@ Page Title="Profile" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Profile.aspx.cs" Inherits="Mathling.Profile" %>
+﻿<%@ Page Title="Profile" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Profile.aspx.cs" Inherits="Mathling.Profile" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/profile.css">
@@ -9,8 +9,8 @@
     <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
     <div class="navbar-nav" id="main-nav"></div>
     <div class="navbar-actions">
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+      <button type="button" class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
     </div>
   </div></nav>
   <div class="mobile-nav" id="mobile-nav"></div>
@@ -18,7 +18,7 @@
   <main class="main">
     <section class="profile-hero">
       <div class="container">
-        <div class="profile-avatar" id="profile-avatar">Ã°Å¸â€˜Â¤</div>
+        <div class="profile-avatar" id="profile-avatar">👤</div>
         <h1 class="profile-name" id="profile-name">User</h1>
         <span class="badge badge-blue profile-role" id="profile-role-badge">User</span>
         <div class="profile-level-bar" id="level-section" style="display:none">
@@ -38,7 +38,7 @@
       </div>
     </section>
     <div style="text-align:center;padding-bottom:var(--space-2xl)">
-      <button class="btn btn-ghost" onclick="App.logout()" style="color:var(--accent-red)">
+      <button type="button" class="btn btn-ghost" onclick="App.logout()" style="color:var(--accent-red)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Log Out
       </button>
@@ -47,6 +47,6 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=2"></script>
-    <script src="/js/profile.js?v=2"></script>
+    <script src="/js/app.js?v=3"></script>
+    <script src="/js/profile.js?v=3"></script>
 </asp:Content>

@@ -1,4 +1,4 @@
-<%@ Page Title="Forum" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Forum.aspx.cs" Inherits="Mathling.Forum" %>
+﻿<%@ Page Title="Forum" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Forum.aspx.cs" Inherits="Mathling.Forum" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/forum.css">
@@ -9,8 +9,8 @@
     <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
     <div class="navbar-nav" id="main-nav"></div>
     <div class="navbar-actions">
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+      <button type="button" class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
     </div>
   </div></nav>
   <div class="mobile-nav" id="mobile-nav"></div>
@@ -19,15 +19,15 @@
     <div class="forum-page container">
       <div class="forum-header">
         <div>
-          <h1>Ã°Å¸â€™Â¬ Community Forum</h1>
+          <h1>💬 Community Forum</h1>
           <p style="color:var(--text-secondary)">Connect with instructors and other parents</p>
         </div>
-        <button class="btn btn-primary" id="new-thread-btn">+ New Thread</button>
+        <button type="button" class="btn btn-primary" id="new-thread-btn">+ New Thread</button>
       </div>
 
       <!-- New Thread Form -->
       <div class="new-thread-form card" id="new-thread-form" style="margin-bottom:var(--space-xl)">
-        <h3 style="margin-bottom:var(--space-lg)">Ã°Å¸â€œÂ Create New Thread</h3>
+        <h3 style="margin-bottom:var(--space-lg)">📝 Create New Thread</h3>
         <div class="form-group">
           <label class="form-label" for="thread-title">Title</label>
           <input type="text" id="thread-title" class="form-input" placeholder="Thread title...">
@@ -44,15 +44,15 @@
           <label class="form-label" for="thread-content">Content</label>
           <textarea id="thread-content" class="form-input" placeholder="Write your post..." rows="4"></textarea>
         </div>
-        <button class="btn btn-accent-green" id="submit-thread">Post Thread</button>
+        <button type="button" class="btn btn-accent-green" id="submit-thread">Post Thread</button>
       </div>
 
       <!-- Filters -->
       <div class="forum-filters">
-        <button class="tag forum-filter active" data-filter="all">All</button>
-        <button class="tag forum-filter" data-filter="General">Ã°Å¸â€™Â¡ General</button>
-        <button class="tag forum-filter" data-filter="Tips">Ã°Å¸Å½Â¯ Tips</button>
-        <button class="tag forum-filter" data-filter="Questions">Ã¢Ââ€œ Questions</button>
+        <button type="button" class="tag forum-filter active" data-filter="all">All</button>
+        <button type="button" class="tag forum-filter" data-filter="General">💡 General</button>
+        <button type="button" class="tag forum-filter" data-filter="Tips">🎯 Tips</button>
+        <button type="button" class="tag forum-filter" data-filter="Questions">❓ Questions</button>
       </div>
 
       <!-- Threads -->
@@ -63,6 +63,6 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=2"></script>
+    <script src="/js/app.js?v=3"></script>
     <script src="/js/forum.js"></script>
 </asp:Content>

@@ -1,4 +1,4 @@
-<%@ Page Title="Home" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Mathling._Default" %>
+﻿<%@ Page Title="Home" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Mathling._Default" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/home.css" />
@@ -15,12 +15,12 @@
       </a>
       <div class="navbar-nav" id="main-nav"></div>
       <div class="navbar-actions">
-        <button class="audio-toggle" id="audio-toggle" aria-label="Toggle audio">
+        <button type="button" class="audio-toggle" id="audio-toggle" aria-label="Toggle audio">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
         </button>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
         <a href="Login.aspx" class="btn btn-primary btn-sm" id="nav-auth-btn">Get Started</a>
-        <button class="hamburger" id="hamburger" aria-label="Menu">
+        <button type="button" class="hamburger" id="hamburger" aria-label="Menu">
           <div class="hamburger-lines"><span></span><span></span><span></span></div>
         </button>
       </div>
@@ -34,7 +34,7 @@
       <div class="container">
         <div class="hero-content">
           <div class="hero-text">
-            <div class="hero-badge">&#x1F9D2; For ages 4Ã¢â‚¬â€œ11</div>
+            <div class="hero-badge">&#x1F9D2; For ages 4–11</div>
             <h1>Make Math <span class="highlight">Magical</span> with the Abacus</h1>
             <p class="hero-desc">Mathlings turns mental arithmetic into an exciting adventure. Watch your child master numbers through interactive abacus exercises, fun quizzes, and rewarding challenges.</p>
             <div class="hero-buttons">
@@ -131,7 +131,7 @@
           <div class="feature-card" data-animate>
             <div class="feature-icon red">&#x1F3AF;</div>
             <h3>Structured Chapters</h3>
-            <p>Step-by-step curriculum from basic counting to advanced mental arithmetic Ã¢â‚¬â€ at your child's pace.</p>
+            <p>Step-by-step curriculum from basic counting to advanced mental arithmetic — at your child's pace.</p>
           </div>
           <div class="feature-card" data-animate>
             <div class="feature-icon purple">&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;</div>
@@ -280,7 +280,7 @@
 </asp:Content>
 
 <asp:Content ID="Scripts" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=2"></script>
+    <script src="/js/app.js?v=3"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('[data-count]').forEach(function(el) {

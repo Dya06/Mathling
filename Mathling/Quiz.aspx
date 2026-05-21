@@ -1,4 +1,4 @@
-<%@ Page Title="Learn" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
+﻿<%@ Page Title="Learn" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/quiz.css">
@@ -9,11 +9,11 @@
     <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
     <div class="navbar-nav" id="main-nav"></div>
     <div class="navbar-actions">
-      <button class="audio-toggle" id="audio-toggle" aria-label="Toggle audio">
+      <button type="button" class="audio-toggle" id="audio-toggle" aria-label="Toggle audio">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
       </button>
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+      <button type="button" class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
     </div>
   </div></nav>
   <div class="mobile-nav" id="mobile-nav"></div>
@@ -24,7 +24,7 @@
       <aside class="quiz-sidebar">
         <div class="formula-badge" id="formula-badge">
           <h3 id="formula-name">SF+4</h3>
-          <div class="formula-rule" id="formula-rule">= +5 Ã¢Ë†â€™ 1</div>
+          <div class="formula-rule" id="formula-rule">= +5 − 1</div>
         </div>
         <div class="module-nav" id="module-nav"></div>
       </aside>
@@ -36,7 +36,7 @@
     <!-- Feedback Overlay -->
     <div class="feedback-overlay" id="feedback-overlay">
       <div class="feedback-card">
-        <div class="feedback-icon" id="feedback-icon">Ã°Å¸Å½â€°</div>
+        <div class="feedback-icon" id="feedback-icon">🎉</div>
         <h3 class="feedback-title" id="feedback-title">Correct!</h3>
         <p class="feedback-text" id="feedback-text">Great job!</p>
       </div>
@@ -45,7 +45,7 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=2"></script>
+    <script src="/js/app.js?v=3"></script>
     <script src="/js/abacus.js"></script>
     <script src="/js/quiz.js"></script>
 </asp:Content>

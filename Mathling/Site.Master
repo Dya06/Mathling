@@ -1,4 +1,4 @@
-<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Mathling.SiteMaster" %>
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Mathling.SiteMaster" %>
 
 <!DOCTYPE html>
 
@@ -6,17 +6,17 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%: Page.Title %> â€” Mathlings</title>
+    <title><%: Page.Title %> — Mathlings</title>
 
     <link rel="icon" type="image/svg+xml" href="<%=ResolveUrl("~/favicon.svg")%>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    <link rel="stylesheet" href="<%=ResolveUrl("~/css/variables.css?v=2")%>" />
-    <link rel="stylesheet" href="<%=ResolveUrl("~/css/base.css?v=2")%>" />
-    <link rel="stylesheet" href="<%=ResolveUrl("~/css/components.css?v=2")%>" />
-    <link rel="stylesheet" href="<%=ResolveUrl("~/css/layout.css?v=2")%>" />
+    <link rel="stylesheet" href="<%=ResolveUrl("~/css/")variables.css?v=3" />
+    <link rel="stylesheet" href="<%=ResolveUrl("~/css/")base.css?v=3" />
+    <link rel="stylesheet" href="<%=ResolveUrl("~/css/")components.css?v=3" />
+    <link rel="stylesheet" href="<%=ResolveUrl("~/css/")layout.css?v=3" />
 
     <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
 </head>
