@@ -116,7 +116,7 @@ const App = {
   // ---- Navigation ----
   getNavItems() {
     const role = this.state.currentUser?.role;
-    const base = [{ label: 'Home', href: 'index.html', icon: 'home' }];
+    const base = [{ label: 'Home', href: 'Default.aspx', icon: 'home' }];
     
     /*
      * BACKEND TODO:
@@ -125,25 +125,25 @@ const App = {
      */
     const roleNav = {
       student: [
-        { label: 'Learn', href: 'quiz.html', icon: 'book' },
-        { label: 'Progress', href: 'progress.html', icon: 'chart' },
-        { label: 'Profile', href: 'profile.html', icon: 'user' },
+        { label: 'Learn', href: 'Quiz.aspx', icon: 'book' },
+        { label: 'Progress', href: 'Progress.aspx', icon: 'chart' },
+        { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
       parent: [
-        { label: 'Progress', href: 'progress.html', icon: 'chart' },
-        { label: 'Forum', href: 'forum.html', icon: 'forum' },
-        { label: 'Profile', href: 'profile.html', icon: 'user' },
+        { label: 'Progress', href: 'Progress.aspx', icon: 'chart' },
+        { label: 'Forum', href: 'Forum.aspx', icon: 'forum' },
+        { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
       instructor: [
-        { label: 'Forum', href: 'forum.html', icon: 'forum' },
-        { label: 'Moderate', href: 'moderate.html', icon: 'shield' },
-        { label: 'Profile', href: 'profile.html', icon: 'user' },
+        { label: 'Forum', href: 'Forum.aspx', icon: 'forum' },
+        { label: 'Moderate', href: 'Moderate.aspx', icon: 'shield' },
+        { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
       admin: [
-        { label: 'Dashboard', href: 'admin.html', icon: 'dashboard' },
-        { label: 'Moderate', href: 'moderate.html', icon: 'shield' },
-        { label: 'Progress', href: 'progress.html', icon: 'chart' },
-        { label: 'Profile', href: 'profile.html', icon: 'user' },
+        { label: 'Dashboard', href: 'Admin.aspx', icon: 'dashboard' },
+        { label: 'Moderate', href: 'Moderate.aspx', icon: 'shield' },
+        { label: 'Progress', href: 'Progress.aspx', icon: 'chart' },
+        { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
     };
 
@@ -171,7 +171,7 @@ const App = {
     if (!nav) return;
 
     const items = this.getNavItems();
-    const current = window.location.pathname.split('/').pop() || 'index.html';
+    const current = window.location.pathname.split('/').pop() || 'Default.aspx';
 
     let html = items.map(item => 
       `<a href="${item.href}" class="nav-link ${current === item.href ? 'active' : ''}">${this.getIcon(item.icon)}<span>${item.label}</span></a>`
@@ -187,14 +187,14 @@ const App = {
       if (this.state.currentUser) {
         mobileHtml += `<a href="#" class="nav-link" onclick="App.logout(); return false;">${this.getIcon('logout')}<span>Logout</span></a>`;
       } else {
-        mobileHtml += `<a href="login.html" class="nav-link">${this.getIcon('login')}<span>Login</span></a>`;
+        mobileHtml += `<a href="Login.aspx" class="nav-link">${this.getIcon('login')}<span>Login</span></a>`;
       }
       mobileNav.innerHTML = mobileHtml;
     }
   },
 
   setupNav() {
-    const current = window.location.pathname.split('/').pop() || 'index.html';
+    const current = window.location.pathname.split('/').pop() || 'Default.aspx';
     document.querySelectorAll('.nav-link').forEach(link => {
       if (link.getAttribute('href') === current) link.classList.add('active');
     });
@@ -230,7 +230,7 @@ const App = {
   logout() {
     this.state.currentUser = null;
     localStorage.removeItem('mathlings-user');
-    window.location.href = 'index.html';
+    window.location.href = 'Default.aspx';
   },
 
   /*
@@ -240,11 +240,11 @@ const App = {
    */
   requireAuth(allowedRoles = []) {
     if (!this.state.currentUser) {
-      window.location.href = 'login.html';
+      window.location.href = 'Login.aspx';
       return false;
     }
     if (allowedRoles.length > 0 && !allowedRoles.includes(this.state.currentUser.role)) {
-      window.location.href = 'index.html';
+      window.location.href = 'Default.aspx';
       return false;
     }
     return true;

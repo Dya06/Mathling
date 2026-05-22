@@ -90,7 +90,7 @@ const Auth = {
 
   setupForm() {
     // Login
-    document.getElementById('login-form')?.addEventListener('submit', (e) => {
+    document.getElementById('login-submit-btn')?.addEventListener('click', (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
@@ -121,8 +121,8 @@ const Auth = {
         App.login(user);
         App.showToast(`Welcome back, ${user.name}! 🎉`, 'success');
         setTimeout(() => {
-          const dest = { student: 'quiz.html', parent: 'progress.html', instructor: 'forum.html', admin: 'admin.html' };
-          window.location.href = dest[user.role] || 'index.html';
+          const dest = { student: 'Quiz.aspx', parent: 'Progress.aspx', instructor: 'Forum.aspx', admin: 'Admin.aspx' };
+          window.location.href = dest[user.role] || 'Default.aspx';
         }, 800);
       } else {
         this.showError('login-email', 'Invalid email or password');
@@ -131,7 +131,7 @@ const Auth = {
     });
 
     // Register
-    document.getElementById('register-form')?.addEventListener('submit', (e) => {
+    document.getElementById('register-submit-btn')?.addEventListener('click', (e) => {
       e.preventDefault();
       const name = document.getElementById('reg-name').value.trim();
       const email = document.getElementById('reg-email').value.trim();
@@ -191,8 +191,8 @@ const Auth = {
       App.confetti();
       
       setTimeout(() => {
-        const dest = { student: 'quiz.html', parent: 'progress.html', instructor: 'forum.html', admin: 'admin.html' };
-        window.location.href = dest[role] || 'index.html';
+        const dest = { student: 'Quiz.aspx', parent: 'Progress.aspx', instructor: 'Forum.aspx', admin: 'Admin.aspx' };
+        window.location.href = dest[role] || 'Default.aspx';
       }, 1500);
     });
   },

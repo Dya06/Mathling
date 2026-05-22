@@ -158,7 +158,7 @@ const Profile = {
             <div class="stat-card"><div class="stat-value">${totalQuizzes}</div><div class="stat-label">Quizzes Taken</div></div>
             <div class="stat-card"><div class="stat-value">${avgScore}%</div><div class="stat-label">Avg Score</div></div>
           </div>
-          <a href="progress.html" class="btn btn-accent-blue btn-sm" style="width:100%;margin-top:var(--space-lg)">View Full Progress →</a>
+          <a href="Progress.aspx" class="btn btn-accent-blue btn-sm" style="width:100%;margin-top:var(--space-lg)">View Full Progress →</a>
         </div>
       </div>`;
   },
@@ -190,8 +190,8 @@ const Profile = {
         </div>
         <div>
           <h3 class="profile-section-title">🔗 Quick Links</h3>
-          <a href="forum.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:var(--space-sm)">Community Forum</a>
-          <a href="moderate.html" class="btn btn-secondary btn-sm" style="width:100%">Submit Content</a>
+          <a href="Forum.aspx" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:var(--space-sm)">Community Forum</a>
+          <a href="Moderate.aspx" class="btn btn-secondary btn-sm" style="width:100%">Submit Content</a>
         </div>
       </div>`;
   },
@@ -216,9 +216,9 @@ const Profile = {
         </div>
         <div>
           <h3 class="profile-section-title">🔗 Admin Tools</h3>
-          <a href="admin.html" class="btn btn-accent-blue btn-sm" style="width:100%;margin-bottom:var(--space-sm)">Admin Dashboard</a>
-          <a href="moderate.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:var(--space-sm)">Content Moderation</a>
-          <a href="progress.html" class="btn btn-secondary btn-sm" style="width:100%">View Reports</a>
+          <a href="Admin.aspx" class="btn btn-accent-blue btn-sm" style="width:100%;margin-bottom:var(--space-sm)">Admin Dashboard</a>
+          <a href="Moderate.aspx" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:var(--space-sm)">Content Moderation</a>
+          <a href="Progress.aspx" class="btn btn-secondary btn-sm" style="width:100%">View Reports</a>
         </div>
       </div>`;
   },

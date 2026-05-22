@@ -1,27 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile — Mathlings</title>
-  <meta name="description" content="View your Mathlings profile, achievements, and learning progress.">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/profile.css">
-</head>
-<body>
+﻿<%@ Page Title="Profile" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Profile.aspx.cs" Inherits="Mathling.Profile" %>
+
+<asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
+    <link rel="stylesheet" href="/css/profile.css">
+</asp:Content>
+
+<asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
   <nav class="navbar"><div class="navbar-inner">
-    <a href="index.html" class="navbar-brand"><img src="favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
+    <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
     <div class="navbar-nav" id="main-nav"></div>
     <div class="navbar-actions">
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+      <button type="button" class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
     </div>
   </div></nav>
   <div class="mobile-nav" id="mobile-nav"></div>
@@ -49,14 +38,15 @@
       </div>
     </section>
     <div style="text-align:center;padding-bottom:var(--space-2xl)">
-      <button class="btn btn-ghost" onclick="App.logout()" style="color:var(--accent-red)">
+      <button type="button" class="btn btn-ghost" onclick="App.logout()" style="color:var(--accent-red)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Log Out
       </button>
     </div>
   </main>
+</asp:Content>
 
-  <script src="js/app.js"></script>
-  <script src="js/profile.js"></script>
-</body>
-</html>
+<asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
+    <script src="/js/app.js?v=3"></script>
+    <script src="/js/profile.js?v=3"></script>
+</asp:Content>

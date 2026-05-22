@@ -121,15 +121,13 @@
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="HtmlPage1.html" />
-    <Content Include="index.html" />
-    <Content Include="login.html" />
-    <Content Include="quiz.html" />
-    <Content Include="profile.html" />
-    <Content Include="progress.html" />
-    <Content Include="forum.html" />
-    <Content Include="moderate.html" />
-    <Content Include="admin.html" />
+    <Content Include="Login.aspx" />
+    <Content Include="Quiz.aspx" />
+    <Content Include="Profile.aspx" />
+    <Content Include="Progress.aspx" />
+    <Content Include="Forum.aspx" />
+    <Content Include="Moderate.aspx" />
+    <Content Include="Admin.aspx" />
     <Content Include="favicon.svg" />
     <Content Include="css\variables.css" />
     <Content Include="css\base.css" />
@@ -236,6 +234,34 @@
     </Compile>
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quiz.aspx.cs">
+      <DependentUpon>Quiz.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Profile.aspx.cs">
+      <DependentUpon>Profile.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Progress.aspx.cs">
+      <DependentUpon>Progress.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Forum.aspx.cs">
+      <DependentUpon>Forum.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Moderate.aspx.cs">
+      <DependentUpon>Moderate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin.aspx.cs">
+      <DependentUpon>Admin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
