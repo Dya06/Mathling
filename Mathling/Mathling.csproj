@@ -120,6 +120,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
+    <Content Include=".gitignore" />
     <Content Include="Global.asax" />
     <Content Include="Login.aspx" />
     <Content Include="Quiz.aspx" />
@@ -290,7 +291,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Content Include="App_Data\MathlingDB_Schema.sql" />
   </ItemGroup>
   <ItemGroup>

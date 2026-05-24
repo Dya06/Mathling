@@ -6,6 +6,10 @@
 -- =============================================
 -- USERS
 -- =============================================
+
+CREATE DATABASE MathlingDB;
+USE MathlingDB;
+
 CREATE TABLE [dbo].[Users] (
     [Id]            INT IDENTITY(1,1) PRIMARY KEY,
     [Name]          NVARCHAR(100)   NOT NULL,
@@ -255,17 +259,40 @@ CREATE TABLE [dbo].[ParentStudentLinks] (
 );
 
 -- =============================================
--- SEED DATA
+-- SEED DATA (FIXED WITH HASHING)
 -- =============================================
 
 INSERT INTO [dbo].[Users]
 ([Name], [Email], [PasswordHash], [Role], [Avatar])
 VALUES
-    ('Alex Student',      'student@demo.com',    'demo123', 'student',    'student'),
-    ('Sarah Parent',      'parent@demo.com',     'demo123', 'parent',     'parent'),
-    ('Robert Instructor', 'instructor@demo.com', 'demo123', 'instructor', 'instructor'),
-    ('Admin User',        'admin@demo.com',      'demo123', 'admin',      'admin');
-
+(
+    'Alex Student',
+    'student@demo.com',
+    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2),
+    'student',
+    'student'
+),
+(
+    'Sarah Parent',
+    'parent@demo.com',
+    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2),
+    'parent',
+    'parent'
+),
+(
+    'Robert Instructor',
+    'instructor@demo.com',
+    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2),
+    'instructor',
+    'instructor'
+),
+(
+    'Admin User',
+    'admin@demo.com',
+    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2),
+    'admin',
+    'admin'
+);
 INSERT INTO [dbo].[Formulas]
 ([Name], [Rule], [Description], [SortOrder])
 VALUES
