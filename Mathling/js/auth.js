@@ -3,38 +3,8 @@ const Auth = {
         const form = document.getElementById('auth-form');
         if (!form) return;
 
-        this.setupTabs();
         this.setupForm();
         this.setupRoleSelector();
-    },
-
-    setupTabs() {
-        document.querySelectorAll('.auth-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const mode = tab.dataset.mode;
-
-                document.querySelectorAll('.auth-tab')
-                    .forEach(t => t.classList.remove('active'));
-
-                tab.classList.add('active');
-
-                document.getElementById('login-form').style.display =
-                    mode === 'login' ? 'block' : 'none';
-
-                document.getElementById('register-form').style.display =
-                    mode === 'register' ? 'block' : 'none';
-
-                document.getElementById('auth-title').textContent =
-                    mode === 'login'
-                        ? 'Welcome Back!'
-                        : 'Join Mathlings!';
-
-                document.getElementById('auth-subtitle').textContent =
-                    mode === 'login'
-                        ? 'Log in to continue your learning adventure'
-                        : 'Create your account and start learning';
-            });
-        });
     },
 
     setupRoleSelector() {

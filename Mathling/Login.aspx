@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Mathling.Login" %>
+<%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Mathling.Login" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/login.css">
@@ -25,11 +25,7 @@
         <p id="auth-subtitle">Log in to continue your learning adventure</p>
       </div>
 
-      <!-- Tabs -->
-      <div class="auth-tabs">
-        <button type="button" class="auth-tab active" data-mode="login">Log In</button>
-        <button type="button" class="auth-tab" data-mode="register">Register</button>
-      </div>
+
 
       <div class="auth-card" id="auth-form">
         <!-- Login Form -->
@@ -45,44 +41,7 @@
           <button type="button" class="btn btn-primary btn-lg" id="login-submit-btn" style="width:100%">Log In</button>
         </div>
 
-        <!-- Register Form (hidden) -->
-        <div id="register-form" style="display:none">
-          <div class="form-group">
-            <label class="form-label" for="reg-name">Full Name</label>
-            <input type="text" id="reg-name" class="form-input" placeholder="Enter your name" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-email">Email</label>
-            <input type="email" id="reg-email" class="form-input" placeholder="Enter your email" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-password">Password</label>
-            <input type="password" id="reg-password" class="form-input" placeholder="Create a password" />
-          </div>
-          <input type="hidden" id="selected-role" value="" />
-          <div class="role-selector">
-            <label class="form-label">I am a...</label>
-            <div class="role-grid">
-              <div class="role-option" data-role="student">
-                <span class="role-emoji">🧒</span>
-                <span class="role-name">Student</span>
-              </div>
-              <div class="role-option" data-role="parent">
-                <span class="role-emoji">👩</span>
-                <span class="role-name">Parent</span>
-              </div>
-              <div class="role-option" data-role="instructor">
-                <span class="role-emoji">👨‍🏫</span>
-                <span class="role-name">Instructor</span>
-              </div>
-              <div class="role-option" data-role="admin">
-                <span class="role-emoji">🛡️</span>
-                <span class="role-name">Admin</span>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary btn-lg" id="register-submit-btn" style="width:100%">Create Account</button>
-        </div>
+
       </div>
 
       <!-- Demo Accounts -->
@@ -111,6 +70,8 @@
       </div>
 
       <div class="auth-footer">
+        <p>Don't have an account? <a href="Register.aspx" style="color:var(--primary);font-weight:600;text-decoration:none;">Create one</a></p>
+        <br>
         <a href="Default.aspx">← Back to Home</a>
       </div>
     </div>
@@ -122,8 +83,6 @@
     <script src="/js/auth.js?v=4"></script>
     <script>
       function fillDemo(email, password) {
-        // Switch to login tab
-        document.querySelector('[data-mode="login"]').click();
         document.getElementById('login-email').value = email;
         document.getElementById('login-password').value = password;
         App.showToast('Demo credentials filled! Click Log In.', 'info');

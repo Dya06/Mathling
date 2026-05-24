@@ -123,6 +123,7 @@
     <Content Include=".gitignore" />
     <Content Include="Global.asax" />
     <Content Include="Login.aspx" />
+    <Content Include="Register.aspx" />
     <Content Include="Quiz.aspx" />
     <Content Include="Profile.aspx" />
     <Content Include="Progress.aspx" />
@@ -238,6 +239,10 @@
     </Compile>
     <Compile Include="Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Register.aspx.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Quiz.aspx.cs">
