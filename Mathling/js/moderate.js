@@ -27,20 +27,32 @@
 
 const Moderate = {
   statusFilter: 'all',
+  subsData: [],
 
-  init() {
+  async init() {
     if (!App.requireAuth(['instructor', 'admin'])) return;
+    await this.fetchSubs();
     this.render();
     this.setupFilters();
     this.setupSubmitForm();
   },
 
-  getSubs() {
-    /*
-     * BACKEND TODO:
-     * Replace with: return await fetch('/api/submissions').then(r => r.json());
-     */
-    return JSON.parse(localStorage.getItem('mathlings-submissions') || '[]');
+  async fetchSubs() {
+    try {
+      const response = await fetch('Moderate.aspx/GetSubmissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          userId: App.state.currentUser.id, 
+          role: App.state.currentUser.role 
+        })
+      });
+      const result = await response.json();
+      this.subsData = result.d || [];
+    } catch (e) {
+      console.error('Failed to fetch submissions', e);
+      this.subsData = [];
+    }
   },
 
   render() {
@@ -52,7 +64,7 @@ const Moderate = {
   },
 
   renderList() {
-    const subs = this.getSubs().filter(s => this.statusFilter === 'all' || s.status === this.statusFilter);
+    const subs = this.subsData.filter(s => this.statusFilter === 'all' || s.status === this.statusFilter);
     const isAdmin = App.state.currentUser.role === 'admin';
     const list = document.getElementById('review-list');
 
@@ -79,31 +91,28 @@ const Moderate = {
     `).join('') : '<div class="empty-state"><h3>No submissions</h3><p>Nothing to review here.</p></div>';
   },
 
-  updateStatus(id, status, reason) {
-    /*
-     * BACKEND TODO:
-     * Replace with:
-     *   await fetch(`/api/submissions/${id}`, {
-     *     method: 'PUT',
-     *     headers: { 'Content-Type': 'application/json' },
-     *     body: JSON.stringify({ status, reason })
-     *   });
-     *   // Refresh list from server
-     */
-    const subs = this.getSubs();
-    const s = subs.find(s => s.id === id);
-    if (s) { s.status = status; if (reason) s.reason = reason; }
-    localStorage.setItem('mathlings-submissions', JSON.stringify(subs));
-    this.renderList();
-    App.showToast(`Submission ${status}! ${status === 'approved' ? '✅' : '❌'}`, status === 'approved' ? 'success' : 'error');
+  async updateStatus(id, status, reason = '') {
+    try {
+      const response = await fetch('Moderate.aspx/UpdateStatus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId: id, status: status, reason: reason })
+      });
+      const result = await response.json();
+      if (result.d) {
+        App.showToast(`Submission ${status}! ${status === 'approved' ? '✅' : '❌'}`, status === 'approved' ? 'success' : 'error');
+        await this.fetchSubs();
+        this.renderList();
+      } else {
+        App.showToast('Failed to update status', 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      App.showToast('Error updating status', 'error');
+    }
   },
 
   rejectPrompt(id) {
-    /*
-     * BACKEND TODO:
-     * Consider replacing prompt() with a proper modal dialog
-     * that allows the admin to write a detailed rejection reason.
-     */
     const reason = prompt('Reason for rejection:');
     if (reason) this.updateStatus(id, 'rejected', reason);
   },
@@ -120,33 +129,37 @@ const Moderate = {
   },
 
   setupSubmitForm() {
-    document.getElementById('submit-content-btn')?.addEventListener('click', () => {
+    document.getElementById('submit-content-btn')?.addEventListener('click', async () => {
       const title = document.getElementById('sub-title').value.trim();
       const chapter = document.getElementById('sub-chapter').value;
       const difficulty = document.getElementById('sub-difficulty').value;
       if (!title) { App.showToast('Please enter a title', 'error'); return; }
 
-      /*
-       * BACKEND TODO:
-       * Replace with:
-       *   await fetch('/api/submissions', {
-       *     method: 'POST',
-       *     headers: { 'Content-Type': 'application/json' },
-       *     body: JSON.stringify({ title, chapter, difficulty, questions: [...] })
-       *   });
-       *   // Also need to add a questions editor UI for instructors
-       *   // to create actual quiz questions with answers
-       */
-      const subs = this.getSubs();
-      subs.push({
-        id: Date.now(), title, chapter, difficulty, status: 'pending',
-        instructor: App.state.currentUser.name,
-        date: new Date().toISOString().split('T')[0],
-      });
-      localStorage.setItem('mathlings-submissions', JSON.stringify(subs));
-      document.getElementById('sub-title').value = '';
-      this.renderList();
-      App.showToast('Content submitted for review! 📤', 'success');
+      try {
+        const response = await fetch('Moderate.aspx/SubmitContent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            instructorId: App.state.currentUser.id,
+            title: title, 
+            chapter: chapter, 
+            difficulty: difficulty 
+          })
+        });
+        const result = await response.json();
+        
+        if (result.d) {
+          document.getElementById('sub-title').value = '';
+          App.showToast('Content submitted for review! 📤', 'success');
+          await this.fetchSubs();
+          this.renderList();
+        } else {
+          App.showToast('Failed to submit content', 'error');
+        }
+      } catch (e) {
+        console.error(e);
+        App.showToast('Error submitting content', 'error');
+      }
     });
   },
 };

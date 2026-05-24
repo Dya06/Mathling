@@ -22,30 +22,34 @@
  */
 
 const Progress = {
-  init() {
+  async init() {
     if (!App.requireAuth()) return;
-    this.renderStats();
-    this.drawLineChart();
-    this.drawDonutChart();
-    this.renderHistory();
+    
+    try {
+      const response = await fetch('Progress.aspx/GetProgressData', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: App.state.currentUser.id })
+      });
+      const result = await response.json();
+      const data = result.d;
+
+      this.renderStats(data);
+      this.drawLineChart(data.History);
+      this.drawDonutChart(data.ChaptersDone, data.TotalChapters);
+      this.renderHistory(data.History);
+    } catch (error) {
+      console.error('Failed to load progress data:', error);
+      App.showToast('Failed to load progress data', 'error');
+    }
   },
 
-  renderStats() {
-    /*
-     * BACKEND TODO:
-     * Replace with: const stats = await fetch(`/api/progress/${userId}`).then(r => r.json());
-     */
-    const history = JSON.parse(localStorage.getItem('mathlings-quiz-history') || '[]');
-    const chapters = JSON.parse(localStorage.getItem('mathlings-chapters') || '[]');
-    const avg = history.length ? Math.round(history.reduce((a, h) => a + h.score, 0) / history.length) : 0;
-    const best = history.length ? Math.max(...history.map(h => h.score)) : 0;
-    const completed = chapters.filter(c => c.completed).length;
-    
+  renderStats(data) {
     const vals = [
-      { icon: '📝', value: history.length, label: 'Quizzes Taken' },
-      { icon: '🎯', value: avg + '%', label: 'Avg Score' },
-      { icon: '🏆', value: best + '%', label: 'Best Score' },
-      { icon: '📖', value: `${completed}/${chapters.length || 0}`, label: 'Chapters Done' },
+      { icon: '📝', value: data.QuizzesTaken, label: 'Quizzes Taken' },
+      { icon: '🎯', value: data.AvgScore + '%', label: 'Avg Score' },
+      { icon: '🏆', value: data.BestScore + '%', label: 'Best Score' },
+      { icon: '📖', value: `${data.ChaptersDone}/${data.TotalChapters}`, label: 'Chapters Done' },
     ];
 
     document.getElementById('stats-row').innerHTML = vals.map(v => `
@@ -57,7 +61,7 @@ const Progress = {
     `).join('');
   },
 
-  drawLineChart() {
+  drawLineChart(history) {
     const canvas = document.getElementById('line-chart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -71,14 +75,8 @@ const Progress = {
 
     const w = rect.width, h = 250;
 
-    /*
-     * BACKEND TODO:
-     * Replace with: const chartData = await fetch(`/api/progress/${userId}/chart-data`).then(r => r.json());
-     * Server should return { labels: [...], scores: [...] }
-     */
-    const history = JSON.parse(localStorage.getItem('mathlings-quiz-history') || '[]');
     const data = history.length ? history.map(h => h.score) : [];
-    const labels = history.length ? history.map(h => h.date.slice(5)) : [];
+    const labels = history.length ? history.map(h => h.date) : [];
 
     if (!data.length) {
       ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#9A9A9A';
@@ -150,7 +148,7 @@ const Progress = {
     });
   },
 
-  drawDonutChart() {
+  drawDonutChart(completed, total) {
     const canvas = document.getElementById('donut-chart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -160,13 +158,7 @@ const Progress = {
     canvas.style.width = size + 'px'; canvas.style.height = size + 'px';
     ctx.scale(dpr, dpr);
 
-    /*
-     * BACKEND TODO:
-     * Replace with server data: const { completed, total } = await fetch(`/api/chapters/progress`).then(r => r.json());
-     */
-    const chapters = JSON.parse(localStorage.getItem('mathlings-chapters') || '[]');
-    const completed = chapters.filter(c => c.completed).length;
-    const total = chapters.length || 1;
+    if (total === 0) total = 1;
     const pct = completed / total;
     const cx = size / 2, cy = size / 2, r = 80, lw = 16;
 
@@ -187,16 +179,11 @@ const Progress = {
     document.getElementById('donut-value').textContent = Math.round(pct * 100) + '%';
   },
 
-  renderHistory() {
-    /*
-     * BACKEND TODO:
-     * Replace with: const history = await fetch(`/api/progress/${userId}/history`).then(r => r.json());
-     */
-    const history = JSON.parse(localStorage.getItem('mathlings-quiz-history') || '[]');
+  renderHistory(history) {
     const tbody = document.getElementById('history-body');
     if (!tbody) return;
 
-    if (!history.length) {
+    if (!history || !history.length) {
       tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-tertiary);padding:var(--space-2xl)">No quiz history yet. Start learning to see your results here!</td></tr>';
       return;
     }
