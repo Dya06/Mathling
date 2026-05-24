@@ -80,6 +80,6 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=3"></script>
+    <script src="/js/app.js?v=4"></script>
     <script src="/js/admin.js"></script>
 </asp:Content>

@@ -8,6 +8,7 @@
 -- =============================================
 
 CREATE DATABASE MathlingDB;
+GO
 USE MathlingDB;
 
 CREATE TABLE [dbo].[Users] (

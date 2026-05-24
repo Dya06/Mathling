@@ -85,12 +85,30 @@ const Auth = {
 
                     const data = await response.json();
 
-                    if (data.d === 'success') {
+                    if (data.d && data.d.startsWith('success')) {
+                        const parts = data.d.split('|');
+                        const role = parts[1];
+                        const name = parts[2];
+                        const id = parts[3];
 
-                        App.showToast('Login successful!', 'success');
+                        const avatars = { student: '🧒', parent: '👩', instructor: '👨‍🏫', admin: '🛡️' };
+
+                        const user = {
+                            id: parseInt(id),
+                            name: name,
+                            role: role,
+                            email: email,
+                            avatar: avatars[role] || '👤',
+                            level: 1,
+                            xp: 0
+                        };
+
+                        App.login(user);
+                        App.showToast(`Welcome back, ${user.name}! 🎉`, 'success');
 
                         setTimeout(() => {
-                            window.location.href = 'Default.aspx';
+                            const dest = { student: 'Quiz.aspx', parent: 'Progress.aspx', instructor: 'Forum.aspx', admin: 'Admin.aspx' };
+                            window.location.href = dest[role] || 'Default.aspx';
                         }, 800);
 
                     } else {
