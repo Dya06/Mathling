@@ -129,6 +129,8 @@ namespace Mathling
 
                 return builder.ToString();
             }
+        }
+
         // =========================
         // 🆕 REGISTER BUTTON CLICK
         // =========================
