@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Profile" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Profile.aspx.cs" Inherits="Mathling.Profile" %>
+<%@ Page Title="Profile" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Profile.aspx.cs" Inherits="Mathling.Profile" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/profile.css">
@@ -18,7 +18,7 @@
   <main class="main">
     <section class="profile-hero">
       <div class="container">
-        <div class="profile-avatar" id="profile-avatar">👤</div>
+        <div class="profile-avatar" id="profile-avatar">&#128100;</div>
         <h1 class="profile-name" id="profile-name">User</h1>
         <span class="badge badge-blue profile-role" id="profile-role-badge">User</span>
         <div class="profile-level-bar" id="level-section" style="display:none">
@@ -48,5 +48,5 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=4"></script>
-    <script src="/js/profile.js?v=4"></script>
+    <script src="/js/profile.js?v=5"></script>
 </asp:Content>
