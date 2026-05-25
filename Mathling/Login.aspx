@@ -1,4 +1,4 @@
-<%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Mathling.Login" %>
+﻿<%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Mathling.Login" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/login.css">
@@ -57,18 +57,18 @@
         <!-- Register Form (hidden) -->
         <div id="register-form" style="display:none">
           <div class="form-group">
-            <label class="form-label" for="reg-name">Full Name</label>
-            <input type="text" id="reg-name" class="form-input" placeholder="Enter your name" />
+            <label class="form-label" for="RegName">Full Name</label>
+            <asp:TextBox ID="RegName" runat="server" CssClass="form-input" placeholder="Enter your name" />
           </div>
           <div class="form-group">
-            <label class="form-label" for="reg-email">Email</label>
-            <input type="email" id="reg-email" class="form-input" placeholder="Enter your email" />
+            <label class="form-label" for="RegEmail">Email</label>
+            <asp:TextBox ID="RegEmail" runat="server" CssClass="form-input" placeholder="Enter your email" TextMode="Email" />
           </div>
           <div class="form-group">
-            <label class="form-label" for="reg-password">Password</label>
-            <input type="password" id="reg-password" class="form-input" placeholder="Create a password" />
+            <label class="form-label" for="RegPassword">Password</label>
+            <asp:TextBox ID="RegPassword" runat="server" CssClass="form-input" placeholder="Create a password" TextMode="Password" />
           </div>
-          <input type="hidden" id="selected-role" value="" />
+          <asp:HiddenField ID="RegRole" runat="server" ClientIDMode="Static" />
           <div class="role-selector">
             <label class="form-label">I am a...</label>
             <div class="role-grid">
@@ -90,7 +90,11 @@
               </div>
             </div>
           </div>
-          <button type="button" class="btn btn-primary btn-lg" id="register-submit-btn" style="width:100%">Create Account</button>
+          <asp:Button ID="RegBtn" runat="server" Text="Create Account"
+              OnClick="RegBtn_Click"
+              OnClientClick="return validateRegistration();"
+              CssClass="btn btn-primary btn-lg"
+              Style="width:100%" />
         </div>
 
       </div>
@@ -129,7 +133,7 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=4"></script>
-    <script src="/js/auth.js?v=4"></script>
+    <script src="/js/auth.js?v=6"></script>
     <script>
         function fillDemo(email, password) {
             // Switch to login tab

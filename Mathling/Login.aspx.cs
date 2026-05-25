@@ -129,6 +129,65 @@ namespace Mathling
 
                 return builder.ToString();
             }
+        // =========================
+        // 🆕 REGISTER BUTTON CLICK
+        // =========================
+        protected void RegBtn_Click(object sender, EventArgs e)
+        {
+            string name = RegName.Text.Trim();
+            string email = RegEmail.Text.Trim();
+            string password = RegPassword.Text;
+            string role = RegRole.Value; // Gets value from HiddenField set by JS
+
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(role))
+            {
+                ShowError("Please fill in all registration fields and select a role.");
+                return;
+            }
+
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+
+                // Check if email exists
+                string checkQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@Email", email);
+                    int exists = (int)checkCmd.ExecuteScalar();
+                    if (exists > 0)
+                    {
+                        ShowError("An account with that email already exists.");
+                        return;
+                    }
+                }
+
+                // Insert user
+                string insertQuery = @"
+                    INSERT INTO Users (Name, Email, PasswordHash, Role, Level, XP)
+                    OUTPUT INSERTED.Id
+                    VALUES (@Name, @Email, @PasswordHash, @Role, 1, 0)";
+                
+                using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", name);
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    cmd.Parameters.AddWithValue("@PasswordHash", HashPassword(password));
+                    cmd.Parameters.AddWithValue("@Role", role);
+
+                    int newUserId = (int)cmd.ExecuteScalar();
+
+                    // ✅ Log them in automatically
+                    Session["UserId"] = newUserId;
+                    Session["UserRole"] = role;
+                    Session["UserName"] = name;
+                    Session["UserEmail"] = email;
+
+                    RedirectByRole(role);
+                }
+            }
         }
     }
 }

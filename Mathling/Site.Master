@@ -1,4 +1,4 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Mathling.SiteMaster" %>
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Mathling.SiteMaster" %>
 
 <!DOCTYPE html>
 
@@ -30,6 +30,29 @@
 
         <asp:ContentPlaceHolder ID="MainContent" runat="server" />
     </form>
+
+    <% if (Session["UserId"] != null) { %>
+    <script>
+        // Bridge ASP.NET Session into frontend JavaScript session
+        const sessionUser = {
+            id: <%= Session["UserId"] %>,
+            name: '<%= Session["UserName"] %>',
+            role: '<%= Session["UserRole"] %>',
+            email: '<%= Session["UserEmail"] %>',
+            avatar: '<%= Session["UserRole"]?.ToString() == "student" ? "🧒" : Session["UserRole"]?.ToString() == "parent" ? "👩" : Session["UserRole"]?.ToString() == "instructor" ? "👨‍🏫" : "🛡️" %>',
+            level: 1,
+            xp: 0
+        };
+        localStorage.setItem('mathlings-user', JSON.stringify(sessionUser));
+    </script>
+    <% } else { %>
+    <script>
+        // Clear local storage if server session is null, except on login page
+        if (window.location.pathname.toLowerCase().indexOf('login.aspx') === -1) {
+            localStorage.removeItem('mathlings-user');
+        }
+    </script>
+    <% } %>
 
     <asp:ContentPlaceHolder ID="ScriptContent" runat="server" />
 </body>
