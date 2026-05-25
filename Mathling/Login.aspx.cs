@@ -1,9 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web.Services;
 using System.Web.UI;
 
 namespace Mathling
@@ -12,15 +12,30 @@ namespace Mathling
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            // If already logged in, redirect away from login page
+            if (Session["UserId"] != null)
+            {
+                RedirectByRole(Session["UserRole"]?.ToString());
+            }
         }
 
         // =========================
-        // 🔐 LOGIN USER ONLY
+        // 🔐 LOGIN BUTTON CLICK
         // =========================
-        [WebMethod]
-        public static string LoginUser(string email, string password)
+        protected void LoginBtn_Click(object sender, EventArgs e)
         {
-            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            string email = LoginEmail.Text.Trim();
+            string password = LoginPassword.Text;
+
+            // Basic validation
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                ShowError("Please fill in all fields.");
+                return;
+            }
+
+            string connStr = ConfigurationManager
+                .ConnectionStrings["MathlingDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
@@ -44,24 +59,58 @@ namespace Mathling
                     string name = reader["Name"].ToString();
                     int id = Convert.ToInt32(reader["Id"]);
 
-                    if (VerifyPassword(password, storedHash))
+                    string inputHash = HashPassword(password);
+
+                    if (inputHash == storedHash)
                     {
-                        // optional: you can store session later
-                        return $"success|{role}|{name}|{id}";
+                        // ✅ Store user info in Session
+                        Session["UserId"] = id;
+                        Session["UserRole"] = role;
+                        Session["UserName"] = name;
+                        Session["UserEmail"] = email;
+
+                        // Redirect based on role
+                        RedirectByRole(role);
+                    }
+                    else
+                    {
+                        ShowError("Invalid email or password.");
                     }
                 }
-
-                return "invalid";
+                else
+                {
+                    ShowError("Invalid email or password.");
+                }
             }
         }
 
         // =========================
-        // 🔐 PASSWORD VERIFY
+        // 🔀 REDIRECT BY ROLE
         // =========================
-        private static bool VerifyPassword(string password, string storedHash)
+        private void RedirectByRole(string role)
         {
-            string hashOfInput = HashPassword(password);
-            return hashOfInput == storedHash;
+            var destinations = new Dictionary<string, string>
+            {
+                { "student",    "Quiz.aspx"     },
+                { "parent",     "Progress.aspx" },
+                { "instructor", "Forum.aspx"    },
+                { "admin",      "Admin.aspx"    }
+            };
+
+            string dest = destinations.ContainsKey(role ?? "")
+                ? destinations[role]
+                : "Default.aspx";
+
+            Response.Redirect(dest);
+        }
+
+        // =========================
+        // ❌ SHOW ERROR
+        // =========================
+        private void ShowError(string message)
+        {
+            ErrorMessage.Text = message;
+            ErrorMessage.Visible = true;
         }
 
         // =========================
@@ -71,13 +120,12 @@ namespace Mathling
         {
             using (SHA256 sha256 = SHA256.Create())
             {
-                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                StringBuilder builder = new StringBuilder();
+                byte[] bytes = sha256.ComputeHash(
+                    Encoding.UTF8.GetBytes(password));
 
+                StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < bytes.Length; i++)
-                {
                     builder.Append(bytes[i].ToString("x2"));
-                }
 
                 return builder.ToString();
             }

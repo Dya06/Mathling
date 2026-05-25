@@ -5,7 +5,7 @@
 </asp:Content>
 
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
-  <!-- Minimal Nav -->
+    <!-- Minimal Nav -->
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="Default.aspx" class="navbar-brand">
@@ -25,22 +25,73 @@
         <p id="auth-subtitle">Log in to continue your learning adventure</p>
       </div>
 
-
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-mode="login">Log In</button>
+        <button type="button" class="auth-tab" data-mode="register">Register</button>
+      </div>
 
       <div class="auth-card" id="auth-form">
+
         <!-- Login Form -->
         <div id="login-form">
           <div class="form-group">
-            <label class="form-label" for="login-email">Email</label>
-            <input type="email" id="login-email" class="form-input" placeholder="Enter your email" />
+            <label class="form-label" for="LoginEmail">Email</label>
+            <asp:TextBox ID="LoginEmail" runat="server" CssClass="form-input" placeholder="Enter your email" TextMode="Email" />
           </div>
           <div class="form-group">
-            <label class="form-label" for="login-password">Password</label>
-            <input type="password" id="login-password" class="form-input" placeholder="Enter your password" />
+            <label class="form-label" for="LoginPassword">Password</label>
+            <asp:TextBox ID="LoginPassword" runat="server" CssClass="form-input" placeholder="Enter your password" TextMode="Password" />
           </div>
-          <button type="button" class="btn btn-primary btn-lg" id="login-submit-btn" style="width:100%">Log In</button>
+
+          <%-- Error message shown on invalid login --%>
+          <asp:Label ID="ErrorMessage" runat="server" Text="" CssClass="form-error" Visible="false" />
+
+          <%-- Server-side submit button — no JavaScript needed --%>
+          <asp:Button ID="LoginBtn" runat="server" Text="Log In"
+              OnClick="LoginBtn_Click"
+              CssClass="btn btn-primary btn-lg"
+              Style="width:100%" />
         </div>
 
+        <!-- Register Form (hidden) -->
+        <div id="register-form" style="display:none">
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Full Name</label>
+            <input type="text" id="reg-name" class="form-input" placeholder="Enter your name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input type="email" id="reg-email" class="form-input" placeholder="Enter your email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Password</label>
+            <input type="password" id="reg-password" class="form-input" placeholder="Create a password" />
+          </div>
+          <input type="hidden" id="selected-role" value="" />
+          <div class="role-selector">
+            <label class="form-label">I am a...</label>
+            <div class="role-grid">
+              <div class="role-option" data-role="student">
+                <span class="role-emoji">🧒</span>
+                <span class="role-name">Student</span>
+              </div>
+              <div class="role-option" data-role="parent">
+                <span class="role-emoji">👩</span>
+                <span class="role-name">Parent</span>
+              </div>
+              <div class="role-option" data-role="instructor">
+                <span class="role-emoji">👨‍🏫</span>
+                <span class="role-name">Instructor</span>
+              </div>
+              <div class="role-option" data-role="admin">
+                <span class="role-emoji">🛡️</span>
+                <span class="role-name">Admin</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-lg" id="register-submit-btn" style="width:100%">Create Account</button>
+        </div>
 
       </div>
 
@@ -70,8 +121,6 @@
       </div>
 
       <div class="auth-footer">
-        <p>Don't have an account? <a href="Register.aspx" style="color:var(--primary);font-weight:600;text-decoration:none;">Create one</a></p>
-        <br>
         <a href="Default.aspx">← Back to Home</a>
       </div>
     </div>
@@ -82,10 +131,13 @@
     <script src="/js/app.js?v=4"></script>
     <script src="/js/auth.js?v=4"></script>
     <script>
-      function fillDemo(email, password) {
-        document.getElementById('login-email').value = email;
-        document.getElementById('login-password').value = password;
-        App.showToast('Demo credentials filled! Click Log In.', 'info');
-      }
+        function fillDemo(email, password) {
+            // Switch to login tab
+            document.querySelector('[data-mode="login"]').click();
+            // Fill the ASP.NET TextBox controls (they render with the ID intact)
+            document.getElementById('<%= LoginEmail.ClientID %>').value = email;
+        document.getElementById('<%= LoginPassword.ClientID %>').value = password;
+            App.showToast('Demo credentials filled! Click Log In.', 'info');
+        }
     </script>
 </asp:Content>
