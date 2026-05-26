@@ -1,18 +1,21 @@
 /* ============================================
-   MATHLINGS DATABASE SCHEMA
+   MATHLINGS DATABASE SCHEMA - REBUILT
    SQL Server LocalDB
    ============================================ */
+
+-- Drop and recreate the database
+DROP DATABASE IF EXISTS MathlingDB;
+GO
+CREATE DATABASE MathlingDB;
+GO
+USE MathlingDB;
+GO
 
 -- =============================================
 -- USERS
 -- =============================================
-
-CREATE DATABASE MathlingDB;
-GO
-USE MathlingDB;
-
 CREATE TABLE [dbo].[Users] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [Name]          NVARCHAR(100)   NOT NULL,
     [Email]         NVARCHAR(256)   NOT NULL UNIQUE,
     [PasswordHash]  NVARCHAR(256)   NOT NULL,
@@ -31,7 +34,7 @@ CREATE TABLE [dbo].[Users] (
 -- FORMULAS
 -- =============================================
 CREATE TABLE [dbo].[Formulas] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [Name]          NVARCHAR(50)    NOT NULL UNIQUE,
     [Rule]          NVARCHAR(100)   NOT NULL,
     [Description]   NVARCHAR(255)   NULL,
@@ -43,8 +46,8 @@ CREATE TABLE [dbo].[Formulas] (
 -- MODULES
 -- =============================================
 CREATE TABLE [dbo].[Modules] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
-    [FormulaId]     INT             NOT NULL,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [FormulaId]     VARCHAR(10)     NOT NULL,
     [ModuleKey]     NVARCHAR(30)    NOT NULL,
     [Title]         NVARCHAR(100)   NOT NULL,
     [Icon]          NVARCHAR(50)    NULL,
@@ -64,8 +67,8 @@ CREATE TABLE [dbo].[Modules] (
 -- QUESTION SETS
 -- =============================================
 CREATE TABLE [dbo].[QuestionSets] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
-    [ModuleId]      INT             NOT NULL,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [ModuleId]      VARCHAR(10)     NOT NULL,
     [Label]         NVARCHAR(100)   NOT NULL,
     [DisplayMode]   NVARCHAR(20)    NOT NULL DEFAULT 'static',
     [SortOrder]     INT             NOT NULL DEFAULT 0,
@@ -82,8 +85,8 @@ CREATE TABLE [dbo].[QuestionSets] (
 -- QUESTIONS
 -- =============================================
 CREATE TABLE [dbo].[Questions] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
-    [SetId]         INT             NOT NULL,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [SetId]         VARCHAR(10)     NOT NULL,
     [Answer]        INT             NOT NULL,
     [SortOrder]     INT             NOT NULL DEFAULT 0,
 
@@ -96,8 +99,8 @@ CREATE TABLE [dbo].[Questions] (
 -- QUESTION ROWS
 -- =============================================
 CREATE TABLE [dbo].[QuestionRows] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
-    [QuestionId]    INT             NOT NULL,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [QuestionId]    VARCHAR(10)     NOT NULL,
     [Value]         INT             NOT NULL,
     [SortOrder]     INT             NOT NULL DEFAULT 0,
 
@@ -110,15 +113,15 @@ CREATE TABLE [dbo].[QuestionRows] (
 -- QUIZ RESULTS
 -- =============================================
 CREATE TABLE [dbo].[QuizResults] (
-    [Id]             INT IDENTITY(1,1) PRIMARY KEY,
-    [UserId]         INT             NOT NULL,
-    [SetId]          INT             NOT NULL,
-    [Score]          INT             NOT NULL DEFAULT 0,
-    [TotalCorrect]   INT             NOT NULL DEFAULT 0,
-    [TotalQuestions] INT             NOT NULL DEFAULT 0,
-    [Percentage]     DECIMAL(5,2)    NULL,
-    [TimeTakenSec]   INT             NULL,
-    [CompletedAt]    DATETIME2       NOT NULL DEFAULT GETDATE(),
+    [Id]             VARCHAR(10)    NOT NULL PRIMARY KEY,
+    [UserId]         VARCHAR(10)    NOT NULL,
+    [SetId]          VARCHAR(10)    NOT NULL,
+    [Score]          INT            NOT NULL DEFAULT 0,
+    [TotalCorrect]   INT            NOT NULL DEFAULT 0,
+    [TotalQuestions] INT            NOT NULL DEFAULT 0,
+    [Percentage]     DECIMAL(5,2)   NULL,
+    [TimeTakenSec]   INT            NULL,
+    [CompletedAt]    DATETIME2      NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_QuizResults_Users]
     FOREIGN KEY ([UserId])
@@ -133,9 +136,9 @@ CREATE TABLE [dbo].[QuizResults] (
 -- MODULE PROGRESS
 -- =============================================
 CREATE TABLE [dbo].[ModuleProgress] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
-    [UserId]        INT             NOT NULL,
-    [ModuleId]      INT             NOT NULL,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [UserId]        VARCHAR(10)     NOT NULL,
+    [ModuleId]      VARCHAR(10)     NOT NULL,
     [IsCompleted]   BIT             NOT NULL DEFAULT 0,
     [CompletedAt]   DATETIME2       NULL,
 
@@ -155,11 +158,11 @@ CREATE TABLE [dbo].[ModuleProgress] (
 -- FORUM THREADS
 -- =============================================
 CREATE TABLE [dbo].[ForumThreads] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [Title]         NVARCHAR(200)   NOT NULL,
     [Content]       NVARCHAR(MAX)   NOT NULL,
     [Category]      NVARCHAR(50)    NOT NULL DEFAULT 'General',
-    [AuthorId]      INT             NOT NULL,
+    [AuthorId]      VARCHAR(10)     NOT NULL,
     [CreatedAt]     DATETIME2       NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_ForumThreads_Users]
@@ -171,10 +174,10 @@ CREATE TABLE [dbo].[ForumThreads] (
 -- FORUM REPLIES
 -- =============================================
 CREATE TABLE [dbo].[ForumReplies] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
-    [ThreadId]      INT             NOT NULL,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [ThreadId]      VARCHAR(10)     NOT NULL,
     [Content]       NVARCHAR(MAX)   NOT NULL,
-    [AuthorId]      INT             NOT NULL,
+    [AuthorId]      VARCHAR(10)     NOT NULL,
     [CreatedAt]     DATETIME2       NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_ForumReplies_Threads]
@@ -190,13 +193,13 @@ CREATE TABLE [dbo].[ForumReplies] (
 -- SUBMISSIONS
 -- =============================================
 CREATE TABLE [dbo].[Submissions] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [Title]         NVARCHAR(200)   NOT NULL,
     [Chapter]       NVARCHAR(100)   NULL,
     [Difficulty]    NVARCHAR(20)    NULL,
     [Status]        NVARCHAR(20)    NOT NULL DEFAULT 'pending',
     [Reason]        NVARCHAR(500)   NULL,
-    [InstructorId]  INT             NOT NULL,
+    [InstructorId]  VARCHAR(10)     NOT NULL,
     [CreatedAt]     DATETIME2       NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_Submissions_Users]
@@ -211,7 +214,7 @@ CREATE TABLE [dbo].[Submissions] (
 -- BADGES
 -- =============================================
 CREATE TABLE [dbo].[Badges] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [Name]          NVARCHAR(100)   NOT NULL,
     [Icon]          NVARCHAR(50)    NULL,
     [Description]   NVARCHAR(255)   NULL
@@ -221,9 +224,9 @@ CREATE TABLE [dbo].[Badges] (
 -- USER BADGES
 -- =============================================
 CREATE TABLE [dbo].[UserBadges] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
-    [UserId]        INT             NOT NULL,
-    [BadgeId]       INT             NOT NULL,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [UserId]        VARCHAR(10)     NOT NULL,
+    [BadgeId]       VARCHAR(10)     NOT NULL,
     [EarnedAt]      DATETIME2       NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_UserBadges_Users]
@@ -242,9 +245,9 @@ CREATE TABLE [dbo].[UserBadges] (
 -- PARENT-STUDENT LINKS
 -- =============================================
 CREATE TABLE [dbo].[ParentStudentLinks] (
-    [Id]            INT IDENTITY(1,1) PRIMARY KEY,
-    [ParentId]      INT             NOT NULL,
-    [StudentId]     INT             NOT NULL,
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [ParentId]      VARCHAR(10)     NOT NULL,
+    [StudentId]     VARCHAR(10)     NOT NULL,
     [LinkedAt]      DATETIME2       NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_PSL_Parent]
@@ -260,70 +263,25 @@ CREATE TABLE [dbo].[ParentStudentLinks] (
 );
 
 -- =============================================
--- SEED DATA (FIXED WITH HASHING)
+-- SEED DATA
 -- =============================================
-
-INSERT INTO [dbo].[Users]
-([Name], [Email], [PasswordHash], [Role], [Avatar])
+INSERT INTO [dbo].[Users] ([Id],[Name],[Email],[PasswordHash],[Role],[Avatar])
 VALUES
-(
-    'Alex Student',
-    'student@demo.com',
-    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2),
-    'student',
-    'student'
-),
-(
-    'Sarah Parent',
-    'parent@demo.com',
-    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2),
-    'parent',
-    'parent'
-),
-(
-    'Robert Instructor',
-    'instructor@demo.com',
-    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2),
-    'instructor',
-    'instructor'
-),
-(
-    'Admin User',
-    'admin@demo.com',
-    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2),
-    'admin',
-    'admin'
-);
-INSERT INTO [dbo].[Formulas]
-([Name], [Rule], [Description], [SortOrder])
+('001', 'Alex Student',      'student@demo.com',    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'student',    'student'),
+('002', 'Sarah Parent',      'parent@demo.com',     CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'parent',     'parent'),
+('003', 'Robert Instructor', 'instructor@demo.com', CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'instructor', 'instructor'),
+('004', 'Admin User',        'admin@demo.com',      CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'admin',      'admin');
+
+INSERT INTO [dbo].[Formulas] ([Id],[Name],[Rule],[Description],[SortOrder])
+VALUES ('001', 'SF+4', '+5 - 1', 'Small Friend +4', 1);
+
+INSERT INTO [dbo].[Modules] ([Id],[FormulaId],[ModuleKey],[Title],[Icon],[Description],[UseAbacus],[MentalMode],[IsTimed],[TimeLimitSec],[SortOrder])
 VALUES
-('SF+4', '+5 - 1', 'Small Friend +4', 1);
+('001', '001', 'learning',       'A. Learning Module',   'book',   'Learn how the abacus moves for this formula', 1, 0, 0, NULL, 1),
+('002', '001', 'exerciseAbacus', 'B. Exercise (Abacus)', 'abacus', 'Solve using the abacus',                      1, 0, 0, NULL, 2),
+('003', '001', 'exerciseMental', 'C. Exercise (Mental)', 'brain',  'No abacus. Imagine the beads moving mentally.',0, 1, 0, NULL, 3),
+('004', '001', 'preparation',    'D. Preparation',       'prep',   'Prepare for the final assessment.',           0, 1, 0, NULL, 4),
+('005', '001', 'assessment',     'E. Assessment',        'trophy', 'Timed final assessment.',                     0, 1, 1, 60,   5);
 
-DECLARE @fid INT = SCOPE_IDENTITY();
-
-INSERT INTO [dbo].[Modules]
-([FormulaId], [ModuleKey], [Title], [Icon], [Description],
- [UseAbacus], [MentalMode], [IsTimed], [TimeLimitSec], [SortOrder])
-VALUES
-(@fid, 'learning',       'A. Learning Module',     'book',
- 'Learn how the abacus moves for this formula',
- 1, 0, 0, NULL, 1),
-
-(@fid, 'exerciseAbacus', 'B. Exercise (Abacus)',   'abacus',
- 'Solve using the abacus',
- 1, 0, 0, NULL, 2),
-
-(@fid, 'exerciseMental', 'C. Exercise (Mental)',   'brain',
- 'No abacus. Imagine the beads moving mentally.',
- 0, 1, 0, NULL, 3),
-
-(@fid, 'preparation',    'D. Preparation',         'prep',
- 'Prepare for the final assessment.',
- 0, 1, 0, NULL, 4),
-
-(@fid, 'assessment',     'E. Assessment',          'trophy',
- 'Timed final assessment.',
- 0, 1, 1, 60, 5);
-
-PRINT 'MathlingDB schema created successfully!';
+PRINT 'MathlingDB rebuilt successfully with padded IDs!';
 GO
