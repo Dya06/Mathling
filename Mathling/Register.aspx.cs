@@ -17,13 +17,11 @@ namespace Mathling
 
         protected void RegBtn_Click(object sender, EventArgs e)
         {
-            // ── Read directly from ASP.NET controls ─────────────────
             string name = RegName.Text.Trim();
             string email = RegEmail.Text.Trim();
             string password = RegPassword.Text.Trim();
             string role = RegRole.SelectedValue;
 
-            // ── Validation ──────────────────────────────────────────
             if (string.IsNullOrWhiteSpace(name) ||
                 string.IsNullOrWhiteSpace(email) ||
                 string.IsNullOrWhiteSpace(password))
@@ -44,7 +42,6 @@ namespace Mathling
                 {
                     conn.Open();
 
-                    // ── Step 1: Check if email already exists ────────
                     string checkQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
                     using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
                     {
@@ -58,19 +55,15 @@ namespace Mathling
                         }
                     }
 
-                    // ── Step 2: Generate next padded ID ──────────────
                     string newId;
                     string maxIdQuery = "SELECT ISNULL(MAX(CAST(Id AS INT)), 0) + 1 FROM Users";
                     using (SqlCommand maxIdCmd = new SqlCommand(maxIdQuery, conn))
                     {
                         int nextNum = (int)maxIdCmd.ExecuteScalar();
-                        newId = nextNum.ToString("D3"); // 001, 002, 003...
+                        newId = nextNum.ToString("D3");
                     }
-
-                    // ── Step 3: Hash the password ────────────────────
                     string passwordHash = HashPassword(password);
 
-                    // ── Step 4: Insert new user ──────────────────────
                     string insertQuery = @"
                         INSERT INTO Users 
                             (Id, Name, Email, PasswordHash, Role, Avatar, Level, XP, CreatedAt, IsActive)
@@ -84,7 +77,7 @@ namespace Mathling
                         insertCmd.Parameters.AddWithValue("@Email", email);
                         insertCmd.Parameters.AddWithValue("@PasswordHash", passwordHash);
                         insertCmd.Parameters.AddWithValue("@Role", role);
-                        insertCmd.Parameters.AddWithValue("@Avatar", role); // avatar matches role
+                        insertCmd.Parameters.AddWithValue("@Avatar", role);
                         insertCmd.Parameters.AddWithValue("@Level", 1);
                         insertCmd.Parameters.AddWithValue("@XP", 0);
                         insertCmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
@@ -93,8 +86,6 @@ namespace Mathling
                         insertCmd.ExecuteNonQuery();
                     }
                 }
-
-                // ── Step 5: Success → redirect to login ─────────────
                 ShowAlertAndRedirect("User created successfully! Redirecting to login...", "Login.aspx");
             }
             catch (Exception ex)
@@ -103,7 +94,6 @@ namespace Mathling
             }
         }
 
-        // ── SHA256 uppercase hex to match existing DB hashes ────────
         private string HashPassword(string password)
         {
             using (SHA256 sha256 = SHA256.Create())
@@ -116,14 +106,12 @@ namespace Mathling
             }
         }
 
-        // ── Helper: show inline error using the asp:Label ───────────
         private void ShowError(string message)
         {
             ErrorMessage.Text = message;
             ErrorMessage.Visible = true;
         }
 
-        // ── Helper: show alert then redirect ────────────────────────
         private void ShowAlertAndRedirect(string message, string url)
         {
             string safe = message.Replace("'", "\\'");
