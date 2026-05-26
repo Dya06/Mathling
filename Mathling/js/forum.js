@@ -1,52 +1,33 @@
-/* ============================================
-   MATHLINGS — Forum Page Logic
-   ============================================ */
-
-/*
- * BACKEND TODO:
- * Forum operations should use these API endpoints:
- *
- *   GET    /api/forum/threads                     → list all threads (with pagination)
- *   GET    /api/forum/threads?category=Tips       → filter by category
- *   GET    /api/forum/threads/:id                 → single thread with replies
- *   POST   /api/forum/threads                     → create new thread
- *          Body: { title, content, category }
- *   POST   /api/forum/threads/:id/replies         → add reply
- *          Body: { content }
- *   PUT    /api/forum/threads/:id                 → edit thread (author/admin only)
- *   DELETE /api/forum/threads/:id                 → delete thread (author/admin only)
- *   DELETE /api/forum/replies/:id                 → delete reply (author/admin only)
- *
- * Server should:
- *   - Validate that the user is authenticated
- *   - Sanitize HTML/markdown to prevent XSS
- *   - Implement pagination (e.g., 20 threads per page)
- *   - Support search functionality
- *   - Send email notifications for replies (optional)
- *   - Implement rate limiting to prevent spam
- */
-
 const Forum = {
   currentThread: null,
   currentFilter: 'all',
+  threadsData: [],
 
-  init() {
+  async init() {
     if (!App.requireAuth()) return;
-    this.renderThreads();
     this.setupFilters();
     this.setupNewThread();
+    await this.fetchThreads();
   },
 
-  getThreads() {
-    /*
-     * BACKEND TODO:
-     * Replace with: return await fetch('/api/forum/threads').then(r => r.json());
-     */
-    return JSON.parse(localStorage.getItem('mathlings-forum') || '[]');
+  async fetchThreads() {
+    try {
+      const response = await fetch('Forum.aspx/GetThreads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: "{}"
+      });
+      const data = await response.json();
+      this.threadsData = data.d || [];
+      this.renderThreads();
+    } catch (e) {
+      console.error('Error fetching threads:', e);
+      App.showToast('Failed to load threads', 'error');
+    }
   },
 
   renderThreads() {
-    const threads = this.getThreads().filter(t => 
+    const threads = this.threadsData.filter(t => 
       this.currentFilter === 'all' || t.category === this.currentFilter
     );
     const list = document.getElementById('thread-list');
@@ -60,26 +41,41 @@ const Forum = {
     list.innerHTML = threads.length ? threads.map(t => `
       <div class="thread-card" onclick="Forum.openThread(${t.id})">
         <div class="thread-card-header">
-          <div class="avatar avatar-sm">${t.role === 'instructor' ? '👨‍🏫' : '👩'}</div>
+          <div class="avatar avatar-sm">${this.getAvatarHtml(t.avatar)}</div>
           <h3>${t.title}</h3>
           <span class="badge badge-${t.category === 'Tips' ? 'green' : t.category === 'Questions' ? 'blue' : 'yellow'}">${t.category}</span>
         </div>
         <div class="thread-card-meta">
-          <span>👤 ${t.author}</span>
-          <span>💬 ${t.replies} replies</span>
-          <span>📅 ${t.date}</span>
+          <span>&#128100; ${t.author}</span>
+          <span>&#128172; ${t.replies} replies</span>
+          <span>&#128197; ${t.date}</span>
         </div>
       </div>
     `).join('') : '<div class="empty-state"><h3>No threads yet</h3><p>Start the conversation!</p></div>';
   },
 
-  openThread(id) {
-    /*
-     * BACKEND TODO:
-     * Replace with: this.currentThread = await fetch(`/api/forum/threads/${id}`).then(r => r.json());
-     */
-    this.currentThread = this.getThreads().find(t => t.id === id);
-    this.renderDetail();
+  getAvatarHtml(avatarType) {
+      if (avatarType === 'student') return '&#129490;'; // 🧒
+      if (avatarType === 'parent') return '&#128105;'; // 👩
+      if (avatarType === 'instructor') return '&#128104;&#8205;&#127979;'; // 👨‍🏫
+      if (avatarType === 'admin') return '&#128737;&#65039;'; // 🛡️
+      return '&#128100;'; // 👤 fallback
+  },
+
+  async openThread(id) {
+    try {
+      const response = await fetch('Forum.aspx/GetThread', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ threadId: id })
+      });
+      const data = await response.json();
+      this.currentThread = data.d;
+      this.renderDetail();
+    } catch (e) {
+      console.error('Error opening thread:', e);
+      App.showToast('Failed to load thread details', 'error');
+    }
   },
 
   renderDetail() {
@@ -99,12 +95,12 @@ const Forum = {
       <div class="thread-body">
         <p>${t.content}</p>
       </div>
-      <h4 style="margin-bottom:var(--space-md)">💬 Replies (${(t.replyList || []).length})</h4>
+      <h4 style="margin-bottom:var(--space-md)">&#128172; Replies (${t.replies})</h4>
       <div class="reply-list">
         ${(t.replyList || []).map(r => `
           <div class="reply-card">
             <div class="reply-header">
-              <div class="avatar avatar-sm">${r.role === 'instructor' ? '👨‍🏫' : '👩'}</div>
+              <div class="avatar avatar-sm">${this.getAvatarHtml(r.avatar)}</div>
               <strong>${r.author}</strong>
               <span class="badge badge-${r.role === 'instructor' ? 'purple' : 'blue'} btn-sm" style="padding:2px 8px">${r.role}</span>
               <span style="margin-left:auto;font-size:var(--text-xs);color:var(--text-tertiary)">${r.date}</span>
@@ -121,35 +117,31 @@ const Forum = {
     `;
   },
 
-  addReply() {
+  async addReply() {
     const text = document.getElementById('reply-text')?.value.trim();
     if (!text) { App.showToast('Please write a reply', 'error'); return; }
 
-    /*
-     * BACKEND TODO:
-     * Replace with:
-     *   await fetch(`/api/forum/threads/${this.currentThread.id}/replies`, {
-     *     method: 'POST',
-     *     headers: { 'Content-Type': 'application/json' },
-     *     body: JSON.stringify({ content: text })
-     *   });
-     *   // Then refresh thread data from server
-     *   this.openThread(this.currentThread.id);
-     */
-    const threads = this.getThreads();
-    const t = threads.find(t => t.id === this.currentThread.id);
-    if (!t.replyList) t.replyList = [];
-    t.replyList.push({
-      author: App.state.currentUser.name,
-      role: App.state.currentUser.role,
-      content: text,
-      date: new Date().toISOString().split('T')[0],
-    });
-    t.replies = t.replyList.length;
-    localStorage.setItem('mathlings-forum', JSON.stringify(threads));
-    this.currentThread = t;
-    this.renderDetail();
-    App.showToast('Reply posted! 💬', 'success');
+    try {
+      const response = await fetch('Forum.aspx/AddReply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ threadId: this.currentThread.id, content: text })
+      });
+      const data = await response.json();
+      
+      if (data.d === 'success') {
+          App.showToast('Reply posted!', 'success');
+          // Refresh thread to show new reply
+          await this.openThread(this.currentThread.id);
+          // Also fetch threads in background to update reply count in list
+          this.fetchThreads();
+      } else {
+          App.showToast('Failed to post reply: ' + data.d, 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      App.showToast('Error posting reply', 'error');
+    }
   },
 
   setupFilters() {
@@ -168,36 +160,35 @@ const Forum = {
     document.getElementById('new-thread-btn')?.addEventListener('click', () => {
       document.getElementById('new-thread-form').classList.toggle('active');
     });
-    document.getElementById('submit-thread')?.addEventListener('click', () => {
+    document.getElementById('submit-thread')?.addEventListener('click', async () => {
       const title = document.getElementById('thread-title').value.trim();
       const content = document.getElementById('thread-content').value.trim();
       const category = document.getElementById('thread-category').value;
       if (!title || !content) { App.showToast('Please fill in all fields', 'error'); return; }
 
-      /*
-       * BACKEND TODO:
-       * Replace with:
-       *   await fetch('/api/forum/threads', {
-       *     method: 'POST',
-       *     headers: { 'Content-Type': 'application/json' },
-       *     body: JSON.stringify({ title, content, category })
-       *   });
-       *   // Then refresh thread list from server
-       */
-      const threads = this.getThreads();
-      threads.unshift({
-        id: Date.now(), title, content, category,
-        author: App.state.currentUser.name,
-        role: App.state.currentUser.role,
-        replies: 0, date: new Date().toISOString().split('T')[0],
-        replyList: [],
-      });
-      localStorage.setItem('mathlings-forum', JSON.stringify(threads));
-      document.getElementById('new-thread-form').classList.remove('active');
-      document.getElementById('thread-title').value = '';
-      document.getElementById('thread-content').value = '';
-      this.renderThreads();
-      App.showToast('Thread created! 🎉', 'success');
+      try {
+          const response = await fetch('Forum.aspx/CreateThread', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content, category })
+          });
+          const data = await response.json();
+          
+          if (data.d === 'success') {
+              document.getElementById('new-thread-form').classList.remove('active');
+              document.getElementById('thread-title').value = '';
+              document.getElementById('thread-content').value = '';
+              App.showToast('Thread created! 🎉', 'success');
+              
+              this.currentThread = null;
+              await this.fetchThreads();
+          } else {
+              App.showToast('Failed to create thread: ' + data.d, 'error');
+          }
+      } catch(e) {
+          console.error(e);
+          App.showToast('Error creating thread', 'error');
+      }
     });
   },
 };
