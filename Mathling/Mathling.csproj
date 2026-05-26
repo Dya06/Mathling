@@ -250,6 +250,9 @@
       <DependentUpon>Quiz.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Quiz.aspx.designer.cs">
+      <DependentUpon>Quiz.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Profile.aspx.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -298,6 +301,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\MathlingDB_Schema.sql" />
+    <Content Include="App_Data\Quiz_WebForms_Seed_Data.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
