@@ -12,22 +12,19 @@ namespace Mathling
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            // If already logged in, redirect away from login page
             if (Session["UserId"] != null)
             {
                 RedirectByRole(Session["UserRole"]?.ToString());
             }
         }
 
-        // =========================
-        // 🔐 LOGIN BUTTON CLICK
-        // =========================
+        //  LOGIN BUTTON CLICK
         protected void LoginBtn_Click(object sender, EventArgs e)
         {
             string email = LoginEmail.Text.Trim();
             string password = LoginPassword.Text;
 
-            // Basic validation
+
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 ShowError("Please fill in all fields.");
@@ -61,15 +58,14 @@ namespace Mathling
 
                     string inputHash = HashPassword(password);
 
-                    if (inputHash == storedHash)
+                    if (inputHash.Equals(storedHash, StringComparison.OrdinalIgnoreCase))
                     {
-                        // ✅ Store user info in Session
                         Session["UserId"] = id;
                         Session["UserRole"] = role;
                         Session["UserName"] = name;
                         Session["UserEmail"] = email;
 
-                        // Redirect based on role
+
                         RedirectByRole(role);
                     }
                     else
@@ -84,9 +80,8 @@ namespace Mathling
             }
         }
 
-        // =========================
-        // 🔀 REDIRECT BY ROLE
-        // =========================
+
+        //REDIRECT BY ROLE
         private void RedirectByRole(string role)
         {
             var destinations = new Dictionary<string, string>
@@ -103,19 +98,11 @@ namespace Mathling
 
             Response.Redirect(dest);
         }
-
-        // =========================
-        // ❌ SHOW ERROR
-        // =========================
         private void ShowError(string message)
         {
             ErrorMessage.Text = message;
             ErrorMessage.Visible = true;
         }
-
-        // =========================
-        // 🔐 HASH FUNCTION (SHA256)
-        // =========================
         private static string HashPassword(string password)
         {
             using (SHA256 sha256 = SHA256.Create())
