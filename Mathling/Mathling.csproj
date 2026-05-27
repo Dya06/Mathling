@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="App_Data\FormulaAbacus.sql" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
@@ -304,7 +305,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\MathlingDB_Schema.sql" />
-    <Content Include="App_Data\Quiz_WebForms_Seed_Data.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

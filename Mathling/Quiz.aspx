@@ -2,6 +2,35 @@
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href='<%= ResolveUrl("~/css/quiz.css") %>'>
+
+    <style>
+        .formula-switcher {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: var(--space-md) 0 var(--space-lg);
+        }
+        .formula-link {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.75);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: var(--text-sm);
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .formula-link:hover {
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+        .formula-link.active {
+            background: var(--primary, #2563eb);
+            color: white;
+            border-color: transparent;
+        }
+    </style>
 </asp:Content>
 
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
@@ -30,6 +59,15 @@
                         <div class="formula-badge">
                             <h3><asp:Literal ID="FormulaNameLiteral" runat="server" /></h3>
                             <div class="formula-rule"><asp:Literal ID="FormulaRuleLiteral" runat="server" /></div>
+                        </div>
+
+
+
+                        <div class="formula-switcher">
+                            <a class='<%= GetFormulaLinkCss("SF+4") %>' href='<%= GetFormulaUrl("SF+4") %>'>SF+4</a>
+                            <a class='<%= GetFormulaLinkCss("SF+3") %>' href='<%= GetFormulaUrl("SF+3") %>'>SF+3</a>
+                            <a class='<%= GetFormulaLinkCss("SF+2") %>' href='<%= GetFormulaUrl("SF+2") %>'>SF+2</a>
+                            <a class='<%= GetFormulaLinkCss("SF+1") %>' href='<%= GetFormulaUrl("SF+1") %>'>SF+1</a>
                         </div>
 
                         <div class="module-nav">
@@ -139,28 +177,6 @@
 
 
 
-                            <asp:Panel ID="AbacusPanel" runat="server" Visible="false" CssClass="abacus-section" Style="margin:var(--space-lg) auto;max-width:420px;text-align:center">
-                                <h3 style="margin-bottom:var(--space-sm)">Abacus Demonstration</h3>
-                                <p style="color:var(--text-tertiary);font-size:var(--text-sm);margin-bottom:var(--space-md)">
-                                    Watch how the beads move for this question.
-                                </p>
-
-                                <div id="abacusContainer" class="abacus-container"></div>
-
-                                <div style="margin-top:var(--space-md);display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-                                    <asp:Repeater ID="AbacusStepRepeater" runat="server">
-                                        <ItemTemplate>
-                                            <span class="module-tag" style="font-size:var(--text-xs)"><%# Container.DataItem %></span>
-                                        </ItemTemplate>
-                                    </asp:Repeater>
-                                </div>
-
-                                <button type="button" class="btn btn-secondary" style="margin-top:var(--space-md)" onclick="playCurrentQuestionAbacus()">
-                                    ▶ Replay Abacus
-                                </button>
-                            </asp:Panel>
-
-
                             <div class="answer-display">
                                 <asp:Literal ID="AnswerDisplayLiteral" runat="server" />
                             </div>
@@ -215,22 +231,4 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src='<%= ResolveUrl("~/js/abacus.js") %>'></script>
-
-    <script type="text/javascript">
-        window.mathlingsLastAbacusRows = window.mathlingsLastAbacusRows || [];
-
-        function playCurrentQuestionAbacus(rowsFromServer) {
-            var rows = rowsFromServer || window.mathlingsLastAbacusRows || [];
-            var container = document.getElementById("abacusContainer");
-
-            if (!container || !rows || rows.length === 0 || typeof Abacus === "undefined") {
-                return;
-            }
-
-            container.innerHTML = "";
-            window.mathlingsAbacusInstance = new Abacus(container, { rods: 1 });
-            window.mathlingsAbacusInstance.animateQuestion(rows);
-        }
-    </script>
 </asp:Content>

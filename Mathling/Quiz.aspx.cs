@@ -12,8 +12,24 @@ namespace Mathling
 {
     public partial class Quiz : Page
     {
-        private const string FormulaName = "SF+4";
         private readonly string _connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+
+        private string SelectedFormulaName
+        {
+            get
+            {
+                string formula = Request.QueryString["formula"];
+                if (string.IsNullOrWhiteSpace(formula)) return "SF+4";
+
+                formula = formula.Trim().ToUpperInvariant();
+                if (formula == "SF+4" || formula == "SF+3" || formula == "SF+2" || formula == "SF+1")
+                {
+                    return formula;
+                }
+
+                return "SF+4";
+            }
+        }
 
         private QuizFormula CurrentFormula
         {
@@ -21,15 +37,15 @@ namespace Mathling
             set { Session["QuizFormula"] = value; }
         }
 
-        private int SelectedModuleId
+        private string SelectedModuleId
         {
-            get { return Session["QuizSelectedModuleId"] == null ? 0 : (int)Session["QuizSelectedModuleId"]; }
+            get { return Session["QuizSelectedModuleId"] == null ? string.Empty : Session["QuizSelectedModuleId"].ToString(); }
             set { Session["QuizSelectedModuleId"] = value; }
         }
 
-        private int SelectedSetId
+        private string SelectedSetId
         {
-            get { return Session["QuizSelectedSetId"] == null ? 0 : (int)Session["QuizSelectedSetId"]; }
+            get { return Session["QuizSelectedSetId"] == null ? string.Empty : Session["QuizSelectedSetId"].ToString(); }
             set { Session["QuizSelectedSetId"] = value; }
         }
 
@@ -80,12 +96,13 @@ namespace Mathling
             if (!IsPostBack)
             {
                 CurrentFormula = LoadFormulaFromDatabase();
-                SelectedModuleId = 0;
-                SelectedSetId = 0;
+                SelectedModuleId = string.Empty;
+                SelectedSetId = string.Empty;
                 QuestionIndex = 0;
                 TotalCorrect = 0;
                 CurrentAnswer = string.Empty;
                 FlashIndex = 0;
+                Session["QuizNextFormula"] = string.Empty;
 
                 BindBaseContent();
                 BindModuleSidebar();
@@ -97,7 +114,7 @@ namespace Mathling
         {
             if (CurrentFormula == null)
             {
-                ShowMessage("Quiz data missing", "No formula data was found in the database. Run the quiz seed SQL script first.");
+                ShowMessage("Quiz data missing", "No formula data was found in the database for " + Server.HtmlEncode(SelectedFormulaName) + ". Run FormulaAbacus.sql first.");
                 return;
             }
 
@@ -134,8 +151,8 @@ namespace Mathling
         protected void ModuleRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName != "SelectModule") return;
-            SelectedModuleId = Convert.ToInt32(e.CommandArgument);
-            SelectedSetId = 0;
+            SelectedModuleId = e.CommandArgument.ToString();
+            SelectedSetId = string.Empty;
             AssessmentTimer.Enabled = false;
             FlashTimer.Enabled = false;
             BindModuleSidebar();
@@ -198,7 +215,7 @@ namespace Mathling
         {
             if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem) return;
             var button = (LinkButton)e.Item.FindControl("SetButton");
-            int setId = Convert.ToInt32(DataBinder.Eval(e.Item.DataItem, "Id"));
+            string setId = DataBinder.Eval(e.Item.DataItem, "Id").ToString();
             var set = GetSelectedModule()?.Sets.FirstOrDefault(s => s.Id == setId);
 
             if (set == null || set.Questions.Count == 0)
@@ -212,7 +229,7 @@ namespace Mathling
         protected void SetRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName != "SelectSet") return;
-            SelectedSetId = Convert.ToInt32(e.CommandArgument);
+            SelectedSetId = e.CommandArgument.ToString();
             StartSet();
         }
 
@@ -232,6 +249,7 @@ namespace Mathling
             CurrentAnswer = string.Empty;
             FlashIndex = 0;
             SetStartedAt = DateTime.Now;
+            Session["QuizNextFormula"] = string.Empty;
 
             if (module.IsTimed)
             {
@@ -283,8 +301,6 @@ namespace Mathling
             CurrentAnswer = CurrentAnswer ?? string.Empty;
             AnswerDisplayLiteral.Text = string.IsNullOrEmpty(CurrentAnswer) ? "_" : Server.HtmlEncode(CurrentAnswer);
 
-            PrepareAbacusForQuestion(module, question);
-
             if (string.Equals(set.DisplayMode, "flash", StringComparison.OrdinalIgnoreCase))
             {
                 FlashIndex = 0;
@@ -296,55 +312,6 @@ namespace Mathling
                 FlashTimer.Enabled = false;
                 RenderStaticQuestion(question);
             }
-        }
-
-
-        private void PrepareAbacusForQuestion(QuizModule module, QuizQuestion question)
-        {
-            bool shouldShowAbacus =
-                module != null &&
-                question != null &&
-                module.UseAbacus &&
-                !module.MentalMode &&
-                question.Rows != null &&
-                question.Rows.Count > 0;
-
-            AbacusPanel.Visible = shouldShowAbacus;
-
-            if (!shouldShowAbacus)
-            {
-                AbacusStepRepeater.DataSource = null;
-                AbacusStepRepeater.DataBind();
-                return;
-            }
-
-            AbacusStepRepeater.DataSource = question.Rows.Select(r => r >= 0 ? "+" + r : r.ToString()).ToList();
-            AbacusStepRepeater.DataBind();
-
-            RegisterAbacusAnimation(question.Rows);
-        }
-
-        private void RegisterAbacusAnimation(List<int> rows)
-        {
-            if (rows == null || rows.Count == 0) return;
-
-            string rowsJson = "[" + string.Join(",", rows) + "]";
-            string script = @"
-                window.mathlingsLastAbacusRows = " + rowsJson + @";
-                setTimeout(function () {
-                    if (window.playCurrentQuestionAbacus) {
-                        window.playCurrentQuestionAbacus(window.mathlingsLastAbacusRows);
-                    }
-                }, 250);
-            ";
-
-            ScriptManager.RegisterStartupScript(
-                QuizUpdatePanel,
-                QuizUpdatePanel.GetType(),
-                "PlayAbacus_" + Guid.NewGuid().ToString("N"),
-                script,
-                true
-            );
         }
 
         private void RenderStaticQuestion(QuizQuestion question)
@@ -545,6 +512,15 @@ namespace Mathling
             CompleteTitleLiteral.Text = Server.HtmlEncode(set.Label + " — Complete!");
             CompleteCorrectLiteral.Text = TotalCorrect + "/" + total;
             CompletePercentageLiteral.Text = pct + "%";
+
+            string nextFormula = null;
+            if (string.Equals(module.ModuleKey, "assessment", StringComparison.OrdinalIgnoreCase))
+            {
+                nextFormula = GetNextFormulaName(SelectedFormulaName);
+            }
+
+            Session["QuizNextFormula"] = nextFormula ?? string.Empty;
+            BackToModuleButton.Text = string.IsNullOrEmpty(nextFormula) ? "← Back to Module" : "Continue to " + nextFormula + " →";
         }
 
         protected void RetryButton_Click(object sender, EventArgs e)
@@ -554,6 +530,13 @@ namespace Mathling
 
         protected void BackToModuleButton_Click(object sender, EventArgs e)
         {
+            string nextFormula = Session["QuizNextFormula"] == null ? string.Empty : Session["QuizNextFormula"].ToString();
+            if (!string.IsNullOrEmpty(nextFormula))
+            {
+                Response.Redirect(GetFormulaUrl(nextFormula));
+                return;
+            }
+
             ShowModuleIntro();
         }
 
@@ -592,14 +575,14 @@ namespace Mathling
             return set.Questions[QuestionIndex];
         }
 
-        private bool IsModuleCompleted(int moduleId)
+        private bool IsModuleCompleted(string moduleId)
         {
-            int userId = Convert.ToInt32(Session["UserId"]);
+            string userId = Session["UserId"].ToString();
             using (SqlConnection conn = new SqlConnection(_connStr))
             using (SqlCommand cmd = new SqlCommand(@"
                 SELECT COUNT(*)
-                FROM ModuleProgress
-                WHERE UserId = @UserId AND ModuleId = @ModuleId AND IsCompleted = 1", conn))
+                FROM [ModuleProgress]
+                WHERE [UserId] = @UserId AND [ModuleId] = @ModuleId AND [IsCompleted] = 1", conn))
             {
                 cmd.Parameters.AddWithValue("@UserId", userId);
                 cmd.Parameters.AddWithValue("@ModuleId", moduleId);
@@ -613,65 +596,90 @@ namespace Mathling
             QuizSet set = GetSelectedSet();
             if (set == null) return;
 
-            int userId = Convert.ToInt32(Session["UserId"]);
+            string userId = Session["UserId"].ToString();
             int total = set.Questions.Count;
             decimal percentage = total == 0 ? 0 : Math.Round((decimal)TotalCorrect / total * 100, 2);
             int timeTaken = Math.Max(0, (int)(DateTime.Now - SetStartedAt).TotalSeconds);
             int score = TotalCorrect * 10;
 
             using (SqlConnection conn = new SqlConnection(_connStr))
-            using (SqlCommand cmd = new SqlCommand(@"
-                INSERT INTO QuizResults (UserId, SetId, Score, TotalCorrect, TotalQuestions, Percentage, TimeTakenSec)
-                VALUES (@UserId, @SetId, @Score, @TotalCorrect, @TotalQuestions, @Percentage, @TimeTakenSec);
-
-                UPDATE Users
-                SET XP = XP + @Score,
-                    Level = CASE WHEN ((XP + @Score) / 100) + 1 > Level THEN ((XP + @Score) / 100) + 1 ELSE Level END
-                WHERE Id = @UserId;", conn))
             {
-                cmd.Parameters.AddWithValue("@UserId", userId);
-                cmd.Parameters.AddWithValue("@SetId", set.Id);
-                cmd.Parameters.AddWithValue("@Score", score);
-                cmd.Parameters.AddWithValue("@TotalCorrect", TotalCorrect);
-                cmd.Parameters.AddWithValue("@TotalQuestions", total);
-                cmd.Parameters.AddWithValue("@Percentage", percentage);
-                cmd.Parameters.AddWithValue("@TimeTakenSec", timeTaken);
                 conn.Open();
-                cmd.ExecuteNonQuery();
+                string resultId = GetNextId(conn, "QuizResults", "QR", 6);
+
+                using (SqlCommand cmd = new SqlCommand(@"
+                    INSERT INTO [QuizResults] ([Id], [UserId], [SetId], [Score], [TotalCorrect], [TotalQuestions], [Percentage], [TimeTakenSec])
+                    VALUES (@Id, @UserId, @SetId, @Score, @TotalCorrect, @TotalQuestions, @Percentage, @TimeTakenSec);
+
+                    UPDATE [Users]
+                    SET [XP] = [XP] + @Score,
+                        [Level] = CASE WHEN (([XP] + @Score) / 100) + 1 > [Level] THEN (([XP] + @Score) / 100) + 1 ELSE [Level] END
+                    WHERE [Id] = @UserId;", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", resultId);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@SetId", set.Id);
+                    cmd.Parameters.AddWithValue("@Score", score);
+                    cmd.Parameters.AddWithValue("@TotalCorrect", TotalCorrect);
+                    cmd.Parameters.AddWithValue("@TotalQuestions", total);
+                    cmd.Parameters.AddWithValue("@Percentage", percentage);
+                    cmd.Parameters.AddWithValue("@TimeTakenSec", timeTaken);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
-        private void MarkModuleCompleted(int moduleId)
+        private void MarkModuleCompleted(string moduleId)
         {
-            int userId = Convert.ToInt32(Session["UserId"]);
+            string userId = Session["UserId"].ToString();
 
             using (SqlConnection conn = new SqlConnection(_connStr))
-            using (SqlCommand cmd = new SqlCommand(@"
-                IF EXISTS (SELECT 1 FROM ModuleProgress WHERE UserId = @UserId AND ModuleId = @ModuleId)
-                BEGIN
-                    UPDATE ModuleProgress
-                    SET IsCompleted = 1, CompletedAt = GETDATE()
-                    WHERE UserId = @UserId AND ModuleId = @ModuleId;
-                END
-                ELSE
-                BEGIN
-                    INSERT INTO ModuleProgress (UserId, ModuleId, IsCompleted, CompletedAt)
-                    VALUES (@UserId, @ModuleId, 1, GETDATE());
-                END", conn))
             {
-                cmd.Parameters.AddWithValue("@UserId", userId);
-                cmd.Parameters.AddWithValue("@ModuleId", moduleId);
                 conn.Open();
-                cmd.ExecuteNonQuery();
+
+                using (SqlCommand existsCmd = new SqlCommand(@"
+                    SELECT [Id]
+                    FROM [ModuleProgress]
+                    WHERE [UserId] = @UserId AND [ModuleId] = @ModuleId", conn))
+                {
+                    existsCmd.Parameters.AddWithValue("@UserId", userId);
+                    existsCmd.Parameters.AddWithValue("@ModuleId", moduleId);
+                    object existingId = existsCmd.ExecuteScalar();
+
+                    if (existingId != null)
+                    {
+                        using (SqlCommand updateCmd = new SqlCommand(@"
+                            UPDATE [ModuleProgress]
+                            SET [IsCompleted] = 1, [CompletedAt] = GETDATE()
+                            WHERE [Id] = @Id", conn))
+                        {
+                            updateCmd.Parameters.AddWithValue("@Id", existingId.ToString());
+                            updateCmd.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        string progressId = GetNextId(conn, "ModuleProgress", "MP", 6);
+                        using (SqlCommand insertCmd = new SqlCommand(@"
+                            INSERT INTO [ModuleProgress] ([Id], [UserId], [ModuleId], [IsCompleted], [CompletedAt])
+                            VALUES (@Id, @UserId, @ModuleId, 1, GETDATE())", conn))
+                        {
+                            insertCmd.Parameters.AddWithValue("@Id", progressId);
+                            insertCmd.Parameters.AddWithValue("@UserId", userId);
+                            insertCmd.Parameters.AddWithValue("@ModuleId", moduleId);
+                            insertCmd.ExecuteNonQuery();
+                        }
+                    }
+                }
             }
         }
 
         private QuizFormula LoadFormulaFromDatabase()
         {
             QuizFormula formula = null;
-            var modules = new Dictionary<int, QuizModule>();
-            var sets = new Dictionary<int, QuizSet>();
-            var questions = new Dictionary<int, QuizQuestion>();
+            var modules = new Dictionary<string, QuizModule>();
+            var sets = new Dictionary<string, QuizSet>();
+            var questions = new Dictionary<string, QuizQuestion>();
 
             using (SqlConnection conn = new SqlConnection(_connStr))
             {
@@ -682,14 +690,14 @@ namespace Mathling
                     FROM [Formulas]
                     WHERE [Name] = @Name AND [IsActive] = 1", conn))
                 {
-                    cmd.Parameters.AddWithValue("@Name", FormulaName);
+                    cmd.Parameters.AddWithValue("@Name", SelectedFormulaName);
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
                             formula = new QuizFormula
                             {
-                                Id = Convert.ToInt32(reader["Id"]),
+                                Id = reader["Id"].ToString(),
                                 Name = reader["Name"].ToString(),
                                 Rule = reader["Rule"].ToString(),
                                 Description = reader["Description"].ToString(),
@@ -703,10 +711,10 @@ namespace Mathling
                 if (formula == null) return null;
 
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT Id, FormulaId, ModuleKey, Title, Icon, Description, UseAbacus, MentalMode, IsTimed, TimeLimitSec, SortOrder
-                    FROM Modules
-                    WHERE FormulaId = @FormulaId
-                    ORDER BY SortOrder", conn))
+                    SELECT [Id], [FormulaId], [ModuleKey], [Title], [Icon], [Description], [UseAbacus], [MentalMode], [IsTimed], [TimeLimitSec], [SortOrder]
+                    FROM [Modules]
+                    WHERE [FormulaId] = @FormulaId
+                    ORDER BY [SortOrder]", conn))
                 {
                     cmd.Parameters.AddWithValue("@FormulaId", formula.Id);
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -715,8 +723,8 @@ namespace Mathling
                         {
                             var module = new QuizModule
                             {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                FormulaId = Convert.ToInt32(reader["FormulaId"]),
+                                Id = reader["Id"].ToString(),
+                                FormulaId = reader["FormulaId"].ToString(),
                                 ModuleKey = reader["ModuleKey"].ToString(),
                                 Title = reader["Title"].ToString(),
                                 Icon = reader["Icon"].ToString(),
@@ -735,11 +743,11 @@ namespace Mathling
                 }
 
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT qs.Id, qs.ModuleId, qs.Label, qs.DisplayMode, qs.SortOrder
-                    FROM QuestionSets qs
-                    INNER JOIN Modules m ON qs.ModuleId = m.Id
-                    WHERE m.FormulaId = @FormulaId
-                    ORDER BY m.SortOrder, qs.SortOrder", conn))
+                    SELECT qs.[Id], qs.[ModuleId], qs.[Label], qs.[DisplayMode], qs.[SortOrder]
+                    FROM [QuestionSets] qs
+                    INNER JOIN [Modules] m ON qs.[ModuleId] = m.[Id]
+                    WHERE m.[FormulaId] = @FormulaId
+                    ORDER BY m.[SortOrder], qs.[SortOrder]", conn))
                 {
                     cmd.Parameters.AddWithValue("@FormulaId", formula.Id);
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -748,8 +756,8 @@ namespace Mathling
                         {
                             var set = new QuizSet
                             {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                ModuleId = Convert.ToInt32(reader["ModuleId"]),
+                                Id = reader["Id"].ToString(),
+                                ModuleId = reader["ModuleId"].ToString(),
                                 Label = reader["Label"].ToString(),
                                 DisplayMode = reader["DisplayMode"].ToString(),
                                 SortOrder = Convert.ToInt32(reader["SortOrder"]),
@@ -762,12 +770,12 @@ namespace Mathling
                 }
 
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT q.Id, q.SetId, q.Answer, q.SortOrder
-                    FROM Questions q
-                    INNER JOIN QuestionSets qs ON q.SetId = qs.Id
-                    INNER JOIN Modules m ON qs.ModuleId = m.Id
-                    WHERE m.FormulaId = @FormulaId
-                    ORDER BY qs.SortOrder, q.SortOrder", conn))
+                    SELECT q.[Id], q.[SetId], q.[Answer], q.[SortOrder]
+                    FROM [Questions] q
+                    INNER JOIN [QuestionSets] qs ON q.[SetId] = qs.[Id]
+                    INNER JOIN [Modules] m ON qs.[ModuleId] = m.[Id]
+                    WHERE m.[FormulaId] = @FormulaId
+                    ORDER BY qs.[SortOrder], q.[SortOrder]", conn))
                 {
                     cmd.Parameters.AddWithValue("@FormulaId", formula.Id);
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -776,8 +784,8 @@ namespace Mathling
                         {
                             var question = new QuizQuestion
                             {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                SetId = Convert.ToInt32(reader["SetId"]),
+                                Id = reader["Id"].ToString(),
+                                SetId = reader["SetId"].ToString(),
                                 Answer = Convert.ToInt32(reader["Answer"]),
                                 SortOrder = Convert.ToInt32(reader["SortOrder"]),
                                 Rows = new List<int>()
@@ -789,20 +797,20 @@ namespace Mathling
                 }
 
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT qr.QuestionId, qr.Value, qr.SortOrder
-                    FROM QuestionRows qr
-                    INNER JOIN Questions q ON qr.QuestionId = q.Id
-                    INNER JOIN QuestionSets qs ON q.SetId = qs.Id
-                    INNER JOIN Modules m ON qs.ModuleId = m.Id
-                    WHERE m.FormulaId = @FormulaId
-                    ORDER BY q.SortOrder, qr.SortOrder", conn))
+                    SELECT qr.[QuestionId], qr.[Value], qr.[SortOrder]
+                    FROM [QuestionRows] qr
+                    INNER JOIN [Questions] q ON qr.[QuestionId] = q.[Id]
+                    INNER JOIN [QuestionSets] qs ON q.[SetId] = qs.[Id]
+                    INNER JOIN [Modules] m ON qs.[ModuleId] = m.[Id]
+                    WHERE m.[FormulaId] = @FormulaId
+                    ORDER BY q.[SortOrder], qr.[SortOrder]", conn))
                 {
                     cmd.Parameters.AddWithValue("@FormulaId", formula.Id);
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            int questionId = Convert.ToInt32(reader["QuestionId"]);
+                            string questionId = reader["QuestionId"].ToString();
                             if (questions.ContainsKey(questionId))
                             {
                                 questions[questionId].Rows.Add(Convert.ToInt32(reader["Value"]));
@@ -813,6 +821,41 @@ namespace Mathling
             }
 
             return formula;
+        }
+
+        private string GetNextId(SqlConnection conn, string tableName, string prefix, int digits)
+        {
+            string sql = "SELECT ISNULL(MAX(TRY_CAST(SUBSTRING([Id], @StartAt, 20) AS INT)), 0) FROM [" + tableName + "] WHERE [Id] LIKE @LikePattern";
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@StartAt", prefix.Length + 1);
+                cmd.Parameters.AddWithValue("@LikePattern", prefix + "%");
+                int current = Convert.ToInt32(cmd.ExecuteScalar());
+                return prefix + (current + 1).ToString().PadLeft(digits, '0');
+            }
+        }
+
+        private string GetNextFormulaName(string currentFormula)
+        {
+            switch (currentFormula)
+            {
+                case "SF+4": return "SF+3";
+                case "SF+3": return "SF+2";
+                case "SF+2": return "SF+1";
+                default: return null;
+            }
+        }
+
+        protected string GetFormulaLinkCss(string formulaName)
+        {
+            return string.Equals(SelectedFormulaName, formulaName, StringComparison.OrdinalIgnoreCase)
+                ? "formula-link active"
+                : "formula-link";
+        }
+
+        protected string GetFormulaUrl(string formulaName)
+        {
+            return "Quiz.aspx?formula=" + Server.UrlEncode(formulaName);
         }
 
         public string GetModuleIcon(object iconValue)
@@ -843,7 +886,7 @@ namespace Mathling
     [Serializable]
     public class QuizFormula
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Rule { get; set; }
         public string Description { get; set; }
@@ -854,8 +897,8 @@ namespace Mathling
     [Serializable]
     public class QuizModule
     {
-        public int Id { get; set; }
-        public int FormulaId { get; set; }
+        public string Id { get; set; }
+        public string FormulaId { get; set; }
         public string ModuleKey { get; set; }
         public string Title { get; set; }
         public string Icon { get; set; }
@@ -871,8 +914,8 @@ namespace Mathling
     [Serializable]
     public class QuizSet
     {
-        public int Id { get; set; }
-        public int ModuleId { get; set; }
+        public string Id { get; set; }
+        public string ModuleId { get; set; }
         public string Label { get; set; }
         public string DisplayMode { get; set; }
         public int SortOrder { get; set; }
@@ -882,8 +925,8 @@ namespace Mathling
     [Serializable]
     public class QuizQuestion
     {
-        public int Id { get; set; }
-        public int SetId { get; set; }
+        public string Id { get; set; }
+        public string SetId { get; set; }
         public int Answer { get; set; }
         public int SortOrder { get; set; }
         public List<int> Rows { get; set; }

@@ -312,24 +312,6 @@ namespace Mathling
         protected global::System.Web.UI.WebControls.Literal QuestionDisplayLiteral;
 
         /// <summary>
-        /// AbacusPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel AbacusPanel;
-
-        /// <summary>
-        /// AbacusStepRepeater control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater AbacusStepRepeater;
-
-        /// <summary>
         /// AnswerDisplayLiteral control.
         /// </summary>
         /// <remarks>
