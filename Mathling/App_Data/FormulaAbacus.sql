@@ -1,8 +1,3 @@
-/* ============================================
-   MATHLINGS - FORMULA ABACUS SEED DATA
-   Compatible with current schema using VARCHAR(10) IDs.
-   Inserts SF+4, SF+3, SF+2, SF+1 modules, sets, questions and rows.
-   ============================================ */
 
 USE MathlingDB;
 GO
@@ -13,7 +8,6 @@ GO
 BEGIN TRY
     BEGIN TRANSACTION;
 
-    /* Clear old quiz/formula data for these formulas first */
     DELETE qr
     FROM [QuestionRows] qr
     INNER JOIN [Questions] q ON qr.[QuestionId] = q.[Id]
@@ -64,7 +58,6 @@ BEGIN TRY
         ('F003', 'SF+2', '+5 - 3', 'Small Friend +2', 3, 1),
         ('F004', 'SF+1', '+5 - 4', 'Small Friend +1', 4, 1);
 
-    /* Insert modules */
     INSERT INTO [Modules] ([Id],[FormulaId],[ModuleKey],[Title],[Icon],[Description],[UseAbacus],[MentalMode],[IsTimed],[TimeLimitSec],[SortOrder])
     VALUES
         ('M001', 'F001', 'learning', 'A. Learning Module', 'book', 'Learn how the abacus moves for this formula', 1, 0, 0, NULL, 1),
@@ -88,7 +81,7 @@ BEGIN TRY
         ('M019', 'F004', 'preparation', 'D. Preparation', 'prep', 'Prepare for the final assessment.', 0, 1, 0, NULL, 4),
         ('M020', 'F004', 'assessment', 'E. Assessment', 'trophy', 'Timed final assessment.', 0, 1, 1, 60, 5);
 
-    /* Insert question sets */
+    /* question sets */
     INSERT INTO [QuestionSets] ([Id],[ModuleId],[Label],[DisplayMode],[SortOrder])
     VALUES
         ('S001', 'M001', 'Set 1 — Static', 'static', 1),
@@ -124,7 +117,7 @@ BEGIN TRY
         ('S031', 'M019', 'Preparation — Flash', 'flash', 31),
         ('S032', 'M020', 'Final Assessment — Flash', 'flash', 32);
 
-    /* Insert questions */
+    /* questions */
     INSERT INTO [Questions] ([Id],[SetId],[Answer],[SortOrder])
     VALUES
         ('Q0001', 'S001', 7, 1),
@@ -328,7 +321,7 @@ BEGIN TRY
         ('Q0199', 'S032', 5, 9),
         ('Q0200', 'S032', 6, 10);
 
-    /* Insert question rows */
+    /* question rows */
     INSERT INTO [QuestionRows] ([Id],[QuestionId],[Value],[SortOrder])
     VALUES
         ('R0001', 'Q0001', 4, 1),

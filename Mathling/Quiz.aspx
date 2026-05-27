@@ -30,6 +30,13 @@
             color: white;
             border-color: transparent;
         }
+        .formula-link.locked {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+            background: #e5e7eb;
+            color: #6b7280;
+        }
     </style>
 </asp:Content>
 
@@ -64,10 +71,10 @@
 
 
                         <div class="formula-switcher">
-                            <a class='<%= GetFormulaLinkCss("SF+4") %>' href='<%= GetFormulaUrl("SF+4") %>'>SF+4</a>
-                            <a class='<%= GetFormulaLinkCss("SF+3") %>' href='<%= GetFormulaUrl("SF+3") %>'>SF+3</a>
-                            <a class='<%= GetFormulaLinkCss("SF+2") %>' href='<%= GetFormulaUrl("SF+2") %>'>SF+2</a>
-                            <a class='<%= GetFormulaLinkCss("SF+1") %>' href='<%= GetFormulaUrl("SF+1") %>'>SF+1</a>
+                            <a class='<%= GetFormulaLinkCss("SF+4") %>' href='<%= GetFormulaUrl("SF+4") %>'><%= GetFormulaLinkLabel("SF+4") %></a>
+                            <a class='<%= GetFormulaLinkCss("SF+3") %>' href='<%= GetFormulaUrl("SF+3") %>'><%= GetFormulaLinkLabel("SF+3") %></a>
+                            <a class='<%= GetFormulaLinkCss("SF+2") %>' href='<%= GetFormulaUrl("SF+2") %>'><%= GetFormulaLinkLabel("SF+2") %></a>
+                            <a class='<%= GetFormulaLinkCss("SF+1") %>' href='<%= GetFormulaUrl("SF+1") %>'><%= GetFormulaLinkLabel("SF+1") %></a>
                         </div>
 
                         <div class="module-nav">

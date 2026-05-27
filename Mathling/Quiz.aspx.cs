@@ -93,6 +93,19 @@ namespace Mathling
                 return;
             }
 
+            // Formula access rule:
+            // SF+4 is open by default.
+            // SF+3 unlocks only after SF+4 Assessment is completed.
+            // SF+2 unlocks only after SF+3 Assessment is completed.
+            // SF+1 unlocks only after SF+2 Assessment is completed.
+            if (!IsFormulaUnlocked(SelectedFormulaName))
+            {
+                string allowedFormula = GetHighestUnlockedFormulaName();
+                Response.Redirect("Quiz.aspx?formula=" + Server.UrlEncode(allowedFormula), false);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+            }
+
             if (!IsPostBack)
             {
                 CurrentFormula = LoadFormulaFromDatabase();
@@ -846,16 +859,93 @@ namespace Mathling
             }
         }
 
+        private string GetPreviousFormulaName(string formulaName)
+        {
+            switch (formulaName)
+            {
+                case "SF+3": return "SF+4";
+                case "SF+2": return "SF+3";
+                case "SF+1": return "SF+2";
+                default: return null;
+            }
+        }
+
+        private bool IsFormulaUnlocked(string formulaName)
+        {
+            formulaName = (formulaName ?? string.Empty).Trim().ToUpperInvariant();
+
+            // First formula is always available.
+            if (formulaName == "SF+4") return true;
+
+            string previousFormula = GetPreviousFormulaName(formulaName);
+            if (string.IsNullOrEmpty(previousFormula)) return false;
+
+            return IsAssessmentCompletedForFormula(previousFormula);
+        }
+
+        private bool IsAssessmentCompletedForFormula(string formulaName)
+        {
+            string userId = Session["UserId"] == null ? string.Empty : Session["UserId"].ToString();
+            if (string.IsNullOrWhiteSpace(userId)) return false;
+
+            using (SqlConnection conn = new SqlConnection(_connStr))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(@"
+                    SELECT COUNT(1)
+                    FROM [ModuleProgress] mp
+                    INNER JOIN [Modules] m ON mp.[ModuleId] = m.[Id]
+                    INNER JOIN [Formulas] f ON m.[FormulaId] = f.[Id]
+                    WHERE mp.[UserId] = @UserId
+                      AND mp.[IsCompleted] = 1
+                      AND f.[Name] = @FormulaName
+                      AND m.[ModuleKey] = 'assessment'", conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@FormulaName", formulaName);
+                    return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+                }
+            }
+        }
+
+        private string GetHighestUnlockedFormulaName()
+        {
+            if (IsFormulaUnlocked("SF+1")) return "SF+1";
+            if (IsFormulaUnlocked("SF+2")) return "SF+2";
+            if (IsFormulaUnlocked("SF+3")) return "SF+3";
+            return "SF+4";
+        }
+
         protected string GetFormulaLinkCss(string formulaName)
         {
-            return string.Equals(SelectedFormulaName, formulaName, StringComparison.OrdinalIgnoreCase)
-                ? "formula-link active"
-                : "formula-link";
+            string css = "formula-link";
+
+            if (string.Equals(SelectedFormulaName, formulaName, StringComparison.OrdinalIgnoreCase))
+            {
+                css += " active";
+            }
+
+            if (!IsFormulaUnlocked(formulaName))
+            {
+                css += " locked";
+            }
+
+            return css;
         }
 
         protected string GetFormulaUrl(string formulaName)
         {
+            if (!IsFormulaUnlocked(formulaName))
+            {
+                return "#";
+            }
+
             return "Quiz.aspx?formula=" + Server.UrlEncode(formulaName);
+        }
+
+        protected string GetFormulaLinkLabel(string formulaName)
+        {
+            return IsFormulaUnlocked(formulaName) ? formulaName : "🔒 " + formulaName;
         }
 
         public string GetModuleIcon(object iconValue)
