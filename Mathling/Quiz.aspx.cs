@@ -283,12 +283,7 @@ namespace Mathling
             CurrentAnswer = CurrentAnswer ?? string.Empty;
             AnswerDisplayLiteral.Text = string.IsNullOrEmpty(CurrentAnswer) ? "_" : Server.HtmlEncode(CurrentAnswer);
 
-            AbacusPanel.Visible = module.UseAbacus;
-            if (module.UseAbacus)
-            {
-                AbacusStepRepeater.DataSource = question.Rows.Select(r => r >= 0 ? "+" + r : r.ToString()).ToList();
-                AbacusStepRepeater.DataBind();
-            }
+            PrepareAbacusForQuestion(module, question);
 
             if (string.Equals(set.DisplayMode, "flash", StringComparison.OrdinalIgnoreCase))
             {
@@ -301,6 +296,55 @@ namespace Mathling
                 FlashTimer.Enabled = false;
                 RenderStaticQuestion(question);
             }
+        }
+
+
+        private void PrepareAbacusForQuestion(QuizModule module, QuizQuestion question)
+        {
+            bool shouldShowAbacus =
+                module != null &&
+                question != null &&
+                module.UseAbacus &&
+                !module.MentalMode &&
+                question.Rows != null &&
+                question.Rows.Count > 0;
+
+            AbacusPanel.Visible = shouldShowAbacus;
+
+            if (!shouldShowAbacus)
+            {
+                AbacusStepRepeater.DataSource = null;
+                AbacusStepRepeater.DataBind();
+                return;
+            }
+
+            AbacusStepRepeater.DataSource = question.Rows.Select(r => r >= 0 ? "+" + r : r.ToString()).ToList();
+            AbacusStepRepeater.DataBind();
+
+            RegisterAbacusAnimation(question.Rows);
+        }
+
+        private void RegisterAbacusAnimation(List<int> rows)
+        {
+            if (rows == null || rows.Count == 0) return;
+
+            string rowsJson = "[" + string.Join(",", rows) + "]";
+            string script = @"
+                window.mathlingsLastAbacusRows = " + rowsJson + @";
+                setTimeout(function () {
+                    if (window.playCurrentQuestionAbacus) {
+                        window.playCurrentQuestionAbacus(window.mathlingsLastAbacusRows);
+                    }
+                }, 250);
+            ";
+
+            ScriptManager.RegisterStartupScript(
+                QuizUpdatePanel,
+                QuizUpdatePanel.GetType(),
+                "PlayAbacus_" + Guid.NewGuid().ToString("N"),
+                script,
+                true
+            );
         }
 
         private void RenderStaticQuestion(QuizQuestion question)
@@ -634,9 +678,9 @@ namespace Mathling
                 conn.Open();
 
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT TOP 1 Id, Name, Rule, Description, SortOrder
-                    FROM Formulas
-                    WHERE Name = @Name AND IsActive = 1", conn))
+                    SELECT TOP 1 [Id], [Name], [Rule], [Description], [SortOrder]
+                    FROM [Formulas]
+                    WHERE [Name] = @Name AND [IsActive] = 1", conn))
                 {
                     cmd.Parameters.AddWithValue("@Name", FormulaName);
                     using (SqlDataReader reader = cmd.ExecuteReader())

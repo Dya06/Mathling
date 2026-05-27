@@ -137,16 +137,29 @@
                                 <asp:Literal ID="QuestionDisplayLiteral" runat="server" />
                             </div>
 
-                            <asp:Panel ID="AbacusPanel" runat="server" Visible="false" CssClass="abacus-demo-area">
-                                <div class="abacus-demo-title">🧮 Abacus Guidance</div>
-                                <div class="abacus-demo-steps">
+
+
+                            <asp:Panel ID="AbacusPanel" runat="server" Visible="false" CssClass="abacus-section" Style="margin:var(--space-lg) auto;max-width:420px;text-align:center">
+                                <h3 style="margin-bottom:var(--space-sm)">Abacus Demonstration</h3>
+                                <p style="color:var(--text-tertiary);font-size:var(--text-sm);margin-bottom:var(--space-md)">
+                                    Watch how the beads move for this question.
+                                </p>
+
+                                <div id="abacusContainer" class="abacus-container"></div>
+
+                                <div style="margin-top:var(--space-md);display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
                                     <asp:Repeater ID="AbacusStepRepeater" runat="server">
                                         <ItemTemplate>
-                                            <span class="abacus-step-pill"><%# Container.DataItem %></span>
+                                            <span class="module-tag" style="font-size:var(--text-xs)"><%# Container.DataItem %></span>
                                         </ItemTemplate>
                                     </asp:Repeater>
                                 </div>
+
+                                <button type="button" class="btn btn-secondary" style="margin-top:var(--space-md)" onclick="playCurrentQuestionAbacus()">
+                                    ▶ Replay Abacus
+                                </button>
                             </asp:Panel>
+
 
                             <div class="answer-display">
                                 <asp:Literal ID="AnswerDisplayLiteral" runat="server" />
@@ -196,9 +209,28 @@
                     </div>
                 </div>
             </ContentTemplate>
+
         </asp:UpdatePanel>
     </main>
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
+    <script src='<%= ResolveUrl("~/js/abacus.js") %>'></script>
+
+    <script type="text/javascript">
+        window.mathlingsLastAbacusRows = window.mathlingsLastAbacusRows || [];
+
+        function playCurrentQuestionAbacus(rowsFromServer) {
+            var rows = rowsFromServer || window.mathlingsLastAbacusRows || [];
+            var container = document.getElementById("abacusContainer");
+
+            if (!container || !rows || rows.length === 0 || typeof Abacus === "undefined") {
+                return;
+            }
+
+            container.innerHTML = "";
+            window.mathlingsAbacusInstance = new Abacus(container, { rods: 1 });
+            window.mathlingsAbacusInstance.animateQuestion(rows);
+        }
+    </script>
 </asp:Content>
