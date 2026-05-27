@@ -5,41 +5,64 @@
 </asp:Content>
 
 <asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
-  <nav class="navbar"><div class="navbar-inner">
-    <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
-    <div class="navbar-nav" id="main-nav"></div>
-    <div class="navbar-actions">
-      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
-      <button type="button" class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="Default.aspx" class="navbar-brand">
+        <img src="/favicon.svg" alt="Mathlings" class="navbar-logo">
+        <span class="navbar-title">Math<span>lings</span></span>
+      </a>
+      <div class="navbar-nav" id="main-nav"></div>
+      <div class="navbar-actions">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+        <button type="button" class="hamburger" id="hamburger" aria-label="Menu">
+          <div class="hamburger-lines"><span></span><span></span><span></span></div>
+        </button>
+      </div>
     </div>
-  </div></nav>
+  </nav>
   <div class="mobile-nav" id="mobile-nav"></div>
 
   <main class="main">
     <section class="profile-hero">
       <div class="container">
-        <div class="profile-avatar" id="profile-avatar">&#128100;</div>
-        <h1 class="profile-name" id="profile-name">User</h1>
-        <span class="badge badge-blue profile-role" id="profile-role-badge">User</span>
-        <div class="profile-level-bar" id="level-section" style="display:none">
+        <!-- Matches 'profile_avatar' in your Canvas -->
+        <div class="profile-avatar" id="profile_avatar" runat="server">&#128100;</div>
+        
+        <!-- Matches 'profileName' in your Canvas -->
+        <h1 class="profile-name" id="profileName" runat="server">User</h1>
+        
+        <!-- Matches 'profileRoleBadge' in your Canvas -->
+        <span class="badge badge-blue profile-role" id="profileRoleBadge" runat="server">User</span>
+        
+        <!-- Matches 'levelSection' in your Canvas -->
+        <div class="profile-level-bar" id="levelSection" runat="server" style="display:none">
           <div class="profile-level-info">
-            <span id="level-num">Level 1</span>
-            <span id="xp-text">0 / 500 XP</span>
+            <span id="levelNum" runat="server">Level 1</span>
+            <span id="xpText" runat="server">0 / 500 XP</span>
           </div>
           <div class="progress-bar progress-bar-yellow">
-            <div class="progress-bar-fill" id="xp-fill" style="width:0%"></div>
+            <div class="progress-bar-fill" id="xpFill" runat="server" style="width:0%"></div>
           </div>
         </div>
       </div>
     </section>
+
     <section class="profile-body">
       <div class="container" id="profile-content">
-        <div style="text-align:center;padding:var(--space-3xl)"><div class="spinner spinner-lg" style="margin:0 auto"></div></div>
+        <div class="profile-details-card" style="max-width: 500px; margin: 0 auto; background: var(--bg-card); padding: 2rem; border-radius: 1rem; border: 1px solid var(--border-color);">
+            <p><strong>Email:</strong> <span id="lblEmail" runat="server"></span></p>
+            <p class="mt-3"><strong>Account Status:</strong> <span style="color: var(--accent-green); font-weight: bold;">Active</span></p>
+        </div>
       </div>
     </section>
+
     <div style="text-align:center;padding-bottom:var(--space-2xl)">
       <button type="button" class="btn btn-ghost" onclick="App.logout()" style="color:var(--accent-red)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
         Log Out
       </button>
     </div>
