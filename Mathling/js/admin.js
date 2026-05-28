@@ -34,21 +34,21 @@ const Admin = {
     this.drawBarChart();
   },
 
-  renderStats() {
-    /*
-     * BACKEND TODO:
-     * Replace with: const stats = await fetch('/api/admin/stats').then(r => r.json());
-     */
-    const users = JSON.parse(localStorage.getItem('mathlings-users') || '[]');
-    const subs = JSON.parse(localStorage.getItem('mathlings-submissions') || '[]');
-    const history = JSON.parse(localStorage.getItem('mathlings-quiz-history') || '[]');
+  async renderStats() {
+    try {
+      const response = await fetch('Admin.aspx/GetStats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await response.json();
+      const s = result.d;
 
-    const stats = [
-      { icon: '👥', bg: 'var(--accent-blue-light)', value: users.length, label: 'Total Users' },
-      { icon: '📝', bg: 'var(--accent-green-light)', value: history.length, label: 'Total Quizzes' },
-      { icon: '📦', bg: 'var(--accent-yellow-light)', value: subs.length, label: 'Content Items' },
-      { icon: '⏳', bg: 'var(--accent-orange-light)', value: subs.filter(s => s.status === 'pending').length, label: 'Pending Review' },
-    ];
+      const stats = [
+        { icon: '👥', bg: 'var(--accent-blue-light)', value: s.totalUsers, label: 'Total Users' },
+        { icon: '📝', bg: 'var(--accent-green-light)', value: s.totalQuizzes, label: 'Total Quizzes' },
+        { icon: '📦', bg: 'var(--accent-yellow-light)', value: s.contentItems, label: 'Content Items' },
+        { icon: '⏳', bg: 'var(--accent-orange-light)', value: s.pendingReviews, label: 'Pending Review' },
+      ];
 
     document.getElementById('admin-stats').innerHTML = stats.map(s => `
       <div class="admin-stat">
@@ -59,46 +59,50 @@ const Admin = {
         </div>
       </div>
     `).join('');
+    } catch(e) { console.error('Failed to load stats', e); }
   },
 
-  renderUsers() {
-    /*
-     * BACKEND TODO:
-     * Replace with: const users = await fetch('/api/admin/users').then(r => r.json());
-     * Should support pagination, search, and role filtering.
-     * Each user row should have actions: edit, disable, delete.
-     */
-    const users = JSON.parse(localStorage.getItem('mathlings-users') || '[]');
-    const container = document.getElementById('user-list');
+  async renderUsers() {
+    try {
+      const response = await fetch('Admin.aspx/GetUsers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await response.json();
+      const users = result.d;
+      const container = document.getElementById('user-list');
 
-    if (!users.length) {
-      container.innerHTML = '<p style="color:var(--text-tertiary);padding:var(--space-md)">No users registered yet.</p>';
-      return;
-    }
+      if (!users.length) {
+        container.innerHTML = '<p style="color:var(--text-tertiary);padding:var(--space-md)">No users registered yet.</p>';
+        return;
+      }
 
-    container.innerHTML = users.map(u => `
-      <div class="user-row">
-        <div class="avatar avatar-sm">${u.avatar || '👤'}</div>
-        <span class="user-name">${u.name}</span>
-        <span class="badge badge-${u.role === 'admin' ? 'red' : u.role === 'instructor' ? 'purple' : u.role === 'parent' ? 'blue' : 'green'}">${u.role}</span>
-      </div>
-    `).join('');
+      container.innerHTML = users.map(u => `
+        <div class="user-row">
+          <div class="avatar avatar-sm">${u.avatar || '👤'}</div>
+          <span class="user-name">${u.name}</span>
+          <span class="badge badge-${u.role === 'admin' ? 'red' : u.role === 'instructor' ? 'purple' : u.role === 'parent' ? 'blue' : 'green'}">${u.role}</span>
+        </div>
+      `).join('');
+    } catch(e) { console.error('Failed to load users', e); }
   },
 
-  renderActivity() {
-    /*
-     * BACKEND TODO:
-     * Replace with: const activity = await fetch('/api/admin/activity').then(r => r.json());
-     * Server should track and return recent platform events:
-     *   - User registrations
-     *   - Quiz completions
-     *   - Content submissions
-     *   - Forum posts
-     *   - Login events
-     * Each event: { text, timestamp, type }
-     */
-    const container = document.getElementById('activity-feed');
-    container.innerHTML = '<p style="color:var(--text-tertiary);padding:var(--space-md);font-size:var(--text-sm)">Activity feed will appear here once connected to the backend.</p>';
+  async renderActivity() {
+    try {
+      const response = await fetch('Admin.aspx/GetActivity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await response.json();
+      const activity = result.d;
+      const container = document.getElementById('activity-feed');
+      container.innerHTML = activity.map(a => `
+        <div class="activity-item">
+          <span class="activity-text"><strong>${a.user}</strong> ${a.action} <em>${a.target}</em></span>
+          <span class="activity-time">${a.time}</span>
+        </div>
+      `).join('');
+    } catch(e) { console.error('Failed to load activity', e); }
   },
 
   renderFeedback() {

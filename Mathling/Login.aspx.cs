@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -39,7 +39,7 @@ namespace Mathling
                 conn.Open();
 
                 string query = @"
-                    SELECT Id, Name, Role, PasswordHash
+                    SELECT Id, Name, Role, PasswordHash, Avatar
                     FROM Users
                     WHERE Email = @Email
                     AND IsActive = 1";
@@ -55,6 +55,7 @@ namespace Mathling
                     string role = reader["Role"].ToString();
                     string name = reader["Name"].ToString();
                     string id = reader["Id"].ToString();
+                    string avatar = reader["Avatar"] == DBNull.Value ? null : reader["Avatar"].ToString();
 
                     string inputHash = HashPassword(password);
 
@@ -64,6 +65,7 @@ namespace Mathling
                         Session["UserRole"] = role;
                         Session["UserName"] = name;
                         Session["UserEmail"] = email;
+                        Session["UserAvatar"] = avatar;
 
 
                         RedirectByRole(role);
@@ -184,6 +186,7 @@ namespace Mathling
                     Session["UserRole"] = role;
                     Session["UserName"] = name;
                     Session["UserEmail"] = email;
+                    Session["UserAvatar"] = null;
 
                     RedirectByRole(role);
                 }
