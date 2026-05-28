@@ -31,7 +31,7 @@
             <asp:Label ID="lblXP" runat="server">0 / 500 XP</asp:Label>
           </div>
           <div class="progress-bar progress-bar-yellow">
-            <div class="progress-bar-fill" id="xp-fill" style="width:0%" runat="server"></div>
+            <div class="progress-bar-fill" id="xp-fill" style="width:0%"></div>
           </div>
         </div>
       </div>
