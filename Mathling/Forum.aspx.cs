@@ -52,7 +52,7 @@ namespace Mathling
                         u.Name as AuthorName, u.Role as AuthorRole, u.Avatar,
                         (SELECT COUNT(*) FROM ForumReplies r WHERE r.ThreadId = t.Id) as ReplyCount
                     FROM ForumThreads t
-                    JOIN Users u ON t.AuthorId = u.Id
+                    JOIN Users u ON t.AuthorId = TRY_CAST(u.Id AS INT)
                     ORDER BY t.CreatedAt DESC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -81,76 +81,83 @@ namespace Mathling
         public static ThreadDto GetThread(string threadId)
         {
             ThreadDto thread = null;
-            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
-
-            using (SqlConnection conn = new SqlConnection(connStr))
+            try
             {
-                conn.Open();
-                
-                // Get Thread
-                string threadQuery = @"
-                    SELECT 
-                        t.Id, t.Title, t.Content, t.Category, t.CreatedAt,
-                        u.Name as AuthorName, u.Role as AuthorRole, u.Avatar
-                    FROM ForumThreads t
-                    JOIN Users u ON t.AuthorId = u.Id
-                    WHERE t.Id = @Id";
+                string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
 
-                using (SqlCommand cmd = new SqlCommand(threadQuery, conn))
+                using (SqlConnection conn = new SqlConnection(connStr))
                 {
-                    cmd.Parameters.AddWithValue("@Id", threadId);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            thread = new ThreadDto
-                            {
-                                id = reader["Id"].ToString(),
-                                title = reader["Title"].ToString(),
-                                content = reader["Content"].ToString(),
-                                category = reader["Category"].ToString(),
-                                author = reader["AuthorName"].ToString(),
-                                role = reader["AuthorRole"].ToString(),
-                                avatar = reader["Avatar"].ToString(),
-                                date = Convert.ToDateTime(reader["CreatedAt"]).ToString("yyyy-MM-dd"),
-                                replyList = new List<ReplyDto>()
-                            };
-                        }
-                    }
-                }
-
-                if (thread != null)
-                {
-                    // Get Replies
-                    string replyQuery = @"
+                    conn.Open();
+                    
+                    // Get Thread
+                    string threadQuery = @"
                         SELECT 
-                            r.Content, r.CreatedAt,
+                            t.Id, t.Title, t.Content, t.Category, t.CreatedAt,
                             u.Name as AuthorName, u.Role as AuthorRole, u.Avatar
-                        FROM ForumReplies r
-                        JOIN Users u ON r.AuthorId = u.Id
-                        WHERE r.ThreadId = @ThreadId
-                        ORDER BY r.CreatedAt ASC";
+                        FROM ForumThreads t
+                        JOIN Users u ON t.AuthorId = TRY_CAST(u.Id AS INT)
+                        WHERE t.Id = @Id";
 
-                    using (SqlCommand rCmd = new SqlCommand(replyQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(threadQuery, conn))
                     {
-                        rCmd.Parameters.AddWithValue("@ThreadId", threadId);
-                        using (SqlDataReader rReader = rCmd.ExecuteReader())
+                        cmd.Parameters.AddWithValue("@Id", threadId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            while (rReader.Read())
+                            if (reader.Read())
                             {
-                                thread.replyList.Add(new ReplyDto
+                                thread = new ThreadDto
                                 {
-                                    author = rReader["AuthorName"].ToString(),
-                                    role = rReader["AuthorRole"].ToString(),
-                                    avatar = rReader["Avatar"].ToString(),
-                                    content = rReader["Content"].ToString(),
-                                    date = Convert.ToDateTime(rReader["CreatedAt"]).ToString("yyyy-MM-dd")
-                                });
+                                    id = reader["Id"].ToString(),
+                                    title = reader["Title"].ToString(),
+                                    content = reader["Content"].ToString(),
+                                    category = reader["Category"].ToString(),
+                                    author = reader["AuthorName"].ToString(),
+                                    role = reader["AuthorRole"].ToString(),
+                                    avatar = reader["Avatar"].ToString(),
+                                    date = Convert.ToDateTime(reader["CreatedAt"]).ToString("yyyy-MM-dd"),
+                                    replyList = new List<ReplyDto>()
+                                };
                             }
                         }
                     }
-                    thread.replies = thread.replyList.Count;
+
+                    if (thread != null)
+                    {
+                        // Get Replies
+                        string replyQuery = @"
+                            SELECT 
+                                r.Content, r.CreatedAt,
+                                u.Name as AuthorName, u.Role as AuthorRole, u.Avatar
+                            FROM ForumReplies r
+                            JOIN Users u ON r.AuthorId = TRY_CAST(u.Id AS INT)
+                            WHERE r.ThreadId = @ThreadId
+                            ORDER BY r.CreatedAt ASC";
+
+                        using (SqlCommand rCmd = new SqlCommand(replyQuery, conn))
+                        {
+                            rCmd.Parameters.AddWithValue("@ThreadId", threadId);
+                            using (SqlDataReader rReader = rCmd.ExecuteReader())
+                            {
+                                while (rReader.Read())
+                                {
+                                    thread.replyList.Add(new ReplyDto
+                                    {
+                                        author = rReader["AuthorName"].ToString(),
+                                        role = rReader["AuthorRole"].ToString(),
+                                        avatar = rReader["Avatar"].ToString(),
+                                        content = rReader["Content"].ToString(),
+                                        date = Convert.ToDateTime(rReader["CreatedAt"]).ToString("yyyy-MM-dd")
+                                    });
+                                }
+                            }
+                        }
+                        thread.replies = thread.replyList.Count;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                return new ThreadDto { title = "Error", content = ex.Message, id = threadId, replyList = new List<ReplyDto>() };
             }
             return thread;
         }
