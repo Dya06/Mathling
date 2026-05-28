@@ -15,75 +15,66 @@ namespace Mathling
     {
 
         /// <summary>
-        /// profileAvatar control.
+        /// lblName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl profileAvatar;
+        protected global::System.Web.UI.WebControls.Label lblName;
 
         /// <summary>
-        /// profileName control.
+        /// lblRole control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl profileName;
+        protected global::System.Web.UI.WebControls.Label lblRole;
 
         /// <summary>
-        /// profileRoleBadge control.
+        /// lblLevel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl profileRoleBadge;
+        protected global::System.Web.UI.WebControls.Label lblLevel;
 
         /// <summary>
-        /// levelSection control.
+        /// lblXP control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl levelSection;
+        protected global::System.Web.UI.WebControls.Label lblXP;
 
         /// <summary>
-        /// levelNum control.
+        /// lblQuizCount control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl levelNum;
+        protected global::System.Web.UI.WebControls.Label lblQuizCount;
 
         /// <summary>
-        /// xpText control.
+        /// lblAverage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl xpText;
+        protected global::System.Web.UI.WebControls.Label lblAverage;
 
         /// <summary>
-        /// xpFill control.
+        /// rptHistory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl xpFill;
-
-        /// <summary>
-        /// lblEmail control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblEmail;
+        protected global::System.Web.UI.WebControls.Repeater rptHistory;
     }
 }
