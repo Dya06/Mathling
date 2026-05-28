@@ -19,7 +19,7 @@
     <div class="forum-page container">
       <div class="forum-header">
         <div>
-          <h1>💬 Community Forum</h1>
+          <h1> Community Forum</h1>
           <p style="color:var(--text-secondary)">Connect with instructors and other parents</p>
         </div>
         <button type="button" class="btn btn-primary" id="new-thread-btn">+ New Thread</button>
@@ -27,7 +27,7 @@
 
       <!-- New Thread Form -->
       <div class="new-thread-form card" id="new-thread-form" style="margin-bottom:var(--space-xl)">
-        <h3 style="margin-bottom:var(--space-lg)">📝 Create New Thread</h3>
+        <h3 style="margin-bottom:var(--space-lg)"> Create New Thread</h3>
         <div class="form-group">
           <label class="form-label" for="thread-title">Title</label>
           <input type="text" id="thread-title" class="form-input" placeholder="Thread title...">
@@ -50,9 +50,9 @@
       <!-- Filters -->
       <div class="forum-filters">
         <button type="button" class="tag forum-filter active" data-filter="all">All</button>
-        <button type="button" class="tag forum-filter" data-filter="General">💡 General</button>
-        <button type="button" class="tag forum-filter" data-filter="Tips">🎯 Tips</button>
-        <button type="button" class="tag forum-filter" data-filter="Questions">❓ Questions</button>
+        <button type="button" class="tag forum-filter" data-filter="General"> General</button>
+        <button type="button" class="tag forum-filter" data-filter="Tips"> Tips</button>
+        <button type="button" class="tag forum-filter" data-filter="Questions"> Questions</button>
       </div>
 
       <!-- Threads -->
@@ -63,6 +63,8 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=4"></script>
+    <script src="/js/app.js?v=5"></script>
     <script src="/js/forum.js"></script>
 </asp:Content>
+
+

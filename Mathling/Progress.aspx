@@ -57,7 +57,8 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=5"></script>
+    <script src="/js/app.js?v=6"></script>
     <script src="/js/progress.js"></script>
 </asp:Content>
+
 

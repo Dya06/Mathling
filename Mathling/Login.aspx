@@ -47,7 +47,7 @@
           <%-- Error message shown on invalid login --%>
           <asp:Label ID="ErrorMessage" runat="server" Text="" CssClass="form-error" Visible="false" />
 
-          <%-- Server-side submit button — no JavaScript needed --%>
+          <%-- Server-side submit button  no JavaScript needed --%>
           <asp:Button ID="LoginBtn" runat="server" Text="Log In"
               OnClick="LoginBtn_Click"
               CssClass="btn btn-primary btn-lg"
@@ -73,19 +73,19 @@
             <label class="form-label">I am a...</label>
             <div class="role-grid">
               <div class="role-option" data-role="student">
-                <span class="role-emoji">🧒</span>
+                <span class="role-emoji"></span>
                 <span class="role-name">Student</span>
               </div>
               <div class="role-option" data-role="parent">
-                <span class="role-emoji">👩</span>
+                <span class="role-emoji"></span>
                 <span class="role-name">Parent</span>
               </div>
               <div class="role-option" data-role="instructor">
-                <span class="role-emoji">👨‍🏫</span>
+                <span class="role-emoji"></span>
                 <span class="role-name">Instructor</span>
               </div>
               <div class="role-option" data-role="admin">
-                <span class="role-emoji">🛡️</span>
+                <span class="role-emoji"></span>
                 <span class="role-name">Admin</span>
               </div>
             </div>
@@ -125,15 +125,15 @@
       </div>
 
       <div class="auth-footer">
-        <a href="Default.aspx">← Back to Home</a>
+        <a href="Default.aspx"> Back to Home</a>
       </div>
     </div>
   </main>
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=4"></script>
-    <script src="/js/auth.js?v=6"></script>
+    <script src="/js/app.js?v=5"></script>
+    <script src="/js/auth.js?v=7"></script>
     <script>
         function fillDemo(email, password) {
             // Switch to login tab
@@ -145,3 +145,5 @@
         }
     </script>
 </asp:Content>
+
+

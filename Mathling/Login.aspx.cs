@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -119,7 +119,7 @@ namespace Mathling
         }
 
         // =========================
-        // 🆕 REGISTER BUTTON CLICK
+        //  REGISTER BUTTON CLICK
         // =========================
         protected void RegBtn_Click(object sender, EventArgs e)
         {
@@ -179,7 +179,7 @@ namespace Mathling
 
                     cmd.ExecuteNonQuery();
 
-                    // ✅ Log them in automatically
+                    //  Log them in automatically
                     Session["UserId"] = newUserId;
                     Session["UserRole"] = role;
                     Session["UserName"] = name;
@@ -191,3 +191,4 @@ namespace Mathling
         }
     }
 }
+
