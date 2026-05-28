@@ -24,10 +24,69 @@ const Profile = {
       
       this.render(user, profileData);
       this.setupEditModal();
+      this.setupLinkModal();
     } catch (e) {
       console.error('Failed to load profile data', e);
       App.showToast('Failed to load profile data', 'error');
     }
+  },
+
+  setupLinkModal() {
+    const modal = document.getElementById('link-student-modal');
+    const closeBtn = document.getElementById('link-student-close');
+    const cancelBtn = document.getElementById('link-student-cancel');
+    const saveBtn = document.getElementById('link-student-save');
+    const emailInput = document.getElementById('link-student-email');
+    const errorMsg = document.getElementById('link-student-error');
+
+    if (!modal) return;
+
+    const openModal = () => {
+        emailInput.value = '';
+        errorMsg.style.display = 'none';
+        modal.classList.add('active');
+    };
+    const closeModal = () => modal.classList.remove('active');
+
+    const saveChanges = async () => {
+        const email = emailInput.value.trim();
+        if (!email) return;
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Linking...';
+        errorMsg.style.display = 'none';
+
+        try {
+            const res = await fetch('Profile.aspx/LinkStudent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentEmail: email })
+            });
+            const data = await res.json();
+            if (data.d && data.d.success) {
+                App.showToast('Student successfully linked!', 'success');
+                closeModal();
+                Profile.init(); // Reload profile
+            } else {
+                errorMsg.textContent = data.d.errorMessage || 'Failed to link student';
+                errorMsg.style.display = 'block';
+            }
+        } catch (e) {
+            console.error(e);
+            errorMsg.textContent = 'A network error occurred.';
+            errorMsg.style.display = 'block';
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Link Student';
+        }
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    saveBtn.addEventListener('click', saveChanges);
+
+    // Make it available to renderParent
+    this.openLinkModal = openModal;
   },
 
   setupEditModal() {
@@ -225,26 +284,9 @@ const Profile = {
         </div>
       </div>`;
 
-    document.getElementById('link-student-btn')?.addEventListener('click', async () => {
-        const email = prompt("Enter the student's email address to link them:");
-        if (!email) return;
-
-        try {
-            const res = await fetch('Profile.aspx/LinkStudent', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ studentEmail: email })
-            });
-            const data = await res.json();
-            if (data.d && data.d.success) {
-                App.showToast('Student successfully linked!', 'success');
-                Profile.fetchData(); // Reload profile to show new student
-            } else {
-                App.showToast(data.d.errorMessage || 'Failed to link student', 'error');
-            }
-        } catch (e) {
-            console.error(e);
-            App.showToast('Error linking student', 'error');
+    document.getElementById('link-student-btn')?.addEventListener('click', () => {
+        if (Profile.openLinkModal) {
+            Profile.openLinkModal();
         }
     });
   },

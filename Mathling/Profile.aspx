@@ -74,9 +74,30 @@
       </div>
     </div>
   </div>
+
+  <!-- Link Student Modal -->
+  <div class="modal-overlay" id="link-student-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Link a Student</h3>
+        <button type="button" class="modal-close" id="link-student-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Student's Email Address</label>
+          <input type="email" id="link-student-email" class="form-input" placeholder="e.g. student@demo.com" />
+        </div>
+        <div id="link-student-error" style="color:var(--accent-red);font-size:var(--text-sm);margin-top:var(--space-sm);display:none;"></div>
+      </div>
+      <div class="modal-footer" style="text-align:right; margin-top:20px;">
+        <button type="button" class="btn btn-ghost" id="link-student-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="link-student-save">Link Student</button>
+      </div>
+    </div>
+  </div>
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=9"></script>
-    <script src="/js/profile.js?v=12"></script>
+    <script src="/js/profile.js?v=13"></script>
 </asp:Content>
