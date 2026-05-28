@@ -1,5 +1,5 @@
-/* ============================================
-   MATHLINGS — Profile Page Logic
+﻿/* ============================================
+   MATHLINGS ΓÇö Profile Page Logic
    ============================================ */
 
 const Profile = {
@@ -23,95 +23,10 @@ const Profile = {
       }
       
       this.render(user, profileData);
-      this.setupEditModal();
     } catch (e) {
       console.error('Failed to load profile data', e);
       App.showToast('Failed to load profile data', 'error');
     }
-  },
-
-  setupEditModal() {
-    const editBtn = document.getElementById('edit-profile-btn');
-    const modal = document.getElementById('edit-profile-modal');
-    const closeBtn = document.getElementById('edit-profile-close');
-    const cancelBtn = document.getElementById('edit-profile-cancel');
-    const saveBtn = document.getElementById('edit-profile-save');
-    const nameInput = document.getElementById('edit-name-input');
-    const avatarGrid = document.getElementById('avatar-grid');
-
-    if (!editBtn || !modal) return;
-
-    const avatars = ['🧑', '👩', '👨‍🏫', '🛡️', '😎', '🤖', '🦊', '🦉', '🐱', '🐶', '🦄', '🌟'];
-    let selectedAvatar = App.state.currentUser.avatar || '🧑';
-
-    const renderAvatars = () => {
-      avatarGrid.innerHTML = avatars.map(a => `
-        <div class="avatar-option" style="font-size:2.5rem; cursor:pointer; padding:5px; border-radius:50%; border:2px solid ${a === selectedAvatar ? 'var(--accent-blue)' : 'transparent'}; transition:all 0.2s;" data-avatar="${a}">
-          ${a}
-        </div>
-      `).join('');
-
-      avatarGrid.querySelectorAll('.avatar-option').forEach(el => {
-        el.addEventListener('click', (e) => {
-          selectedAvatar = e.currentTarget.dataset.avatar;
-          renderAvatars();
-        });
-      });
-    };
-
-    const openModal = () => {
-      nameInput.value = App.state.currentUser.name;
-      selectedAvatar = App.state.currentUser.avatar || '🧑';
-      renderAvatars();
-      modal.classList.add('active');
-    };
-
-    const closeModal = () => modal.classList.remove('active');
-
-    const saveChanges = async () => {
-      const newName = nameInput.value.trim();
-      if (!newName) {
-        App.showToast('Name cannot be empty', 'error');
-        return;
-      }
-      
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Saving...';
-      
-      try {
-        const response = await fetch('Profile.aspx/UpdateProfile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: newName, avatar: selectedAvatar })
-        });
-        const result = await response.json();
-        
-        if (result.d && result.d.success) {
-          App.showToast('Profile updated successfully!', 'success');
-          App.state.currentUser.name = newName;
-          App.state.currentUser.avatar = selectedAvatar;
-          localStorage.setItem('mathlings-user', JSON.stringify(App.state.currentUser));
-          
-          document.getElementById('profile-name').textContent = newName;
-          document.getElementById('profile-avatar').textContent = selectedAvatar;
-          App.renderNav();
-          closeModal();
-        } else {
-          App.showToast('Failed to update: ' + (result.d ? result.d.errorMessage : 'Unknown error'), 'error');
-        }
-      } catch (e) {
-        console.error(e);
-        App.showToast('Error saving profile', 'error');
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Save Changes';
-      }
-    };
-
-    editBtn.addEventListener('click', openModal);
-    closeBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
-    saveBtn.addEventListener('click', saveChanges);
   },
 
   render(user, data) {

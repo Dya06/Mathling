@@ -19,16 +19,16 @@
     <section class="profile-hero">
       <div class="container">
         <div class="profile-avatar" id="profile-avatar">&#128100;</div>
-        <asp:Label ID="lblName" runat="server" CssClass="profile-name" style="display:inline-block; margin-right:10px;">User</asp:Label>
+        <h1 class="profile-name" id="profile-name" style="display:inline-block; margin-right:10px;">User</h1>
         <button type="button" class="btn btn-sm btn-ghost" id="edit-profile-btn" style="vertical-align: super; padding: 4px 8px;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Edit
         </button>
         <br />
-        <asp:Label ID="lblRole" runat="server" CssClass="badge badge-blue profile-role">User</asp:Label>
-        <div class="profile-level-bar" id="level-section">
+        <span class="badge badge-blue profile-role" id="profile-role-badge">User</span>
+        <div class="profile-level-bar" id="level-section" style="display:none">
           <div class="profile-level-info">
-            <asp:Label ID="lblLevel" runat="server">Level 1</asp:Label>
-            <asp:Label ID="lblXP" runat="server">0 / 500 XP</asp:Label>
+            <span id="level-num">Level 1</span>
+            <span id="xp-text">0 / 500 XP</span>
           </div>
           <div class="progress-bar progress-bar-yellow">
             <div class="progress-bar-fill" id="xp-fill" style="width:0%"></div>
@@ -38,36 +38,7 @@
     </section>
     <section class="profile-body">
       <div class="container" id="profile-content">
-        <div class="profile-grid">
-          <div>
-            <h3 class="profile-section-title">Quick Stats</h3>
-            <div class="stats-cards">
-              <div class="stat-card"><div class="stat-value"><asp:Label ID="lblQuizCount" runat="server">0</asp:Label></div><div class="stat-label">Quizzes Taken</div></div>
-              <div class="stat-card"><div class="stat-value"><asp:Label ID="lblAverage" runat="server">0%</asp:Label></div><div class="stat-label">Avg Score</div></div>
-            </div>
-          </div>
-          <div>
-            <h3 class="profile-section-title">Recent Activity</h3>
-            <div class="history-list">
-              <asp:Repeater ID="rptHistory" runat="server">
-                <ItemTemplate>
-                  <div class="history-item">
-                    <div class="history-score"><%# Eval("Score") %>%</div>
-                    <div class="history-info">
-                      <div class="history-chapter"><%# Eval("ChapterName") %></div>
-                      <div class="history-date"><%# Convert.ToDateTime(Eval("DateTaken")).ToString("MM-dd") %></div>
-                    </div>
-                  </div>
-                </ItemTemplate>
-                <FooterTemplate>
-                    <asp:PlaceHolder ID="phEmpty" runat="server" Visible='<%# ((Repeater)Container.NamingContainer).Items.Count == 0 %>'>
-                        <p style="color:var(--text-tertiary);">No quizzes taken yet.</p>
-                    </asp:PlaceHolder>
-                </FooterTemplate>
-              </asp:Repeater>
-            </div>
-          </div>
-        </div>
+        <div style="text-align:center;padding:var(--space-3xl)"><div class="spinner spinner-lg" style="margin:0 auto"></div></div>
       </div>
     </section>
     <div style="text-align:center;padding-bottom:var(--space-2xl)">
@@ -107,5 +78,5 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=9"></script>
-    <script src="/js/profile.js?v=7"></script>
+    <script src="/js/profile.js?v=11"></script>
 </asp:Content>

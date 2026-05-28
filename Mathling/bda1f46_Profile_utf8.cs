@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -229,52 +229,6 @@ namespace Mathling
                         res.errorMessage = "Role not recognized: " + role;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                res.errorMessage = ex.Message;
-            }
-            return res;
-        }
-
-        public class UpdateProfileResponse
-        {
-            public bool success { get; set; }
-            public string errorMessage { get; set; }
-        }
-
-        [System.Web.Services.WebMethod]
-        public static UpdateProfileResponse UpdateProfile(string name, string avatar)
-        {
-            var res = new UpdateProfileResponse { success = false };
-            try
-            {
-                if (System.Web.HttpContext.Current.Session["UserId"] == null)
-                {
-                    res.errorMessage = "Not logged in.";
-                    return res;
-                }
-
-                string userId = System.Web.HttpContext.Current.Session["UserId"].ToString();
-
-                string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
-                using (SqlConnection conn = new SqlConnection(connStr))
-                {
-                    conn.Open();
-                    string query = "UPDATE Users SET Name = @Name, Avatar = @Avatar WHERE Id = @Id";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@Name", name);
-                        cmd.Parameters.AddWithValue("@Avatar", avatar);
-                        cmd.Parameters.AddWithValue("@Id", userId);
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-
-                System.Web.HttpContext.Current.Session["UserName"] = name;
-                System.Web.HttpContext.Current.Session["UserAvatar"] = avatar;
-
-                res.success = true;
             }
             catch (Exception ex)
             {
