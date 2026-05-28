@@ -167,12 +167,14 @@ namespace Mathling
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
+                string newId = Guid.NewGuid().ToString().Substring(0, 8);
                 string query = @"
-                    INSERT INTO ForumThreads (Title, Content, Category, AuthorId, CreatedAt)
-                    VALUES (@Title, @Content, @Category, @AuthorId, GETDATE())";
+                    INSERT INTO ForumThreads (Id, Title, Content, Category, AuthorId, CreatedAt)
+                    VALUES (@Id, @Title, @Content, @Category, @AuthorId, GETDATE())";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
+                    cmd.Parameters.AddWithValue("@Id", newId);
                     cmd.Parameters.AddWithValue("@Title", title);
                     cmd.Parameters.AddWithValue("@Content", content);
                     cmd.Parameters.AddWithValue("@Category", category);
@@ -195,12 +197,14 @@ namespace Mathling
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
+                string newId = Guid.NewGuid().ToString().Substring(0, 8);
                 string query = @"
-                    INSERT INTO ForumReplies (ThreadId, Content, AuthorId, CreatedAt)
-                    VALUES (@ThreadId, @Content, @AuthorId, GETDATE())";
+                    INSERT INTO ForumReplies (Id, ThreadId, Content, AuthorId, CreatedAt)
+                    VALUES (@Id, @ThreadId, @Content, @AuthorId, GETDATE())";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
+                    cmd.Parameters.AddWithValue("@Id", newId);
                     cmd.Parameters.AddWithValue("@ThreadId", threadId);
                     cmd.Parameters.AddWithValue("@Content", content);
                     cmd.Parameters.AddWithValue("@AuthorId", userId);
