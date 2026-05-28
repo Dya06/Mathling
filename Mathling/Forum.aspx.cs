@@ -16,7 +16,7 @@ namespace Mathling
 
         public class ThreadDto
         {
-            public int id { get; set; }
+            public string id { get; set; }
             public string title { get; set; }
             public string content { get; set; }
             public string category { get; set; }
@@ -62,7 +62,7 @@ namespace Mathling
                     {
                         threads.Add(new ThreadDto
                         {
-                            id = (int)reader["Id"],
+                            id = reader["Id"].ToString(),
                             title = reader["Title"].ToString(),
                             category = reader["Category"].ToString(),
                             author = reader["AuthorName"].ToString(),
@@ -78,7 +78,7 @@ namespace Mathling
         }
 
         [WebMethod]
-        public static ThreadDto GetThread(int threadId)
+        public static ThreadDto GetThread(string threadId)
         {
             ThreadDto thread = null;
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
@@ -105,7 +105,7 @@ namespace Mathling
                         {
                             thread = new ThreadDto
                             {
-                                id = (int)reader["Id"],
+                                id = reader["Id"].ToString(),
                                 title = reader["Title"].ToString(),
                                 content = reader["Content"].ToString(),
                                 category = reader["Category"].ToString(),
@@ -161,7 +161,7 @@ namespace Mathling
             if (HttpContext.Current.Session["UserId"] == null)
                 return "error|Not logged in";
 
-            int userId = (int)HttpContext.Current.Session["UserId"];
+            string userId = HttpContext.Current.Session["UserId"].ToString();
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connStr))
@@ -184,12 +184,12 @@ namespace Mathling
         }
 
         [WebMethod(EnableSession = true)]
-        public static string AddReply(int threadId, string content)
+        public static string AddReply(string threadId, string content)
         {
             if (HttpContext.Current.Session["UserId"] == null)
                 return "error|Not logged in";
 
-            int userId = (int)HttpContext.Current.Session["UserId"];
+            string userId = HttpContext.Current.Session["UserId"].ToString();
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connStr))

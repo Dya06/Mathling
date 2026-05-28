@@ -35,7 +35,7 @@
     <script>
         // Bridge ASP.NET Session into frontend JavaScript session
         const sessionUser = {
-            id: <%= Session["UserId"] %>,
+            id: '<%= Session["UserId"] %>',
             name: '<%= Session["UserName"] %>',
             role: '<%= Session["UserRole"] %>',
             email: '<%= Session["UserEmail"] %>',

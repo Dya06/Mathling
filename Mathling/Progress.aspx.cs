@@ -33,7 +33,7 @@ namespace Mathling
         }
 
         [WebMethod]
-        public static ProgressData GetProgressData(int userId)
+        public static ProgressData GetProgressData(string userId)
         {
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
             ProgressData data = new ProgressData();
