@@ -77,9 +77,11 @@ namespace Mathling
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
-                string query = "INSERT INTO Submissions (InstructorId, Title, Chapter, Difficulty) VALUES (@InstructorId, @Title, @Chapter, @Difficulty)";
+                string newId = Guid.NewGuid().ToString().Substring(0, 8);
+                string query = "INSERT INTO Submissions (Id, InstructorId, Title, Chapter, Difficulty) VALUES (@Id, @InstructorId, @Title, @Chapter, @Difficulty)";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
+                    cmd.Parameters.AddWithValue("@Id", newId);
                     cmd.Parameters.AddWithValue("@InstructorId", instructorId);
                     cmd.Parameters.AddWithValue("@Title", title);
                     cmd.Parameters.AddWithValue("@Chapter", chapter);
