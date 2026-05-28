@@ -290,7 +290,7 @@ const Profile = {
             const result = await res.json();
             if (result.d && result.d.success) {
                 App.showToast('Student removed successfully!', 'success');
-                Profile.fetchData();
+                window.location.reload();
             } else {
                 App.showToast('Failed to remove student', 'error');
             }
