@@ -330,7 +330,7 @@ const Profile = {
           <div id="parent-stats-container">
             ${renderStats()}
           </div>
-          <a href="Progress.aspx" class="btn btn-accent-blue btn-sm" style="width:100%;margin-top:var(--space-lg)">View Full Progress</a>
+          <a href="Progress.aspx" id="view-progress-btn" class="btn btn-accent-blue btn-sm" style="width:100%;margin-top:var(--space-lg)">View Full Progress</a>
         </div>
       </div>`;
 
@@ -343,6 +343,11 @@ const Profile = {
     document.getElementById('student-filter')?.addEventListener('change', (e) => {
         selectedStudentId = e.target.value;
         reRenderStats();
+        
+        const btn = document.getElementById('view-progress-btn');
+        if (btn) {
+            btn.href = selectedStudentId ? `Progress.aspx?studentId=${selectedStudentId}` : 'Progress.aspx';
+        }
     });
   },
 
