@@ -213,6 +213,110 @@ namespace Mathling
             }
         }
 
+        // ---- Content Moderation ----
+        public class ContentItemDto
+        {
+            public string id { get; set; }
+            public string label { get; set; }
+            public string formulaName { get; set; }
+            public string moduleTitle { get; set; }
+            public string displayMode { get; set; }
+            public string status { get; set; }
+            public string reason { get; set; }
+            public string instructor { get; set; }
+            public int questionCount { get; set; }
+            public string date { get; set; }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public static List<ContentItemDto> GetContentItems()
+        {
+            if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")
+                return new List<ContentItemDto>();
+
+            var items = new List<ContentItemDto>();
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                string query = @"
+                    SELECT 
+                        qs.Id, qs.Label, qs.DisplayMode, qs.Status, qs.Reason, qs.SubmittedAt,
+                        f.Name as FormulaName,
+                        m.Title as ModuleTitle,
+                        u.Name as InstructorName,
+                        (SELECT COUNT(*) FROM Questions q WHERE q.SetId = qs.Id) as QuestionCount
+                    FROM QuestionSets qs
+                    INNER JOIN Modules m ON qs.ModuleId = m.Id
+                    INNER JOIN Formulas f ON m.FormulaId = f.Id
+                    LEFT JOIN Users u ON qs.CreatedBy = u.Id
+                    ORDER BY 
+                        CASE qs.Status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END,
+                        qs.SubmittedAt DESC, qs.Id DESC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        items.Add(new ContentItemDto
+                        {
+                            id = reader["Id"].ToString(),
+                            label = reader["Label"].ToString(),
+                            formulaName = reader["FormulaName"].ToString(),
+                            moduleTitle = reader["ModuleTitle"].ToString(),
+                            displayMode = reader["DisplayMode"].ToString(),
+                            status = reader["Status"].ToString(),
+                            reason = reader["Reason"] != DBNull.Value ? reader["Reason"].ToString() : "",
+                            instructor = reader["InstructorName"] != DBNull.Value ? reader["InstructorName"].ToString() : "System",
+                            questionCount = Convert.ToInt32(reader["QuestionCount"]),
+                            date = reader["SubmittedAt"] != DBNull.Value
+                                ? Convert.ToDateTime(reader["SubmittedAt"]).ToString("yyyy-MM-dd")
+                                : ""
+                        });
+                    }
+                }
+            }
+            return items;
+        }
+
+        [WebMethod(EnableSession = true)]
+        public static string ApproveContent(string setId)
+        {
+            if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")
+                return "error|Unauthorized";
+
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand("UPDATE QuestionSets SET Status = 'approved', Reason = NULL WHERE Id = @Id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", setId);
+                    return cmd.ExecuteNonQuery() > 0 ? "success" : "error|Not found";
+                }
+            }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public static string RejectContent(string setId, string reason)
+        {
+            if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")
+                return "error|Unauthorized";
+
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand("UPDATE QuestionSets SET Status = 'rejected', Reason = @Reason WHERE Id = @Id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Reason", string.IsNullOrEmpty(reason) ? (object)DBNull.Value : reason);
+                    cmd.Parameters.AddWithValue("@Id", setId);
+                    return cmd.ExecuteNonQuery() > 0 ? "success" : "error|Not found";
+                }
+            }
+        }
+
         private static void ExecuteNonQuery(string query, int userId, SqlConnection conn, SqlTransaction trans)
         {
             using (SqlCommand cmd = new SqlCommand(query, conn, trans))

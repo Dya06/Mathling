@@ -31,7 +31,7 @@ const Admin = {
     this.renderStats();
     this.renderUsers();
     this.renderActivity();
-    this.renderFeedback();
+    this.renderModeration();
     this.drawBarChart();
   },
 
@@ -108,16 +108,84 @@ const Admin = {
     } catch(e) { console.error('Failed to load activity', e); }
   },
 
-  renderFeedback() {
-    /*
-     * BACKEND TODO:
-     * Replace with: const feedback = await fetch('/api/admin/feedback').then(r => r.json());
-     * Users should be able to submit feedback via a form on any page.
-     * Each feedback item: { text, author, priority, date, status }
-     * Admin can mark feedback as resolved.
-     */
-    const container = document.getElementById('feedback-list');
-    container.innerHTML = '<p style="color:var(--text-tertiary);padding:var(--space-md);font-size:var(--text-sm)">No feedback submitted yet.</p>';
+  async renderModeration() {
+    const container = document.getElementById('moderation-list');
+    try {
+      const response = await fetch('Admin.aspx/GetContentItems', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await response.json();
+      const items = result.d || [];
+      const pending = items.filter(i => i.status === 'pending');
+      const recent = items.slice(0, 8);
+
+      if (!recent.length) {
+        container.innerHTML = '<p style="color:var(--text-tertiary);padding:var(--space-md);font-size:var(--text-sm)">No content items yet.</p>';
+        return;
+      }
+
+      container.innerHTML = recent.map(item => `
+        <div class="user-row" style="display:flex;align-items:center;gap:var(--space-sm);padding:var(--space-sm) 0;border-bottom:1px solid var(--border-color)">
+          <span style="flex:1;font-size:var(--text-sm)">
+            <strong>${item.label}</strong>
+            <span style="color:var(--text-tertiary)"> · ${item.formulaName} · ${item.questionCount}q</span>
+          </span>
+          <span class="badge badge-${item.status === 'approved' ? 'green' : item.status === 'pending' ? 'yellow' : 'red'}" style="font-size:var(--text-xs)">${item.status}</span>
+          ${item.status === 'pending' ? `
+            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--accent-green);padding:0 4px" onclick="Admin.approveContent('${item.id}')" title="Approve">✓</button>
+            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);padding:0 4px" onclick="Admin.rejectContent('${item.id}')" title="Reject">✗</button>
+          ` : ''}
+        </div>
+      `).join('');
+    } catch(e) {
+      console.error('Failed to load moderation items', e);
+      container.innerHTML = '<p style="color:var(--text-tertiary);padding:var(--space-md);font-size:var(--text-sm)">Failed to load content.</p>';
+    }
+  },
+
+  async approveContent(id) {
+    try {
+      const res = await fetch('Admin.aspx/ApproveContent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ setId: id })
+      });
+      const data = await res.json();
+      if (data.d === 'success') {
+        App.showToast('Content approved! ✅', 'success');
+        this.renderModeration();
+        this.renderStats();
+      } else {
+        App.showToast(data.d, 'error');
+      }
+    } catch(e) {
+      console.error(e);
+      App.showToast('Error approving content', 'error');
+    }
+  },
+
+  async rejectContent(id) {
+    const reason = prompt('Reason for rejection:');
+    if (reason === null || !reason.trim()) return;
+    try {
+      const res = await fetch('Admin.aspx/RejectContent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ setId: id, reason: reason.trim() })
+      });
+      const data = await res.json();
+      if (data.d === 'success') {
+        App.showToast('Content rejected ❌', 'error');
+        this.renderModeration();
+        this.renderStats();
+      } else {
+        App.showToast(data.d, 'error');
+      }
+    } catch(e) {
+      console.error(e);
+      App.showToast('Error rejecting content', 'error');
+    }
   },
 
   drawBarChart() {

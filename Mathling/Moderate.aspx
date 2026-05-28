@@ -18,47 +18,71 @@
   <main class="main">
     <div class="moderate-page container">
       <div class="moderate-header">
-        <h1> Content Moderation</h1>
-        <p style="color:var(--text-secondary)">Submit new exercises or review pending content</p>
+        <h1>📝 Content Moderation</h1>
+        <p style="color:var(--text-secondary)">Create quizzes for students or review pending content</p>
       </div>
 
-      <!-- Submit Section (Instructor Only) -->
-      <div id="submit-section" class="submission-form card" style="margin-bottom:var(--space-2xl)">
-        <h3> Submit New Content</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">
+      <!-- Quiz Builder (Instructor Only) -->
+      <div id="submit-section" class="submission-form card" style="margin-bottom:var(--space-2xl);display:none">
+        <h3>🧩 Create New Quiz</h3>
+        <p style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:var(--space-md)">
+          Build a question set and submit it for admin review. Once approved, it will appear on the quiz page for students.
+        </p>
+
+        <!-- Step 1: Select Formula & Module -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">
           <div class="form-group" style="margin:0">
-            <label class="form-label" for="sub-title">Title</label>
-            <input type="text" id="sub-title" class="form-input" placeholder="Exercise title...">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label" for="sub-chapter">Chapter</label>
-            <select id="sub-chapter" class="form-input form-select">
-              <option>Counting Beads</option><option>Simple Addition</option>
-              <option>Simple Subtraction</option><option>Double Digits</option>
-              <option>Speed Challenge</option><option>Multiplication Intro</option>
+            <label class="form-label" for="quiz-formula">Formula</label>
+            <select id="quiz-formula" class="form-input form-select">
+              <option value="">Loading formulas...</option>
             </select>
           </div>
           <div class="form-group" style="margin:0">
-            <label class="form-label" for="sub-difficulty">Difficulty</label>
-            <select id="sub-difficulty" class="form-input form-select">
-              <option>Easy</option><option>Medium</option><option>Hard</option>
+            <label class="form-label" for="quiz-module">Module</label>
+            <select id="quiz-module" class="form-input form-select" disabled>
+              <option value="">Select a formula first</option>
             </select>
           </div>
         </div>
-        <button type="button" class="btn btn-accent-green" id="submit-content-btn">Submit for Review</button>
+
+        <!-- Step 2: Set info -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">
+          <div class="form-group" style="margin:0">
+            <label class="form-label" for="quiz-label">Set Label</label>
+            <input type="text" id="quiz-label" class="form-input" placeholder="e.g. Practice Set 3">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label" for="quiz-display">Display Mode</label>
+            <select id="quiz-display" class="form-input form-select">
+              <option value="static">Static (all numbers shown at once)</option>
+              <option value="flash">Flash (numbers shown one at a time)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Step 3: Question Builder -->
+        <div style="margin-bottom:var(--space-md)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-sm)">
+            <label class="form-label" style="margin:0">Questions</label>
+            <button type="button" class="btn btn-ghost btn-sm" id="add-question-btn" style="color:var(--accent-green)">+ Add Question</button>
+          </div>
+          <div id="questions-container"></div>
+        </div>
+
+        <button type="button" class="btn btn-accent-green" id="submit-quiz-btn">📤 Submit for Review</button>
       </div>
 
       <!-- Review Section -->
       <div>
-        <h3 style="margin-bottom:var(--space-md)"> Review Queue</h3>
+        <h3 style="margin-bottom:var(--space-md)">📋 Review Queue</h3>
         <p id="review-actions-note" style="display:none;font-size:var(--text-sm);color:var(--accent-blue);margin-bottom:var(--space-md)">
           As an admin, you can approve or reject submissions below.
         </p>
         <div class="status-filters">
           <button type="button" class="tag status-filter active" data-status="all">All</button>
-          <button type="button" class="tag status-filter" data-status="pending"> Pending</button>
-          <button type="button" class="tag status-filter" data-status="approved"> Approved</button>
-          <button type="button" class="tag status-filter" data-status="rejected"> Rejected</button>
+          <button type="button" class="tag status-filter" data-status="pending">⏳ Pending</button>
+          <button type="button" class="tag status-filter" data-status="approved">✅ Approved</button>
+          <button type="button" class="tag status-filter" data-status="rejected">❌ Rejected</button>
         </div>
         <div class="review-list" id="review-list"></div>
       </div>
@@ -68,8 +92,5 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=10"></script>
-    <script src="/js/moderate.js"></script>
+    <script src="/js/moderate.js?v=2"></script>
 </asp:Content>
-
-
-
