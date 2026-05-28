@@ -87,7 +87,7 @@
                         </asp:Panel>
 
                         <asp:Panel ID="StartPanel" runat="server" CssClass="start-screen">
-                            <div style="font-size:4rem;margin-bottom:var(--space-lg)">🧮</div>
+                            <div style="font-size:4rem;margin-bottom:var(--space-lg)"></div>
                             <h2>Formula: <asp:Literal ID="StartFormulaNameLiteral" runat="server" /></h2>
                             <p>
                                 <asp:Literal ID="StartDescriptionLiteral" runat="server" /><br />
@@ -96,7 +96,7 @@
                             <p style="color:var(--text-tertiary);font-size:var(--text-sm);margin-bottom:var(--space-xl)">
                                 Select a module from the sidebar to begin learning.
                             </p>
-                            <asp:Button ID="StartLearningButton" runat="server" Text="📖 Start Learning"
+                            <asp:Button ID="StartLearningButton" runat="server" Text=" Start Learning"
                                 CssClass="btn btn-primary btn-lg" OnClick="StartLearningButton_Click" />
                         </asp:Panel>
 
@@ -111,7 +111,7 @@
                             </div>
 
                             <asp:Panel ID="MentalBannerPanel" runat="server" Visible="false" CssClass="mental-banner">
-                                <div class="mental-icon">🧠✋</div>
+                                <div class="mental-icon"></div>
                                 <h3>Mental Mode</h3>
                                 <p>You cannot use the abacus for this module.<br />Imagine the beads moving in your mind.</p>
                             </asp:Panel>
@@ -125,7 +125,7 @@
                                                 CommandName="SelectSet" CommandArgument='<%# Eval("Id") %>'>
                                                 <%# Eval("Label") %>
                                                 <span style="display:block;font-size:var(--text-xs);opacity:0.8;margin-top:4px">
-                                                    <%# Eval("QuestionCount") %> questions • <%# Eval("DisplayMode") %>
+                                                    <%# Eval("QuestionCount") %> questions  <%# Eval("DisplayMode") %>
                                                 </span>
                                                 <asp:Literal ID="SetCompletedLiteral" runat="server" />
                                             </asp:LinkButton>
@@ -151,7 +151,7 @@
                             </asp:Panel>
 
                             <asp:Panel ID="QuestionMentalBannerPanel" runat="server" Visible="false" CssClass="mental-banner" Style="margin-bottom:var(--space-lg)">
-                                <div class="mental-icon">🧠✋</div>
+                                <div class="mental-icon"></div>
                                 <h3>Use Mental Only!</h3>
                                 <p>Imagine the abacus beads moving. Use your hand movements!</p>
                             </asp:Panel>
@@ -188,8 +188,8 @@
                                 <asp:Button runat="server" Text="9" CssClass="numpad-btn" CommandArgument="9" OnCommand="Numpad_Command" />
                                 <asp:Button runat="server" Text="0" CssClass="numpad-btn" CommandArgument="0" OnCommand="Numpad_Command" />
                                 <asp:Button runat="server" Text="C" CssClass="numpad-btn clear" CommandArgument="clear" OnCommand="Numpad_Command" />
-                                <asp:Button runat="server" Text="←" CssClass="numpad-btn" CommandArgument="back" OnCommand="Numpad_Command" />
-                                <asp:Button runat="server" Text="✓ Submit" CssClass="numpad-btn submit" CommandArgument="submit" OnCommand="Numpad_Command" />
+                                <asp:Button runat="server" Text="" CssClass="numpad-btn" CommandArgument="back" OnCommand="Numpad_Command" />
+                                <asp:Button runat="server" Text=" Submit" CssClass="numpad-btn submit" CommandArgument="submit" OnCommand="Numpad_Command" />
                             </div>
                         </asp:Panel>
 
@@ -213,7 +213,7 @@
                                 </div>
                             </div>
                             <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap;margin-top:var(--space-xl)">
-                                <asp:Button ID="RetryButton" runat="server" Text="↺ Retry" CssClass="btn btn-secondary" OnClick="RetryButton_Click" />
+                                <asp:Button ID="RetryButton" runat="server" Text=" Retry" CssClass="btn btn-secondary" OnClick="RetryButton_Click" />
                                 <asp:Button ID="BackToModuleButton" runat="server" Text="Finish Module" CssClass="btn btn-primary" OnClick="BackToModuleButton_Click" CausesValidation="false" UseSubmitBehavior="false" />
                             </div>
                         </asp:Panel>
@@ -227,3 +227,4 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
 </asp:Content>
+

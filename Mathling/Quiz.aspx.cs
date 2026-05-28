@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -172,7 +172,7 @@ namespace Mathling
             if (completed) css += " completed";
 
             button.CssClass = css;
-            completedLiteral.Text = completed ? "<span class='mod-check'>✅</span>" : string.Empty;
+            completedLiteral.Text = completed ? "<span class='mod-check'></span>" : string.Empty;
         }
 
         protected void ModuleRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
@@ -229,7 +229,7 @@ namespace Mathling
             ModuleTagLiteral.Text = GetModuleIcon(module.Icon) + " " + Server.HtmlEncode(module.Title);
             ModuleTitleLiteral.Text = Server.HtmlEncode(module.Title);
             ModuleDescriptionLiteral.Text = Server.HtmlEncode(module.Description);
-            ModuleTimerLiteral.Text = module.IsTimed ? "<p style='color:var(--accent-red);font-weight:700;margin-top:var(--space-md)'>⏱️ Time Limit: " + module.TimeLimitSec + " seconds</p>" : string.Empty;
+            ModuleTimerLiteral.Text = module.IsTimed ? "<p style='color:var(--accent-red);font-weight:700;margin-top:var(--space-md)'> Time Limit: " + module.TimeLimitSec + " seconds</p>" : string.Empty;
             MentalBannerPanel.Visible = module.MentalMode;
 
             SetRepeater.DataSource = module.Sets.OrderBy(s => s.SortOrder).Select(s => new
@@ -268,7 +268,7 @@ namespace Mathling
                 button.ToolTip = "Completed";
                 if (completedLiteral != null)
                 {
-                    completedLiteral.Text = "<span class='set-completed-badge'>✅ Completed</span>";
+                    completedLiteral.Text = "<span class='set-completed-badge'> Completed</span>";
                 }
             }
             else if (completedLiteral != null)
@@ -370,14 +370,14 @@ namespace Mathling
         private void RenderStaticQuestion(QuizQuestion question)
         {
             StringBuilder html = new StringBuilder();
-            html.Append("<div class='vq-counter'>📝</div>");
+            html.Append("<div class='vq-counter'></div>");
             html.Append("<div class='vertical-question'>");
 
             for (int i = 0; i < question.Rows.Count; i++)
             {
                 int row = question.Rows[i];
                 string css = row < 0 ? "vq-row negative" : "vq-row";
-                string display = row < 0 ? "−" + Math.Abs(row) : row.ToString();
+                string display = row < 0 ? "" + Math.Abs(row) : row.ToString();
                 html.Append("<div class='").Append(css).Append("'>").Append(display).Append("</div>");
             }
 
@@ -395,7 +395,7 @@ namespace Mathling
             if (FlashIndex < question.Rows.Count)
             {
                 int value = question.Rows[FlashIndex];
-                display = value < 0 ? "−" + Math.Abs(value) : value.ToString();
+                display = value < 0 ? "" + Math.Abs(value) : value.ToString();
                 if (value < 0) css += " negative";
             }
             else
@@ -405,7 +405,7 @@ namespace Mathling
             }
 
             QuestionDisplayLiteral.Text =
-                "<div class='vq-counter'>Watch carefully! 👀</div>" +
+                "<div class='vq-counter'>Watch carefully! </div>" +
                 "<div class='vertical-question' style='min-height:180px;justify-content:center;align-items:center;'>" +
                 "<div class='flash-container'><div class='" + css + "'>" + display + "</div></div>" +
                 "</div>";
@@ -511,7 +511,7 @@ namespace Mathling
             if (isCorrect) TotalCorrect++;
 
             bool isLastQuestion = QuestionIndex >= set.Questions.Count - 1;
-            string title = isCorrect ? "Correct! 🎉" : "Not Quite 😅";
+            string title = isCorrect ? "Correct! " : "Not Quite ";
             string body;
 
             if (isLastQuestion)
@@ -590,13 +590,13 @@ namespace Mathling
             int total = set.Questions.Count;
             int pct = total == 0 ? 0 : (int)Math.Round((decimal)TotalCorrect / total * 100, 0);
 
-            CompleteIconLiteral.Text = pct >= 90 ? "🎊" : pct >= 50 ? "👍" : "💪";
-            CompleteTitleLiteral.Text = Server.HtmlEncode(set.Label + " — Complete!");
+            CompleteIconLiteral.Text = pct >= 90 ? "" : pct >= 50 ? "" : "";
+            CompleteTitleLiteral.Text = Server.HtmlEncode(set.Label + "  Complete!");
             CompleteCorrectLiteral.Text = TotalCorrect + "/" + total;
             CompletePercentageLiteral.Text = pct + "%";
 
             RetryButton.Visible = true;
-            RetryButton.Text = "↺ Retry";
+            RetryButton.Text = " Retry";
 
             if (isAssessment)
             {
@@ -606,7 +606,7 @@ namespace Mathling
                     Session["QuizCompleteAction"] = "jump";
                     Session["QuizJumpFormula"] = nextFormula;
                     CompleteTitleLiteral.Text = Server.HtmlEncode("Assessment Passed!");
-                    BackToModuleButton.Text = "Jump to " + nextFormula + " →";
+                    BackToModuleButton.Text = "Jump to " + nextFormula + " ";
                     RetryButton.Visible = false;
                 }
                 else if (TotalCorrect >= 9)
@@ -806,7 +806,7 @@ namespace Mathling
 
         protected string GetFormulaLinkLabel(string formulaName)
         {
-            return IsFormulaLocked(formulaName) ? "🔒 " + formulaName : formulaName;
+            return IsFormulaLocked(formulaName) ? " " + formulaName : formulaName;
         }
 
         protected string GetFormulaUrl(string formulaName)
@@ -1070,12 +1070,12 @@ namespace Mathling
             string icon = iconValue == null ? string.Empty : iconValue.ToString();
             switch (icon)
             {
-                case "book": return "📖";
-                case "abacus": return "🧮";
-                case "brain": return "🧠";
-                case "prep": return "📝";
-                case "trophy": return "🏆";
-                default: return string.IsNullOrWhiteSpace(icon) ? "📌" : Server.HtmlEncode(icon);
+                case "book": return "";
+                case "abacus": return "";
+                case "brain": return "";
+                case "prep": return "";
+                case "trophy": return "";
+                default: return string.IsNullOrWhiteSpace(icon) ? "" : Server.HtmlEncode(icon);
             }
         }
 
@@ -1139,3 +1139,4 @@ namespace Mathling
         public List<int> Rows { get; set; }
     }
 }
+

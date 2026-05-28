@@ -18,7 +18,7 @@
   <main class="main">
     <div class="progress-page container">
       <div class="progress-header">
-        <h1>📊 Progress &amp; Performance</h1>
+        <h1> Progress &amp; Performance</h1>
         <p>Track your learning journey and see how you're improving over time.</p>
       </div>
 
@@ -26,11 +26,11 @@
 
       <div class="charts-grid">
         <div class="chart-card">
-          <h3>📈 Score History</h3>
+          <h3> Score History</h3>
           <div class="chart-canvas-wrap"><canvas id="line-chart"></canvas></div>
         </div>
         <div class="chart-card">
-          <h3>📊 Completion</h3>
+          <h3> Completion</h3>
           <div class="donut-wrap">
             <canvas id="donut-chart" width="200" height="200"></canvas>
             <div class="donut-center">
@@ -42,7 +42,7 @@
       </div>
 
       <div class="history-section">
-        <h3>📝 Quiz History</h3>
+        <h3> Quiz History</h3>
         <div class="card card-flat" style="overflow-x:auto">
           <table class="data-table">
             <thead>
@@ -60,3 +60,4 @@
     <script src="/js/app.js?v=5"></script>
     <script src="/js/progress.js"></script>
 </asp:Content>
+
