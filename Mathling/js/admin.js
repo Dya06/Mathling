@@ -83,8 +83,8 @@ const Admin = {
           <div class="avatar avatar-sm">${u.avatar || '👤'}</div>
           <span class="user-name" style="flex:1">${u.name}</span>
           <span class="badge badge-${u.role === 'admin' ? 'red' : u.role === 'instructor' ? 'purple' : u.role === 'parent' ? 'blue' : 'green'}">${u.role}</span>
-          <button class="btn btn-ghost btn-sm" onclick="Admin.editUser(${u.id}, '${u.name}', '${u.role}')">✏️</button>
-          <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Admin.deleteUser(${u.id})">🗑️</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.editUser(${u.id}, '${u.name}', '${u.role}')">✏️</button>
+          <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Admin.deleteUser(${u.id})">🗑️</button>
         </div>
       `).join('');
     } catch(e) { console.error('Failed to load users', e); }
@@ -198,8 +198,8 @@ const Admin = {
             </select>
           </div>
           <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-md)">
-            <button class="btn btn-primary" onclick="Admin.saveUser()" style="flex:1">Save Changes</button>
-            <button class="btn btn-secondary" onclick="document.getElementById('edit-user-modal').classList.remove('active')" style="flex:1">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="Admin.saveUser()" style="flex:1">Save Changes</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('edit-user-modal').classList.remove('active')" style="flex:1">Cancel</button>
           </div>
         </div>
       </div>

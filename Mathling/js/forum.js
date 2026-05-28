@@ -89,8 +89,8 @@ const Forum = {
     
     detail.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md)">
-        <button class="btn btn-ghost btn-sm" onclick="Forum.currentThread=null;Forum.renderThreads()">← Back to threads</button>
-        ${canDeleteThread ? `<button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Forum.deleteThread('${t.id}')">🗑️ Delete Thread</button>` : ''}
+        <button type="button" class="btn btn-ghost btn-sm" onclick="Forum.currentThread=null;Forum.renderThreads()">← Back to threads</button>
+        ${canDeleteThread ? `<button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Forum.deleteThread('${t.id}')">🗑️ Delete Thread</button>` : ''}
       </div>
       <div class="thread-detail-header">
         <h2>${t.title}</h2>
@@ -112,7 +112,7 @@ const Forum = {
               <strong>${r.author}</strong>
               <span class="badge badge-${r.role === 'instructor' ? 'purple' : 'blue'} btn-sm" style="padding:2px 8px">${r.role}</span>
               <span style="margin-left:auto;font-size:var(--text-xs);color:var(--text-tertiary)">${r.date}</span>
-              ${canDeleteReply ? `<button class="btn btn-ghost btn-sm" style="color:var(--danger);margin-left:var(--space-sm);padding:0 4px" onclick="Forum.deleteReply('${r.id}')" title="Delete Reply">🗑️</button>` : ''}
+              ${canDeleteReply ? `<button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);margin-left:var(--space-sm);padding:0 4px" onclick="Forum.deleteReply('${r.id}')" title="Delete Reply">🗑️</button>` : ''}
             </div>
             <p style="font-size:var(--text-sm);color:var(--text-secondary)">${r.content}</p>
           </div>`;
@@ -121,7 +121,7 @@ const Forum = {
       <div class="reply-form">
         <h4>Reply</h4>
         <textarea class="form-input" id="reply-text" placeholder="Write your reply..." rows="3"></textarea>
-        <button class="btn btn-accent-blue btn-sm" style="margin-top:var(--space-sm)" onclick="Forum.addReply()">Post Reply</button>
+        <button type="button" class="btn btn-accent-blue btn-sm" style="margin-top:var(--space-sm)" onclick="Forum.addReply()">Post Reply</button>
       </div>
     `;
   },
