@@ -26,10 +26,17 @@ const Progress = {
     if (!App.requireAuth()) return;
     
     try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const studentId = urlParams.get('studentId') || '';
+
       const response = await fetch('Progress.aspx/GetProgressData', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: App.state.currentUser.id })
+        body: JSON.stringify({ 
+            userId: App.state.currentUser.id,
+            role: App.state.currentUser.role,
+            studentId: studentId
+        })
       });
       const result = await response.json();
       const data = result.d;

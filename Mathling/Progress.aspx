@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Progress" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Progress.aspx.cs" Inherits="Mathling.Progress" %>
+<%@ Page Title="Progress" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Progress.aspx.cs" Inherits="Mathling.Progress" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/progress.css">
@@ -58,8 +58,5 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=9"></script>
-    <script src="/js/progress.js"></script>
+    <script src="/js/progress.js?v=10"></script>
 </asp:Content>
-
-
-

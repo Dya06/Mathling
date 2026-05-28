@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -33,7 +33,7 @@ namespace Mathling
         }
 
         [WebMethod]
-        public static ProgressData GetProgressData(string userId)
+        public static ProgressData GetProgressData(string userId, string role, string studentId)
         {
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
             ProgressData data = new ProgressData();
@@ -43,24 +43,66 @@ namespace Mathling
             {
                 conn.Open();
 
-                // 1. Get History & Stats
-                string historyQuery = @"
-                    SELECT 
-                        qr.Percentage as Score, 
-                        qr.TimeTakenSec, 
-                        qr.CompletedAt, 
-                        m.Title as ChapterName
-                    FROM QuizResults qr
-                    JOIN QuestionSets qs ON qr.SetId = qs.Id
-                    JOIN Modules m ON qs.ModuleId = m.Id
-                    WHERE qr.UserId = @UserId
-                    ORDER BY qr.CompletedAt ASC";
+                // Build query based on role
+                string historyQuery = "";
+                string compQuery = "";
+
+                if (role == "parent" || role == "Parent")
+                {
+                    if (!string.IsNullOrEmpty(studentId))
+                    {
+                        historyQuery = @"
+                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
+                            FROM QuizResults qr
+                            JOIN QuestionSets qs ON qr.SetId = qs.Id
+                            JOIN Modules m ON qs.ModuleId = m.Id
+                            JOIN ParentStudentLinks psl ON psl.StudentId = qr.UserId
+                            WHERE psl.ParentId = @UserId AND qr.UserId = @StudentId
+                            ORDER BY qr.CompletedAt ASC";
+                        compQuery = @"
+                            SELECT 
+                                (SELECT COUNT(*) FROM ModuleProgress mp JOIN ParentStudentLinks psl ON mp.UserId = psl.StudentId WHERE psl.ParentId = @UserId AND mp.UserId = @StudentId AND mp.IsCompleted = 1) as ChaptersDone,
+                                (SELECT COUNT(*) FROM Modules) as TotalChapters";
+                    }
+                    else
+                    {
+                        historyQuery = @"
+                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
+                            FROM QuizResults qr
+                            JOIN QuestionSets qs ON qr.SetId = qs.Id
+                            JOIN Modules m ON qs.ModuleId = m.Id
+                            JOIN ParentStudentLinks psl ON psl.StudentId = qr.UserId
+                            WHERE psl.ParentId = @UserId
+                            ORDER BY qr.CompletedAt ASC";
+                        compQuery = @"
+                            SELECT 
+                                (SELECT COUNT(*) FROM ModuleProgress mp JOIN ParentStudentLinks psl ON mp.UserId = psl.StudentId WHERE psl.ParentId = @UserId AND mp.IsCompleted = 1) as ChaptersDone,
+                                (SELECT COUNT(*) FROM Modules) as TotalChapters";
+                    }
+                }
+                else
+                {
+                    historyQuery = @"
+                        SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
+                        FROM QuizResults qr
+                        JOIN QuestionSets qs ON qr.SetId = qs.Id
+                        JOIN Modules m ON qs.ModuleId = m.Id
+                        WHERE qr.UserId = @UserId
+                        ORDER BY qr.CompletedAt ASC";
+                    compQuery = @"
+                        SELECT 
+                            (SELECT COUNT(*) FROM ModuleProgress WHERE UserId = @UserId AND IsCompleted = 1) as ChaptersDone,
+                            (SELECT COUNT(*) FROM Modules) as TotalChapters";
+                }
 
                 int totalScore = 0;
                 
                 using (SqlCommand cmd = new SqlCommand(historyQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
+                    if (!string.IsNullOrEmpty(studentId))
+                        cmd.Parameters.AddWithValue("@StudentId", studentId);
+
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -93,28 +135,23 @@ namespace Mathling
 
                 data.AvgScore = data.QuizzesTaken > 0 ? totalScore / data.QuizzesTaken : 0;
 
-                // 2. Get Chapters Completion
-                string compQuery = @"
-                    SELECT 
-                        (SELECT COUNT(*) FROM ModuleProgress WHERE UserId = @UserId AND IsCompleted = 1) as ChaptersDone,
-                        (SELECT COUNT(*) FROM Modules) as TotalChapters";
-
                 using (SqlCommand cmd = new SqlCommand(compQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
+                    if (!string.IsNullOrEmpty(studentId))
+                        cmd.Parameters.AddWithValue("@StudentId", studentId);
+                    
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            data.ChaptersDone = Convert.ToInt32(reader["ChaptersDone"]);
-                            data.TotalChapters = Convert.ToInt32(reader["TotalChapters"]);
+                            data.ChaptersDone = reader["ChaptersDone"] != DBNull.Value ? Convert.ToInt32(reader["ChaptersDone"]) : 0;
+                            data.TotalChapters = reader["TotalChapters"] != DBNull.Value ? Convert.ToInt32(reader["TotalChapters"]) : 0;
                         }
                     }
                 }
             }
-
             return data;
         }
     }
 }
-
