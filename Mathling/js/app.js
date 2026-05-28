@@ -52,6 +52,9 @@ const App = {
 
   // ---- Initialize ----
   init() {
+    if (this.state.currentUser && this.state.currentUser.avatar) {
+      this.state.currentUser.avatar = this.getAvatarEmoji(this.state.currentUser.avatar);
+    }
     this.applyTheme();
     this.setupNav();
     this.setupThemeToggle();
@@ -248,6 +251,16 @@ const App = {
       return false;
     }
     return true;
+  },
+
+  getAvatarEmoji(avatarType) {
+    if (!avatarType) return '👤';
+    const lower = avatarType.toLowerCase();
+    if (lower === 'student') return '🧒';
+    if (lower === 'parent') return '👩';
+    if (lower === 'instructor') return '👨‍🏫';
+    if (lower === 'admin') return '🛡️';
+    return avatarType;
   },
 
   // ---- Toast Notifications ----

@@ -180,7 +180,7 @@ const Profile = {
     const container = document.getElementById('profile-content');
     if (!container) return;
 
-    document.getElementById('profile-avatar').textContent = user.avatar || '\uD83D\uDC64';
+    document.getElementById('profile-avatar').textContent = App.getAvatarEmoji(user.avatar);
     document.getElementById('profile-name').textContent = user.name;
     document.getElementById('profile-role-badge').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 
