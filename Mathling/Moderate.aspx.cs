@@ -15,7 +15,7 @@ namespace Mathling
 
         public class SubmissionItem
         {
-            public int id { get; set; }
+            public string id { get; set; }
             public string title { get; set; }
             public string chapter { get; set; }
             public string difficulty { get; set; }
@@ -26,7 +26,7 @@ namespace Mathling
         }
 
         [WebMethod]
-        public static List<SubmissionItem> GetSubmissions(int userId, string role)
+        public static List<SubmissionItem> GetSubmissions(string userId, string role)
         {
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
             List<SubmissionItem> subs = new List<SubmissionItem>();
@@ -54,7 +54,7 @@ namespace Mathling
                         {
                             subs.Add(new SubmissionItem
                             {
-                                id = Convert.ToInt32(reader["Id"]),
+                                id = reader["Id"].ToString(),
                                 title = reader["Title"].ToString(),
                                 chapter = reader["Chapter"].ToString(),
                                 difficulty = reader["Difficulty"].ToString(),
@@ -71,7 +71,7 @@ namespace Mathling
         }
 
         [WebMethod]
-        public static bool SubmitContent(int instructorId, string title, string chapter, string difficulty)
+        public static bool SubmitContent(string instructorId, string title, string chapter, string difficulty)
         {
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connStr))
@@ -90,7 +90,7 @@ namespace Mathling
         }
 
         [WebMethod]
-        public static bool UpdateStatus(int submissionId, string status, string reason)
+        public static bool UpdateStatus(string submissionId, string status, string reason)
         {
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connStr))

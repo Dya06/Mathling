@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -33,7 +33,7 @@ namespace Mathling
         }
 
         [WebMethod]
-        public static ProgressData GetProgressData(int userId)
+        public static ProgressData GetProgressData(string userId)
         {
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
             ProgressData data = new ProgressData();
@@ -46,7 +46,7 @@ namespace Mathling
                 // 1. Get History & Stats
                 string historyQuery = @"
                     SELECT 
-                        qr.Score, 
+                        qr.Percentage as Score, 
                         qr.TimeTakenSec, 
                         qr.CompletedAt, 
                         m.Title as ChapterName
@@ -65,7 +65,7 @@ namespace Mathling
                     {
                         while (reader.Read())
                         {
-                            int score = Convert.ToInt32(reader["Score"]);
+                            int score = reader["Score"] != DBNull.Value ? Convert.ToInt32(reader["Score"]) : 0;
                             int timeSec = reader["TimeTakenSec"] != DBNull.Value ? Convert.ToInt32(reader["TimeTakenSec"]) : 0;
                             DateTime completedAt = Convert.ToDateTime(reader["CompletedAt"]);
                             string chapter = reader["ChapterName"].ToString();
@@ -117,3 +117,4 @@ namespace Mathling
         }
     }
 }
+

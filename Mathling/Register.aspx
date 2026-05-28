@@ -1,4 +1,4 @@
-<%@ Page Title="Register" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Register.aspx.cs" Inherits="Mathling.Register" %>
+﻿<%@ Page Title="Register" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Register.aspx.cs" Inherits="Mathling.Register" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/login.css">
@@ -99,7 +99,7 @@
             <div class="auth-footer">
                 <p>Already have an account? <a href="Login.aspx" style="color: var(--primary); font-weight: 600; text-decoration: none;">Log In</a></p>
                 <br>
-                <a href="Default.aspx">← Back to Home</a>
+                <a href="Default.aspx"> Back to Home</a>
             </div>
         </div>
         <!-- REMOVED THE DUPLICATE CLOSING FORM TAG FROM HERE -->
@@ -107,5 +107,8 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=4"></script>
+    <script src="/js/app.js?v=9"></script>
 </asp:Content>
+
+
+

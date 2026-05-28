@@ -18,13 +18,13 @@
   <main class="main">
     <div class="moderate-page container">
       <div class="moderate-header">
-        <h1>🛡️ Content Moderation</h1>
+        <h1> Content Moderation</h1>
         <p style="color:var(--text-secondary)">Submit new exercises or review pending content</p>
       </div>
 
       <!-- Submit Section (Instructor Only) -->
       <div id="submit-section" class="submission-form card" style="margin-bottom:var(--space-2xl)">
-        <h3>📤 Submit New Content</h3>
+        <h3> Submit New Content</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">
           <div class="form-group" style="margin:0">
             <label class="form-label" for="sub-title">Title</label>
@@ -50,15 +50,15 @@
 
       <!-- Review Section -->
       <div>
-        <h3 style="margin-bottom:var(--space-md)">📋 Review Queue</h3>
+        <h3 style="margin-bottom:var(--space-md)"> Review Queue</h3>
         <p id="review-actions-note" style="display:none;font-size:var(--text-sm);color:var(--accent-blue);margin-bottom:var(--space-md)">
           As an admin, you can approve or reject submissions below.
         </p>
         <div class="status-filters">
           <button type="button" class="tag status-filter active" data-status="all">All</button>
-          <button type="button" class="tag status-filter" data-status="pending">⏳ Pending</button>
-          <button type="button" class="tag status-filter" data-status="approved">✅ Approved</button>
-          <button type="button" class="tag status-filter" data-status="rejected">❌ Rejected</button>
+          <button type="button" class="tag status-filter" data-status="pending"> Pending</button>
+          <button type="button" class="tag status-filter" data-status="approved"> Approved</button>
+          <button type="button" class="tag status-filter" data-status="rejected"> Rejected</button>
         </div>
         <div class="review-list" id="review-list"></div>
       </div>
@@ -67,6 +67,9 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=5"></script>
+    <script src="/js/app.js?v=9"></script>
     <script src="/js/moderate.js"></script>
 </asp:Content>
+
+
+

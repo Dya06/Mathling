@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -13,6 +13,7 @@ namespace Mathling
     public partial class Quiz : Page
     {
         private readonly string _connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+        private static readonly string[] FormulaOrder = { "SF+4", "SF+3", "SF+2", "SF+1" };
 
         private string SelectedFormulaName
         {
@@ -20,14 +21,8 @@ namespace Mathling
             {
                 string formula = Request.QueryString["formula"];
                 if (string.IsNullOrWhiteSpace(formula)) return "SF+4";
-
                 formula = formula.Trim().ToUpperInvariant();
-                if (formula == "SF+4" || formula == "SF+3" || formula == "SF+2" || formula == "SF+1")
-                {
-                    return formula;
-                }
-
-                return "SF+4";
+                return FormulaOrder.Contains(formula) ? formula : "SF+4";
             }
         }
 
@@ -85,49 +80,67 @@ namespace Mathling
             set { Session["QuizSetStartedAt"] = value; }
         }
 
+        private string CurrentUserId
+        {
+            get
+            {
+                if (Session["UserId"] == null) return string.Empty;
+
+                string id = Session["UserId"].ToString().Trim();
+
+                int numericId;
+                if (int.TryParse(id, out numericId) && id.Length < 3)
+                {
+                    return numericId.ToString("000");
+                }
+
+                return id;
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["UserId"] == null || !string.Equals(Session["UserRole"]?.ToString(), "student", StringComparison.OrdinalIgnoreCase))
+            if (Session["UserId"] == null || !string.Equals(Session["UserRole"] == null ? string.Empty : Session["UserRole"].ToString(), "student", StringComparison.OrdinalIgnoreCase))
             {
                 Response.Redirect("Login.aspx");
                 return;
             }
 
-            // Formula access rule:
-            // SF+4 is open by default.
-            // SF+3 unlocks only after SF+4 Assessment is completed.
-            // SF+2 unlocks only after SF+3 Assessment is completed.
-            // SF+1 unlocks only after SF+2 Assessment is completed.
-            if (!IsFormulaUnlocked(SelectedFormulaName))
-            {
-                string allowedFormula = GetHighestUnlockedFormulaName();
-                Response.Redirect("Quiz.aspx?formula=" + Server.UrlEncode(allowedFormula), false);
-                Context.ApplicationInstance.CompleteRequest();
-                return;
-            }
-
             if (!IsPostBack)
             {
-                CurrentFormula = LoadFormulaFromDatabase();
-                SelectedModuleId = string.Empty;
-                SelectedSetId = string.Empty;
-                QuestionIndex = 0;
-                TotalCorrect = 0;
-                CurrentAnswer = string.Empty;
-                FlashIndex = 0;
-                Session["QuizNextFormula"] = string.Empty;
+                if (IsFormulaLocked(SelectedFormulaName))
+                {
+                    Response.Redirect(GetFormulaUrl(GetHighestUnlockedFormula()), false);
+                    Context.ApplicationInstance.CompleteRequest();
+                    return;
+                }
 
+                ResetQuizSessionForFormula();
+                CurrentFormula = LoadFormulaFromDatabase(SelectedFormulaName);
                 BindBaseContent();
                 BindModuleSidebar();
                 ShowStartScreen();
             }
         }
 
+        private void ResetQuizSessionForFormula()
+        {
+            SelectedModuleId = string.Empty;
+            SelectedSetId = string.Empty;
+            QuestionIndex = 0;
+            TotalCorrect = 0;
+            CurrentAnswer = string.Empty;
+            FlashIndex = 0;
+            Session["QuizSetSaved"] = false;
+            Session["QuizCompleteAction"] = "back";
+            Session["QuizJumpFormula"] = string.Empty;
+        }
+
         private void BindBaseContent()
         {
             if (CurrentFormula == null)
             {
-                ShowMessage("Quiz data missing", "No formula data was found in the database for " + Server.HtmlEncode(SelectedFormulaName) + ". Run FormulaAbacus.sql first.");
+                ShowMessage("Quiz data missing", "No formula data was found in the database. Run FormulaAbacus.sql first.");
                 return;
             }
 
@@ -149,21 +162,23 @@ namespace Mathling
         {
             if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem) return;
 
-            var module = (QuizModule)e.Item.DataItem;
-            var button = (LinkButton)e.Item.FindControl("ModuleButton");
-            var completedLiteral = (Literal)e.Item.FindControl("CompletedLiteral");
+            QuizModule module = (QuizModule)e.Item.DataItem;
+            LinkButton button = (LinkButton)e.Item.FindControl("ModuleButton");
+            Literal completedLiteral = (Literal)e.Item.FindControl("CompletedLiteral");
 
+            bool completed = IsModuleCompleted(module);
             string css = "module-nav-item";
             if (module.Id == SelectedModuleId) css += " active";
-            if (IsModuleCompleted(module.Id)) css += " completed";
+            if (completed) css += " completed";
 
             button.CssClass = css;
-            completedLiteral.Text = IsModuleCompleted(module.Id) ? "<span class='mod-check'>✅</span>" : string.Empty;
+            completedLiteral.Text = completed ? "<span class='mod-check'></span>" : string.Empty;
         }
 
         protected void ModuleRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName != "SelectModule") return;
+
             SelectedModuleId = e.CommandArgument.ToString();
             SelectedSetId = string.Empty;
             AssessmentTimer.Enabled = false;
@@ -174,7 +189,7 @@ namespace Mathling
 
         protected void StartLearningButton_Click(object sender, EventArgs e)
         {
-            var firstModule = CurrentFormula?.Modules.OrderBy(m => m.SortOrder).FirstOrDefault();
+            QuizModule firstModule = CurrentFormula == null ? null : CurrentFormula.Modules.OrderBy(m => m.SortOrder).FirstOrDefault();
             if (firstModule == null)
             {
                 ShowMessage("No module found", "The formula exists, but no quiz modules were found.");
@@ -182,6 +197,7 @@ namespace Mathling
             }
 
             SelectedModuleId = firstModule.Id;
+            SelectedSetId = string.Empty;
             BindModuleSidebar();
             ShowModuleIntro();
         }
@@ -197,21 +213,23 @@ namespace Mathling
 
         private void ShowModuleIntro()
         {
-            HideAllPanels();
-            ModuleIntroPanel.Visible = true;
-
             QuizModule module = GetSelectedModule();
             if (module == null)
             {
-                ShowMessage("Module not found", "Please select a valid module.");
+                ShowStartScreen();
                 return;
             }
+
+            HideAllPanels();
+            ModuleIntroPanel.Visible = true;
+            AssessmentTimer.Enabled = false;
+            FlashTimer.Enabled = false;
 
             SetModuleTag(ModuleTagSpan, module);
             ModuleTagLiteral.Text = GetModuleIcon(module.Icon) + " " + Server.HtmlEncode(module.Title);
             ModuleTitleLiteral.Text = Server.HtmlEncode(module.Title);
             ModuleDescriptionLiteral.Text = Server.HtmlEncode(module.Description);
-            ModuleTimerLiteral.Text = module.IsTimed ? "<p style='color:var(--accent-red);font-weight:700;margin-top:var(--space-md)'>⏱️ Time Limit: " + module.TimeLimitSec + " seconds</p>" : string.Empty;
+            ModuleTimerLiteral.Text = module.IsTimed ? "<p style='color:var(--accent-red);font-weight:700;margin-top:var(--space-md)'> Time Limit: " + module.TimeLimitSec + " seconds</p>" : string.Empty;
             MentalBannerPanel.Visible = module.MentalMode;
 
             SetRepeater.DataSource = module.Sets.OrderBy(s => s.SortOrder).Select(s => new
@@ -227,15 +245,35 @@ namespace Mathling
         protected void SetRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
             if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem) return;
-            var button = (LinkButton)e.Item.FindControl("SetButton");
+
+            LinkButton button = (LinkButton)e.Item.FindControl("SetButton");
+            Literal completedLiteral = (Literal)e.Item.FindControl("SetCompletedLiteral");
             string setId = DataBinder.Eval(e.Item.DataItem, "Id").ToString();
-            var set = GetSelectedModule()?.Sets.FirstOrDefault(s => s.Id == setId);
+            QuizModule module = GetSelectedModule();
+            QuizSet set = module == null ? null : module.Sets.FirstOrDefault(s => s.Id == setId);
 
             if (set == null || set.Questions.Count == 0)
             {
                 button.Enabled = false;
                 button.CssClass = "btn btn-secondary";
                 button.Style["opacity"] = "0.5";
+                if (completedLiteral != null) completedLiteral.Text = string.Empty;
+                return;
+            }
+
+            bool completed = IsSetCompleted(set, module);
+            if (completed)
+            {
+                button.CssClass = "btn btn-primary set-completed";
+                button.ToolTip = "Completed";
+                if (completedLiteral != null)
+                {
+                    completedLiteral.Text = "<span class='set-completed-badge'> Completed</span>";
+                }
+            }
+            else if (completedLiteral != null)
+            {
+                completedLiteral.Text = string.Empty;
             }
         }
 
@@ -262,9 +300,11 @@ namespace Mathling
             CurrentAnswer = string.Empty;
             FlashIndex = 0;
             SetStartedAt = DateTime.Now;
-            Session["QuizNextFormula"] = string.Empty;
+            Session["QuizSetSaved"] = false;
+            Session["QuizCompleteAction"] = "back";
+            Session["QuizJumpFormula"] = string.Empty;
 
-            if (module.IsTimed)
+            if (module != null && module.IsTimed)
             {
                 TimeLeft = module.TimeLimitSec.HasValue ? module.TimeLimitSec.Value : 60;
                 AssessmentTimer.Enabled = true;
@@ -329,15 +369,15 @@ namespace Mathling
 
         private void RenderStaticQuestion(QuizQuestion question)
         {
-            var html = new StringBuilder();
-            html.Append("<div class='vq-counter'>📝</div>");
+            StringBuilder html = new StringBuilder();
+            html.Append("<div class='vq-counter'></div>");
             html.Append("<div class='vertical-question'>");
 
             for (int i = 0; i < question.Rows.Count; i++)
             {
                 int row = question.Rows[i];
                 string css = row < 0 ? "vq-row negative" : "vq-row";
-                string display = row < 0 ? "−" + Math.Abs(row) : row.ToString();
+                string display = row < 0 ? "" + Math.Abs(row) : row.ToString();
                 html.Append("<div class='").Append(css).Append("'>").Append(display).Append("</div>");
             }
 
@@ -355,7 +395,7 @@ namespace Mathling
             if (FlashIndex < question.Rows.Count)
             {
                 int value = question.Rows[FlashIndex];
-                display = value < 0 ? "−" + Math.Abs(value) : value.ToString();
+                display = value < 0 ? "" + Math.Abs(value) : value.ToString();
                 if (value < 0) css += " negative";
             }
             else
@@ -365,7 +405,7 @@ namespace Mathling
             }
 
             QuestionDisplayLiteral.Text =
-                "<div class='vq-counter'>Watch carefully! 👀</div>" +
+                "<div class='vq-counter'>Watch carefully! </div>" +
                 "<div class='vertical-question' style='min-height:180px;justify-content:center;align-items:center;'>" +
                 "<div class='flash-container'><div class='" + css + "'>" + display + "</div></div>" +
                 "</div>";
@@ -404,9 +444,8 @@ namespace Mathling
         private void RenderQuestionWithoutResettingFlash()
         {
             QuizModule module = GetSelectedModule();
-            QuizSet set = GetSelectedSet();
             QuizQuestion question = GetCurrentQuestion();
-            if (module == null || set == null || question == null) return;
+            if (module == null || question == null) return;
 
             TimerValueLiteral.Text = TimeLeft + "s";
             int maxTime = module.TimeLimitSec.HasValue ? module.TimeLimitSec.Value : 60;
@@ -456,7 +495,8 @@ namespace Mathling
         private void CheckAnswer()
         {
             QuizQuestion question = GetCurrentQuestion();
-            if (question == null) return;
+            QuizSet set = GetSelectedSet();
+            if (question == null || set == null) return;
 
             FlashTimer.Enabled = false;
 
@@ -470,9 +510,21 @@ namespace Mathling
             bool isCorrect = submittedAnswer == question.Answer;
             if (isCorrect) TotalCorrect++;
 
-            ShowTemporaryFeedback(isCorrect ? "Correct! 🎉" : "Not Quite 😅",
-                isCorrect ? "Great job! Keep going." : "The correct answer was " + question.Answer + ". Keep trying.",
-                true);
+            bool isLastQuestion = QuestionIndex >= set.Questions.Count - 1;
+            string title = isCorrect ? "Correct! " : "Not Quite ";
+            string body;
+
+            if (isLastQuestion)
+            {
+                body = "Question " + set.Questions.Count + "/" + set.Questions.Count + " answered. Click Finish to complete this set.";
+            }
+            else
+            {
+                body = isCorrect ? "Great job! Keep going." : "The correct answer was " + question.Answer + ". Keep trying.";
+            }
+
+            ShowTemporaryFeedback(title, body, true);
+            NextQuestionButton.Text = isLastQuestion ? "Finish Module" : "Next Question";
         }
 
         private void ShowTemporaryFeedback(string title, string body, bool canContinue)
@@ -481,25 +533,29 @@ namespace Mathling
             FeedbackPanel.Visible = true;
             FeedbackTitleLiteral.Text = Server.HtmlEncode(title);
             FeedbackBodyLiteral.Text = Server.HtmlEncode(body);
-            NextQuestionButton.Text = "Next Question";
             NextQuestionButton.Visible = canContinue;
         }
 
         protected void NextQuestionButton_Click(object sender, EventArgs e)
         {
+            QuizSet set = GetSelectedSet();
+            if (set == null || set.Questions == null || set.Questions.Count == 0)
+            {
+                ShowSetComplete();
+                return;
+            }
+
+            bool isLastQuestion = QuestionIndex >= set.Questions.Count - 1;
+            if (isLastQuestion)
+            {
+                ShowSetComplete();
+                return;
+            }
+
             QuestionIndex++;
             CurrentAnswer = string.Empty;
             FlashIndex = 0;
-
-            QuizSet set = GetSelectedSet();
-            if (set == null || QuestionIndex >= set.Questions.Count)
-            {
-                ShowSetComplete();
-            }
-            else
-            {
-                RenderQuestion();
-            }
+            RenderQuestion();
         }
 
         private void ShowSetComplete()
@@ -511,29 +567,68 @@ namespace Mathling
             QuizModule module = GetSelectedModule();
             if (set == null || module == null) return;
 
-            SaveQuizResult();
-            MarkModuleCompleted(module.Id);
+            bool alreadySaved = Session["QuizSetSaved"] != null && (bool)Session["QuizSetSaved"];
+            if (!alreadySaved)
+            {
+                SaveQuizResult();
+                Session["QuizSetSaved"] = true;
+            }
+
+            bool isAssessment = string.Equals(module.ModuleKey, "assessment", StringComparison.OrdinalIgnoreCase);
+            bool assessmentPassed = !isAssessment || TotalCorrect >= 9;
+
+            if (assessmentPassed && IsModuleCompleted(module))
+            {
+                MarkModuleCompleted(module.Id);
+            }
+
             BindModuleSidebar();
 
             HideAllPanels();
             CompletePanel.Visible = true;
 
             int total = set.Questions.Count;
-            int pct = total == 0 ? 0 : (int)Math.Round((decimal)TotalCorrect / total * 100);
+            int pct = total == 0 ? 0 : (int)Math.Round((decimal)TotalCorrect / total * 100, 0);
 
-            CompleteIconLiteral.Text = pct >= 80 ? "🎊" : pct >= 50 ? "👍" : "💪";
-            CompleteTitleLiteral.Text = Server.HtmlEncode(set.Label + " — Complete!");
+            CompleteIconLiteral.Text = pct >= 90 ? "" : pct >= 50 ? "" : "";
+            CompleteTitleLiteral.Text = Server.HtmlEncode(set.Label + "  Complete!");
             CompleteCorrectLiteral.Text = TotalCorrect + "/" + total;
             CompletePercentageLiteral.Text = pct + "%";
 
-            string nextFormula = null;
-            if (string.Equals(module.ModuleKey, "assessment", StringComparison.OrdinalIgnoreCase))
-            {
-                nextFormula = GetNextFormulaName(SelectedFormulaName);
-            }
+            RetryButton.Visible = true;
+            RetryButton.Text = " Retry";
 
-            Session["QuizNextFormula"] = nextFormula ?? string.Empty;
-            BackToModuleButton.Text = string.IsNullOrEmpty(nextFormula) ? "← Back to Module" : "Continue to " + nextFormula + " →";
+            if (isAssessment)
+            {
+                string nextFormula = GetNextFormulaName(SelectedFormulaName);
+                if (TotalCorrect >= 9 && !string.IsNullOrEmpty(nextFormula))
+                {
+                    Session["QuizCompleteAction"] = "jump";
+                    Session["QuizJumpFormula"] = nextFormula;
+                    CompleteTitleLiteral.Text = Server.HtmlEncode("Assessment Passed!");
+                    BackToModuleButton.Text = "Jump to " + nextFormula + " ";
+                    RetryButton.Visible = false;
+                }
+                else if (TotalCorrect >= 9)
+                {
+                    Session["QuizCompleteAction"] = "back";
+                    CompleteTitleLiteral.Text = Server.HtmlEncode("Assessment Passed!");
+                    BackToModuleButton.Text = "Finish Module";
+                    RetryButton.Visible = false;
+                }
+                else
+                {
+                    Session["QuizCompleteAction"] = "retry";
+                    CompleteTitleLiteral.Text = Server.HtmlEncode("Assessment needs retry");
+                    BackToModuleButton.Text = "Retry Assessment";
+                    RetryButton.Visible = false;
+                }
+            }
+            else
+            {
+                Session["QuizCompleteAction"] = "back";
+                BackToModuleButton.Text = "Finish Module";
+            }
         }
 
         protected void RetryButton_Click(object sender, EventArgs e)
@@ -543,13 +638,39 @@ namespace Mathling
 
         protected void BackToModuleButton_Click(object sender, EventArgs e)
         {
-            string nextFormula = Session["QuizNextFormula"] == null ? string.Empty : Session["QuizNextFormula"].ToString();
-            if (!string.IsNullOrEmpty(nextFormula))
+            string action = Session["QuizCompleteAction"] == null ? "back" : Session["QuizCompleteAction"].ToString();
+
+            if (action == "jump")
             {
-                Response.Redirect(GetFormulaUrl(nextFormula));
+                string nextFormula = Session["QuizJumpFormula"] == null ? string.Empty : Session["QuizJumpFormula"].ToString();
+                if (!string.IsNullOrWhiteSpace(nextFormula))
+                {
+                    Response.Redirect(GetFormulaUrl(nextFormula), false);
+                    Context.ApplicationInstance.CompleteRequest();
+                    return;
+                }
+            }
+
+            if (action == "retry")
+            {
+                StartSet();
                 return;
             }
 
+            SelectedSetId = string.Empty;
+            CurrentAnswer = string.Empty;
+            QuestionIndex = 0;
+            TotalCorrect = 0;
+            FlashIndex = 0;
+            AssessmentTimer.Enabled = false;
+            FlashTimer.Enabled = false;
+            Session["QuizSetSaved"] = false;
+            Session["QuizCompleteAction"] = "back";
+            Session["QuizJumpFormula"] = string.Empty;
+
+            CurrentFormula = LoadFormulaFromDatabase(SelectedFormulaName);
+            BindBaseContent();
+            BindModuleSidebar();
             ShowModuleIntro();
         }
 
@@ -573,12 +694,13 @@ namespace Mathling
 
         private QuizModule GetSelectedModule()
         {
-            return CurrentFormula?.Modules.FirstOrDefault(m => m.Id == SelectedModuleId);
+            return CurrentFormula == null ? null : CurrentFormula.Modules.FirstOrDefault(m => m.Id == SelectedModuleId);
         }
 
         private QuizSet GetSelectedSet()
         {
-            return GetSelectedModule()?.Sets.FirstOrDefault(s => s.Id == SelectedSetId);
+            QuizModule module = GetSelectedModule();
+            return module == null ? null : module.Sets.FirstOrDefault(s => s.Id == SelectedSetId);
         }
 
         private QuizQuestion GetCurrentQuestion()
@@ -588,20 +710,109 @@ namespace Mathling
             return set.Questions[QuestionIndex];
         }
 
-        private bool IsModuleCompleted(string moduleId)
+        private bool IsSetCompleted(QuizSet set, QuizModule module)
         {
-            string userId = Session["UserId"].ToString();
+            if (set == null || module == null) return false;
+            return IsSetCompleted(set.Id, module.ModuleKey);
+        }
+
+        private bool IsSetCompleted(string setId, string moduleKey)
+        {
+            if (string.IsNullOrWhiteSpace(CurrentUserId) || string.IsNullOrWhiteSpace(setId)) return false;
+            bool isAssessment = string.Equals(moduleKey, "assessment", StringComparison.OrdinalIgnoreCase);
+
+            using (SqlConnection conn = new SqlConnection(_connStr))
+            using (SqlCommand cmd = new SqlCommand(isAssessment ? @"
+                SELECT COUNT(*)
+                FROM [QuizResults]
+                WHERE [UserId] = @UserId AND [SetId] = @SetId AND [TotalCorrect] >= 9" : @"
+                SELECT COUNT(*)
+                FROM [QuizResults]
+                WHERE [UserId] = @UserId AND [SetId] = @SetId", conn))
+            {
+                cmd.Parameters.AddWithValue("@UserId", CurrentUserId);
+                cmd.Parameters.AddWithValue("@SetId", setId);
+                conn.Open();
+                return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+            }
+        }
+
+        private bool IsModuleCompleted(QuizModule module)
+        {
+            if (module == null || module.Sets == null || module.Sets.Count == 0) return false;
+            foreach (QuizSet set in module.Sets)
+            {
+                if (!IsSetCompleted(set, module)) return false;
+            }
+            return true;
+        }
+
+        private bool HasPassedAssessmentForFormula(string formulaName)
+        {
+            if (string.IsNullOrWhiteSpace(CurrentUserId)) return false;
+
             using (SqlConnection conn = new SqlConnection(_connStr))
             using (SqlCommand cmd = new SqlCommand(@"
                 SELECT COUNT(*)
-                FROM [ModuleProgress]
-                WHERE [UserId] = @UserId AND [ModuleId] = @ModuleId AND [IsCompleted] = 1", conn))
+                FROM [QuizResults] qr
+                INNER JOIN [QuestionSets] qs ON qr.[SetId] = qs.[Id]
+                INNER JOIN [Modules] m ON qs.[ModuleId] = m.[Id]
+                INNER JOIN [Formulas] f ON m.[FormulaId] = f.[Id]
+                WHERE qr.[UserId] = @UserId
+                  AND f.[Name] = @FormulaName
+                  AND m.[ModuleKey] = 'assessment'
+                  AND qr.[TotalCorrect] >= 9", conn))
             {
-                cmd.Parameters.AddWithValue("@UserId", userId);
-                cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+                cmd.Parameters.AddWithValue("@UserId", CurrentUserId);
+                cmd.Parameters.AddWithValue("@FormulaName", formulaName);
                 conn.Open();
-                return (int)cmd.ExecuteScalar() > 0;
+                return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
             }
+        }
+
+        private bool IsFormulaLocked(string formulaName)
+        {
+            int index = Array.IndexOf(FormulaOrder, formulaName);
+            if (index <= 0) return false;
+            string previousFormula = FormulaOrder[index - 1];
+            return !HasPassedAssessmentForFormula(previousFormula);
+        }
+
+        private string GetHighestUnlockedFormula()
+        {
+            string highest = "SF+4";
+            for (int i = 1; i < FormulaOrder.Length; i++)
+            {
+                if (HasPassedAssessmentForFormula(FormulaOrder[i - 1])) highest = FormulaOrder[i];
+                else break;
+            }
+            return highest;
+        }
+
+        private string GetNextFormulaName(string currentFormula)
+        {
+            int index = Array.IndexOf(FormulaOrder, currentFormula);
+            if (index < 0 || index >= FormulaOrder.Length - 1) return null;
+            return FormulaOrder[index + 1];
+        }
+
+        protected string GetFormulaLinkCss(string formulaName)
+        {
+            string css = "formula-link";
+            if (string.Equals(SelectedFormulaName, formulaName, StringComparison.OrdinalIgnoreCase)) css += " active";
+            if (IsFormulaLocked(formulaName)) css += " locked";
+            return css;
+        }
+
+        protected string GetFormulaLinkLabel(string formulaName)
+        {
+            return IsFormulaLocked(formulaName) ? " " + formulaName : formulaName;
+        }
+
+        protected string GetFormulaUrl(string formulaName)
+        {
+            if (IsFormulaLocked(formulaName)) return "#";
+            return "Quiz.aspx?formula=" + Server.UrlEncode(formulaName);
         }
 
         private void SaveQuizResult()
@@ -609,11 +820,10 @@ namespace Mathling
             QuizSet set = GetSelectedSet();
             if (set == null) return;
 
-            string userId = Session["UserId"].ToString();
             int total = set.Questions.Count;
             decimal percentage = total == 0 ? 0 : Math.Round((decimal)TotalCorrect / total * 100, 2);
             int timeTaken = Math.Max(0, (int)(DateTime.Now - SetStartedAt).TotalSeconds);
-            int score = TotalCorrect * 10;
+            int xpToAdd = TotalCorrect * 10;
 
             using (SqlConnection conn = new SqlConnection(_connStr))
             {
@@ -625,18 +835,19 @@ namespace Mathling
                     VALUES (@Id, @UserId, @SetId, @Score, @TotalCorrect, @TotalQuestions, @Percentage, @TimeTakenSec);
 
                     UPDATE [Users]
-                    SET [XP] = [XP] + @Score,
-                        [Level] = CASE WHEN (([XP] + @Score) / 100) + 1 > [Level] THEN (([XP] + @Score) / 100) + 1 ELSE [Level] END
+                    SET [XP] = [XP] + @XpToAdd,
+                        [Level] = CASE WHEN (([XP] + @XpToAdd) / 100) + 1 > [Level] THEN (([XP] + @XpToAdd) / 100) + 1 ELSE [Level] END
                     WHERE [Id] = @UserId;", conn))
                 {
                     cmd.Parameters.AddWithValue("@Id", resultId);
-                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@UserId", CurrentUserId);
                     cmd.Parameters.AddWithValue("@SetId", set.Id);
-                    cmd.Parameters.AddWithValue("@Score", score);
+                    cmd.Parameters.AddWithValue("@Score", TotalCorrect);
                     cmd.Parameters.AddWithValue("@TotalCorrect", TotalCorrect);
                     cmd.Parameters.AddWithValue("@TotalQuestions", total);
                     cmd.Parameters.AddWithValue("@Percentage", percentage);
                     cmd.Parameters.AddWithValue("@TimeTakenSec", timeTaken);
+                    cmd.Parameters.AddWithValue("@XpToAdd", xpToAdd);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -644,55 +855,73 @@ namespace Mathling
 
         private void MarkModuleCompleted(string moduleId)
         {
-            string userId = Session["UserId"].ToString();
+            if (string.IsNullOrWhiteSpace(CurrentUserId) || string.IsNullOrWhiteSpace(moduleId)) return;
 
             using (SqlConnection conn = new SqlConnection(_connStr))
             {
                 conn.Open();
+                string progressId = GetExistingProgressId(conn, CurrentUserId, moduleId);
 
-                using (SqlCommand existsCmd = new SqlCommand(@"
-                    SELECT [Id]
-                    FROM [ModuleProgress]
-                    WHERE [UserId] = @UserId AND [ModuleId] = @ModuleId", conn))
+                if (string.IsNullOrWhiteSpace(progressId))
                 {
-                    existsCmd.Parameters.AddWithValue("@UserId", userId);
-                    existsCmd.Parameters.AddWithValue("@ModuleId", moduleId);
-                    object existingId = existsCmd.ExecuteScalar();
-
-                    if (existingId != null)
+                    progressId = GetNextId(conn, "ModuleProgress", "MP", 6);
+                    using (SqlCommand cmd = new SqlCommand(@"
+                        INSERT INTO [ModuleProgress] ([Id], [UserId], [ModuleId], [IsCompleted], [CompletedAt])
+                        VALUES (@Id, @UserId, @ModuleId, 1, GETDATE())", conn))
                     {
-                        using (SqlCommand updateCmd = new SqlCommand(@"
-                            UPDATE [ModuleProgress]
-                            SET [IsCompleted] = 1, [CompletedAt] = GETDATE()
-                            WHERE [Id] = @Id", conn))
-                        {
-                            updateCmd.Parameters.AddWithValue("@Id", existingId.ToString());
-                            updateCmd.ExecuteNonQuery();
-                        }
+                        cmd.Parameters.AddWithValue("@Id", progressId);
+                        cmd.Parameters.AddWithValue("@UserId", CurrentUserId);
+                        cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+                        cmd.ExecuteNonQuery();
                     }
-                    else
+                }
+                else
+                {
+                    using (SqlCommand cmd = new SqlCommand(@"
+                        UPDATE [ModuleProgress]
+                        SET [IsCompleted] = 1, [CompletedAt] = GETDATE()
+                        WHERE [Id] = @Id", conn))
                     {
-                        string progressId = GetNextId(conn, "ModuleProgress", "MP", 6);
-                        using (SqlCommand insertCmd = new SqlCommand(@"
-                            INSERT INTO [ModuleProgress] ([Id], [UserId], [ModuleId], [IsCompleted], [CompletedAt])
-                            VALUES (@Id, @UserId, @ModuleId, 1, GETDATE())", conn))
-                        {
-                            insertCmd.Parameters.AddWithValue("@Id", progressId);
-                            insertCmd.Parameters.AddWithValue("@UserId", userId);
-                            insertCmd.Parameters.AddWithValue("@ModuleId", moduleId);
-                            insertCmd.ExecuteNonQuery();
-                        }
+                        cmd.Parameters.AddWithValue("@Id", progressId);
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }
         }
 
-        private QuizFormula LoadFormulaFromDatabase()
+        private string GetExistingProgressId(SqlConnection conn, string userId, string moduleId)
+        {
+            using (SqlCommand cmd = new SqlCommand(@"
+                SELECT TOP 1 [Id]
+                FROM [ModuleProgress]
+                WHERE [UserId] = @UserId AND [ModuleId] = @ModuleId", conn))
+            {
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+                object obj = cmd.ExecuteScalar();
+                return obj == null || obj == DBNull.Value ? string.Empty : obj.ToString();
+            }
+        }
+
+        private string GetNextId(SqlConnection conn, string tableName, string prefix, int digits)
+        {
+            string sql = "SELECT MAX(CAST(SUBSTRING([Id], @StartPos, 20) AS INT)) FROM [" + tableName + "] WHERE [Id] LIKE @PrefixLike";
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@StartPos", prefix.Length + 1);
+                cmd.Parameters.AddWithValue("@PrefixLike", prefix + "%");
+                object obj = cmd.ExecuteScalar();
+                int next = (obj == null || obj == DBNull.Value) ? 1 : Convert.ToInt32(obj) + 1;
+                return prefix + next.ToString(new string('0', digits));
+            }
+        }
+
+        private QuizFormula LoadFormulaFromDatabase(string formulaName)
         {
             QuizFormula formula = null;
-            var modules = new Dictionary<string, QuizModule>();
-            var sets = new Dictionary<string, QuizSet>();
-            var questions = new Dictionary<string, QuizQuestion>();
+            Dictionary<string, QuizModule> modules = new Dictionary<string, QuizModule>();
+            Dictionary<string, QuizSet> sets = new Dictionary<string, QuizSet>();
+            Dictionary<string, QuizQuestion> questions = new Dictionary<string, QuizQuestion>();
 
             using (SqlConnection conn = new SqlConnection(_connStr))
             {
@@ -703,7 +932,7 @@ namespace Mathling
                     FROM [Formulas]
                     WHERE [Name] = @Name AND [IsActive] = 1", conn))
                 {
-                    cmd.Parameters.AddWithValue("@Name", SelectedFormulaName);
+                    cmd.Parameters.AddWithValue("@Name", formulaName);
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -734,7 +963,7 @@ namespace Mathling
                     {
                         while (reader.Read())
                         {
-                            var module = new QuizModule
+                            QuizModule module = new QuizModule
                             {
                                 Id = reader["Id"].ToString(),
                                 FormulaId = reader["FormulaId"].ToString(),
@@ -767,7 +996,7 @@ namespace Mathling
                     {
                         while (reader.Read())
                         {
-                            var set = new QuizSet
+                            QuizSet set = new QuizSet
                             {
                                 Id = reader["Id"].ToString(),
                                 ModuleId = reader["ModuleId"].ToString(),
@@ -795,7 +1024,7 @@ namespace Mathling
                     {
                         while (reader.Read())
                         {
-                            var question = new QuizQuestion
+                            QuizQuestion question = new QuizQuestion
                             {
                                 Id = reader["Id"].ToString(),
                                 SetId = reader["SetId"].ToString(),
@@ -836,129 +1065,17 @@ namespace Mathling
             return formula;
         }
 
-        private string GetNextId(SqlConnection conn, string tableName, string prefix, int digits)
-        {
-            string sql = "SELECT ISNULL(MAX(TRY_CAST(SUBSTRING([Id], @StartAt, 20) AS INT)), 0) FROM [" + tableName + "] WHERE [Id] LIKE @LikePattern";
-            using (SqlCommand cmd = new SqlCommand(sql, conn))
-            {
-                cmd.Parameters.AddWithValue("@StartAt", prefix.Length + 1);
-                cmd.Parameters.AddWithValue("@LikePattern", prefix + "%");
-                int current = Convert.ToInt32(cmd.ExecuteScalar());
-                return prefix + (current + 1).ToString().PadLeft(digits, '0');
-            }
-        }
-
-        private string GetNextFormulaName(string currentFormula)
-        {
-            switch (currentFormula)
-            {
-                case "SF+4": return "SF+3";
-                case "SF+3": return "SF+2";
-                case "SF+2": return "SF+1";
-                default: return null;
-            }
-        }
-
-        private string GetPreviousFormulaName(string formulaName)
-        {
-            switch (formulaName)
-            {
-                case "SF+3": return "SF+4";
-                case "SF+2": return "SF+3";
-                case "SF+1": return "SF+2";
-                default: return null;
-            }
-        }
-
-        private bool IsFormulaUnlocked(string formulaName)
-        {
-            formulaName = (formulaName ?? string.Empty).Trim().ToUpperInvariant();
-
-            // First formula is always available.
-            if (formulaName == "SF+4") return true;
-
-            string previousFormula = GetPreviousFormulaName(formulaName);
-            if (string.IsNullOrEmpty(previousFormula)) return false;
-
-            return IsAssessmentCompletedForFormula(previousFormula);
-        }
-
-        private bool IsAssessmentCompletedForFormula(string formulaName)
-        {
-            string userId = Session["UserId"] == null ? string.Empty : Session["UserId"].ToString();
-            if (string.IsNullOrWhiteSpace(userId)) return false;
-
-            using (SqlConnection conn = new SqlConnection(_connStr))
-            {
-                conn.Open();
-                using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT COUNT(1)
-                    FROM [ModuleProgress] mp
-                    INNER JOIN [Modules] m ON mp.[ModuleId] = m.[Id]
-                    INNER JOIN [Formulas] f ON m.[FormulaId] = f.[Id]
-                    WHERE mp.[UserId] = @UserId
-                      AND mp.[IsCompleted] = 1
-                      AND f.[Name] = @FormulaName
-                      AND m.[ModuleKey] = 'assessment'", conn))
-                {
-                    cmd.Parameters.AddWithValue("@UserId", userId);
-                    cmd.Parameters.AddWithValue("@FormulaName", formulaName);
-                    return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
-                }
-            }
-        }
-
-        private string GetHighestUnlockedFormulaName()
-        {
-            if (IsFormulaUnlocked("SF+1")) return "SF+1";
-            if (IsFormulaUnlocked("SF+2")) return "SF+2";
-            if (IsFormulaUnlocked("SF+3")) return "SF+3";
-            return "SF+4";
-        }
-
-        protected string GetFormulaLinkCss(string formulaName)
-        {
-            string css = "formula-link";
-
-            if (string.Equals(SelectedFormulaName, formulaName, StringComparison.OrdinalIgnoreCase))
-            {
-                css += " active";
-            }
-
-            if (!IsFormulaUnlocked(formulaName))
-            {
-                css += " locked";
-            }
-
-            return css;
-        }
-
-        protected string GetFormulaUrl(string formulaName)
-        {
-            if (!IsFormulaUnlocked(formulaName))
-            {
-                return "#";
-            }
-
-            return "Quiz.aspx?formula=" + Server.UrlEncode(formulaName);
-        }
-
-        protected string GetFormulaLinkLabel(string formulaName)
-        {
-            return IsFormulaUnlocked(formulaName) ? formulaName : "🔒 " + formulaName;
-        }
-
         public string GetModuleIcon(object iconValue)
         {
             string icon = iconValue == null ? string.Empty : iconValue.ToString();
             switch (icon)
             {
-                case "book": return "📖";
-                case "abacus": return "🧮";
-                case "brain": return "🧠";
-                case "prep": return "📝";
-                case "trophy": return "🏆";
-                default: return string.IsNullOrWhiteSpace(icon) ? "📌" : Server.HtmlEncode(icon);
+                case "book": return "";
+                case "abacus": return "";
+                case "brain": return "";
+                case "prep": return "";
+                case "trophy": return "";
+                default: return string.IsNullOrWhiteSpace(icon) ? "" : Server.HtmlEncode(icon);
             }
         }
 
@@ -1022,3 +1139,4 @@ namespace Mathling
         public List<int> Rows { get; set; }
     }
 }
+

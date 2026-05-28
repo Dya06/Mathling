@@ -1,42 +1,30 @@
 ﻿<%@ Page Title="Quiz" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
-    <link rel="stylesheet" href='<%= ResolveUrl("~/css/quiz.css") %>'>
+    <link rel="stylesheet" href="/css/quiz.css?v=2">
 
     <style>
         .formula-switcher {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin: var(--space-md) 0 var(--space-lg);
+            margin: 14px 0 18px;
         }
         .formula-link {
             display: inline-block;
             padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.75);
-            color: var(--text-primary);
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #1f2937;
             text-decoration: none;
             font-weight: 700;
-            font-size: var(--text-sm);
-            border: 1px solid rgba(0,0,0,0.08);
+            font-size: 0.9rem;
         }
-        .formula-link:hover {
-            transform: translateY(-1px);
-            text-decoration: none;
-        }
-        .formula-link.active {
-            background: var(--primary, #2563eb);
-            color: white;
-            border-color: transparent;
-        }
-        .formula-link.locked {
-            opacity: 0.45;
-            cursor: not-allowed;
-            pointer-events: none;
-            background: #e5e7eb;
-            color: #6b7280;
-        }
+        .formula-link.active { background: #2563eb; color: #fff; }
+        .formula-link.locked { background: #e5e7eb; color: #6b7280; cursor: not-allowed; opacity: 0.75; }
+        .module-nav-item.completed { background: #dcfce7 !important; border-color: #22c55e !important; color: #14532d !important; }
+        .set-completed { background: #16a34a !important; border-color: #15803d !important; color: #fff !important; }
+        .set-completed-badge { display: block; font-size: var(--text-xs); margin-top: 4px; opacity: .95; }
     </style>
 </asp:Content>
 
@@ -47,13 +35,14 @@
                 <img src="/favicon.svg" alt="Mathlings" class="navbar-logo">
                 <span class="navbar-title">Math<span>lings</span></span>
             </a>
-            <div class="navbar-nav">
-                <a href="Quiz.aspx" class="nav-link active">Quiz</a>
-                <a href="Progress.aspx" class="nav-link">Progress</a>
-                <a href="Forum.aspx" class="nav-link">Forum</a>
+            <div class="navbar-nav" id="main-nav"></div>
+            <div class="navbar-actions">
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+                <button type="button" class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
             </div>
         </div>
     </nav>
+    <div class="mobile-nav" id="mobile-nav"></div>
 
     <main class="main">
         <asp:UpdatePanel ID="QuizUpdatePanel" runat="server" UpdateMode="Conditional">
@@ -67,7 +56,6 @@
                             <h3><asp:Literal ID="FormulaNameLiteral" runat="server" /></h3>
                             <div class="formula-rule"><asp:Literal ID="FormulaRuleLiteral" runat="server" /></div>
                         </div>
-
 
 
                         <div class="formula-switcher">
@@ -100,7 +88,7 @@
                         </asp:Panel>
 
                         <asp:Panel ID="StartPanel" runat="server" CssClass="start-screen">
-                            <div style="font-size:4rem;margin-bottom:var(--space-lg)">🧮</div>
+                            <div style="font-size:4rem;margin-bottom:var(--space-lg)"></div>
                             <h2>Formula: <asp:Literal ID="StartFormulaNameLiteral" runat="server" /></h2>
                             <p>
                                 <asp:Literal ID="StartDescriptionLiteral" runat="server" /><br />
@@ -109,7 +97,7 @@
                             <p style="color:var(--text-tertiary);font-size:var(--text-sm);margin-bottom:var(--space-xl)">
                                 Select a module from the sidebar to begin learning.
                             </p>
-                            <asp:Button ID="StartLearningButton" runat="server" Text="📖 Start Learning"
+                            <asp:Button ID="StartLearningButton" runat="server" Text=" Start Learning"
                                 CssClass="btn btn-primary btn-lg" OnClick="StartLearningButton_Click" />
                         </asp:Panel>
 
@@ -124,7 +112,7 @@
                             </div>
 
                             <asp:Panel ID="MentalBannerPanel" runat="server" Visible="false" CssClass="mental-banner">
-                                <div class="mental-icon">🧠✋</div>
+                                <div class="mental-icon"></div>
                                 <h3>Mental Mode</h3>
                                 <p>You cannot use the abacus for this module.<br />Imagine the beads moving in your mind.</p>
                             </asp:Panel>
@@ -138,8 +126,9 @@
                                                 CommandName="SelectSet" CommandArgument='<%# Eval("Id") %>'>
                                                 <%# Eval("Label") %>
                                                 <span style="display:block;font-size:var(--text-xs);opacity:0.8;margin-top:4px">
-                                                    <%# Eval("QuestionCount") %> questions • <%# Eval("DisplayMode") %>
+                                                    <%# Eval("QuestionCount") %> questions  <%# Eval("DisplayMode") %>
                                                 </span>
+                                                <asp:Literal ID="SetCompletedLiteral" runat="server" />
                                             </asp:LinkButton>
                                         </ItemTemplate>
                                     </asp:Repeater>
@@ -163,7 +152,7 @@
                             </asp:Panel>
 
                             <asp:Panel ID="QuestionMentalBannerPanel" runat="server" Visible="false" CssClass="mental-banner" Style="margin-bottom:var(--space-lg)">
-                                <div class="mental-icon">🧠✋</div>
+                                <div class="mental-icon"></div>
                                 <h3>Use Mental Only!</h3>
                                 <p>Imagine the abacus beads moving. Use your hand movements!</p>
                             </asp:Panel>
@@ -200,8 +189,8 @@
                                 <asp:Button runat="server" Text="9" CssClass="numpad-btn" CommandArgument="9" OnCommand="Numpad_Command" />
                                 <asp:Button runat="server" Text="0" CssClass="numpad-btn" CommandArgument="0" OnCommand="Numpad_Command" />
                                 <asp:Button runat="server" Text="C" CssClass="numpad-btn clear" CommandArgument="clear" OnCommand="Numpad_Command" />
-                                <asp:Button runat="server" Text="←" CssClass="numpad-btn" CommandArgument="back" OnCommand="Numpad_Command" />
-                                <asp:Button runat="server" Text="✓ Submit" CssClass="numpad-btn submit" CommandArgument="submit" OnCommand="Numpad_Command" />
+                                <asp:Button runat="server" Text="" CssClass="numpad-btn" CommandArgument="back" OnCommand="Numpad_Command" />
+                                <asp:Button runat="server" Text=" Submit" CssClass="numpad-btn submit" CommandArgument="submit" OnCommand="Numpad_Command" />
                             </div>
                         </asp:Panel>
 
@@ -225,8 +214,8 @@
                                 </div>
                             </div>
                             <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap;margin-top:var(--space-xl)">
-                                <asp:Button ID="RetryButton" runat="server" Text="↺ Retry" CssClass="btn btn-secondary" OnClick="RetryButton_Click" />
-                                <asp:Button ID="BackToModuleButton" runat="server" Text="← Back to Module" CssClass="btn btn-primary" OnClick="BackToModuleButton_Click" />
+                                <asp:Button ID="RetryButton" runat="server" Text=" Retry" CssClass="btn btn-secondary" OnClick="RetryButton_Click" />
+                                <asp:Button ID="BackToModuleButton" runat="server" Text="Finish Module" CssClass="btn btn-primary" OnClick="BackToModuleButton_Click" CausesValidation="false" UseSubmitBehavior="false" />
                             </div>
                         </asp:Panel>
                     </div>
@@ -238,4 +227,7 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
+    <script src="/js/app.js?v=9"></script>
 </asp:Content>
+
+

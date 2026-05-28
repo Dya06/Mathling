@@ -1,0 +1,70 @@
+using System;
+using System.Data.SqlClient;
+
+class Program
+{
+    static void Main()
+    {
+        try 
+        {
+            string connStr = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\Dyasi\Desktop\Projects\Test\Mathling\App_Data\MathlingDB.mdf;Integrated Security=True";
+            string userId = "001";
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                Console.WriteLine("DB connected.");
+
+                using (SqlCommand cmd = new SqlCommand("SELECT Level, XP FROM Users WHERE Id = @Id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read()) Console.WriteLine("Level: " + reader["Level"]);
+                    }
+                }
+
+                using (SqlCommand cmd = new SqlCommand(@"
+                    SELECT m.Id, m.Title, m.Description, ISNULL(mp.IsCompleted, 0) as IsCompleted
+                    FROM Modules m
+                    LEFT JOIN ModuleProgress mp ON m.Id = mp.ModuleId AND mp.UserId = @Id
+                    ORDER BY m.SortOrder ASC", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            bool completed = Convert.ToBoolean(reader["IsCompleted"]);
+                            Console.WriteLine(reader["Title"].ToString() + " - " + completed.ToString());
+                        }
+                    }
+                }
+
+                using (SqlCommand cmd = new SqlCommand(@"
+                    SELECT TOP 4 qr.Percentage as Score, m.Title as Chapter, qr.CompletedAt
+                    FROM QuizResults qr
+                    JOIN QuestionSets qs ON qr.SetId = qs.Id
+                    JOIN Modules m ON qs.ModuleId = m.Id
+                    WHERE qr.UserId = @Id
+                    ORDER BY qr.CompletedAt DESC", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int score = reader["Score"] != DBNull.Value ? Convert.ToInt32(reader["Score"]) : 0;
+                            Console.WriteLine(reader["Chapter"].ToString() + " - " + score);
+                        }
+                    }
+                }
+            }
+            Console.WriteLine("All queries succeeded.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: " + ex.ToString());
+        }
+    }
+}

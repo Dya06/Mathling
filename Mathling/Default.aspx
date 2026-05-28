@@ -34,7 +34,7 @@
       <div class="container">
         <div class="hero-content">
           <div class="hero-text">
-            <div class="hero-badge">&#x1F9D2; For ages 4–11</div>
+            <div class="hero-badge">&#x1F9D2; For ages 411</div>
             <h1>Make Math <span class="highlight">Magical</span> with the Abacus</h1>
             <p class="hero-desc">Mathlings turns mental arithmetic into an exciting adventure. Watch your child master numbers through interactive abacus exercises, fun quizzes, and rewarding challenges.</p>
             <div class="hero-buttons">
@@ -131,7 +131,7 @@
           <div class="feature-card" data-animate>
             <div class="feature-icon red">&#x1F3AF;</div>
             <h3>Structured Chapters</h3>
-            <p>Step-by-step curriculum from basic counting to advanced mental arithmetic — at your child's pace.</p>
+            <p>Step-by-step curriculum from basic counting to advanced mental arithmetic  at your child's pace.</p>
           </div>
           <div class="feature-card" data-animate>
             <div class="feature-icon purple">&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;</div>
@@ -280,7 +280,7 @@
 </asp:Content>
 
 <asp:Content ID="Scripts" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=4"></script>
+    <script src="/js/app.js?v=9"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('[data-count]').forEach(function(el) {
@@ -297,3 +297,6 @@
       });
     </script>
 </asp:Content>
+
+
+
