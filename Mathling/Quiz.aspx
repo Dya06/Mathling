@@ -8,35 +8,23 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin: var(--space-md) 0 var(--space-lg);
+            margin: 14px 0 18px;
         }
         .formula-link {
             display: inline-block;
             padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.75);
-            color: var(--text-primary);
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #1f2937;
             text-decoration: none;
             font-weight: 700;
-            font-size: var(--text-sm);
-            border: 1px solid rgba(0,0,0,0.08);
+            font-size: 0.9rem;
         }
-        .formula-link:hover {
-            transform: translateY(-1px);
-            text-decoration: none;
-        }
-        .formula-link.active {
-            background: var(--primary, #2563eb);
-            color: white;
-            border-color: transparent;
-        }
-        .formula-link.locked {
-            opacity: 0.45;
-            cursor: not-allowed;
-            pointer-events: none;
-            background: #e5e7eb;
-            color: #6b7280;
-        }
+        .formula-link.active { background: #2563eb; color: #fff; }
+        .formula-link.locked { background: #e5e7eb; color: #6b7280; cursor: not-allowed; opacity: 0.75; }
+        .module-nav-item.completed { background: #dcfce7 !important; border-color: #22c55e !important; color: #14532d !important; }
+        .set-completed { background: #16a34a !important; border-color: #15803d !important; color: #fff !important; }
+        .set-completed-badge { display: block; font-size: var(--text-xs); margin-top: 4px; opacity: .95; }
     </style>
 </asp:Content>
 
@@ -67,7 +55,6 @@
                             <h3><asp:Literal ID="FormulaNameLiteral" runat="server" /></h3>
                             <div class="formula-rule"><asp:Literal ID="FormulaRuleLiteral" runat="server" /></div>
                         </div>
-
 
 
                         <div class="formula-switcher">
@@ -140,6 +127,7 @@
                                                 <span style="display:block;font-size:var(--text-xs);opacity:0.8;margin-top:4px">
                                                     <%# Eval("QuestionCount") %> questions • <%# Eval("DisplayMode") %>
                                                 </span>
+                                                <asp:Literal ID="SetCompletedLiteral" runat="server" />
                                             </asp:LinkButton>
                                         </ItemTemplate>
                                     </asp:Repeater>

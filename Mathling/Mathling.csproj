@@ -144,7 +144,6 @@
     <Content Include="css\admin.css" />
     <Content Include="js\app.js" />
     <Content Include="js\auth.js" />
-    <Content Include="js\abacus.js" />
     <Content Include="js\quiz.js" />
     <Content Include="js\profile.js" />
     <Content Include="js\progress.js" />
