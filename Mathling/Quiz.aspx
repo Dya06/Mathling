@@ -1,7 +1,7 @@
 <%@ Page Title="Quiz" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
-    <link rel="stylesheet" href='<%= ResolveUrl("~/css/quiz.css") %>'>
+    <link rel="stylesheet" href="/css/quiz.css?v=2">
 
     <style>
         .formula-switcher {
@@ -227,5 +227,6 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
+    <script src="/js/app.js?v=8"></script>
 </asp:Content>
 
