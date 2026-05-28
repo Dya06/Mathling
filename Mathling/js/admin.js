@@ -180,8 +180,8 @@ const Admin = {
 
   setupModals() {
     const modalHtml = `
-      <div class="modal" id="edit-user-modal">
-        <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-overlay" id="edit-user-modal">
+        <div class="modal" style="max-width: 400px; padding: var(--space-xl)">
           <h2 style="margin-bottom: var(--space-md)">Edit User Profile</h2>
           <input type="hidden" id="edit-user-id" />
           <div class="form-group">
