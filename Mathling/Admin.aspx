@@ -53,27 +53,6 @@
           <div id="feedback-list"></div>
         </div>
       </div>
-
-      <!-- System Info -->
-      <div class="admin-card" style="margin-top:var(--space-xl)">
-        <h3> System Status</h3>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-lg);margin-top:var(--space-md)">
-          <div style="text-align:center">
-            <div style="font-size:2rem;margin-bottom:var(--space-sm)"></div>
-            <div style="font-weight:700;font-size:var(--text-sm)">All Systems Online</div>
-            <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Uptime: 99.9%</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:2rem;margin-bottom:var(--space-sm)"></div>
-            <div style="font-weight:700;font-size:var(--text-sm)">Storage</div>
-            <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Using localStorage</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:2rem;margin-bottom:var(--space-sm)"></div>
-            <div style="font-weight:700;font-size:var(--text-sm)">Security</div>
-            <div style="font-size:var(--text-xs);color:var(--text-tertiary)">Client-side demo</div>
-          </div>
-        </div>
       </div>
     </div>
   </main>

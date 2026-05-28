@@ -84,8 +84,14 @@ const Forum = {
     document.getElementById('thread-list').style.display = 'none';
     const detail = document.getElementById('thread-detail');
     detail.style.display = 'block';
+    
+    const canDeleteThread = App.state.currentUser && (App.state.currentUser.role === 'admin' || App.state.currentUser.id == t.authorId);
+    
     detail.innerHTML = `
-      <button class="btn btn-ghost btn-sm" onclick="Forum.currentThread=null;Forum.renderThreads()" style="margin-bottom:var(--space-md)">← Back to threads</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md)">
+        <button class="btn btn-ghost btn-sm" onclick="Forum.currentThread=null;Forum.renderThreads()">← Back to threads</button>
+        ${canDeleteThread ? `<button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Forum.deleteThread('${t.id}')">🗑️ Delete Thread</button>` : ''}
+      </div>
       <div class="thread-detail-header">
         <h2>${t.title}</h2>
         <div style="display:flex;align-items:center;gap:var(--space-sm);font-size:var(--text-sm);color:var(--text-tertiary)">
@@ -97,17 +103,20 @@ const Forum = {
       </div>
       <h4 style="margin-bottom:var(--space-md)">&#128172; Replies (${t.replies})</h4>
       <div class="reply-list">
-        ${(t.replyList || []).map(r => `
+        ${(t.replyList || []).map(r => {
+          const canDeleteReply = App.state.currentUser && (App.state.currentUser.role === 'admin' || App.state.currentUser.id == r.authorId);
+          return `
           <div class="reply-card">
             <div class="reply-header">
               <div class="avatar avatar-sm">${this.getAvatarHtml(r.avatar)}</div>
               <strong>${r.author}</strong>
               <span class="badge badge-${r.role === 'instructor' ? 'purple' : 'blue'} btn-sm" style="padding:2px 8px">${r.role}</span>
               <span style="margin-left:auto;font-size:var(--text-xs);color:var(--text-tertiary)">${r.date}</span>
+              ${canDeleteReply ? `<button class="btn btn-ghost btn-sm" style="color:var(--danger);margin-left:var(--space-sm);padding:0 4px" onclick="Forum.deleteReply('${r.id}')" title="Delete Reply">🗑️</button>` : ''}
             </div>
             <p style="font-size:var(--text-sm);color:var(--text-secondary)">${r.content}</p>
-          </div>
-        `).join('') || '<p style="color:var(--text-tertiary);padding:var(--space-md)">No replies yet. Be the first to respond!</p>'}
+          </div>`;
+        }).join('') || '<p style="color:var(--text-tertiary);padding:var(--space-md)">No replies yet. Be the first to respond!</p>'}
       </div>
       <div class="reply-form">
         <h4>Reply</h4>
@@ -141,6 +150,50 @@ const Forum = {
     } catch (e) {
       console.error(e);
       App.showToast('Error posting reply', 'error');
+    }
+  },
+
+  async deleteThread(id) {
+    if (!confirm('Are you sure you want to delete this thread? This action cannot be undone.')) return;
+    try {
+      const response = await fetch('Forum.aspx/DeleteThread', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ threadId: id })
+      });
+      const data = await response.json();
+      if (data.d === 'success') {
+        App.showToast('Thread deleted', 'success');
+        this.currentThread = null;
+        await this.fetchThreads();
+      } else {
+        App.showToast(data.d, 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      App.showToast('Error deleting thread', 'error');
+    }
+  },
+
+  async deleteReply(id) {
+    if (!confirm('Are you sure you want to delete this reply?')) return;
+    try {
+      const response = await fetch('Forum.aspx/DeleteReply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ replyId: id })
+      });
+      const data = await response.json();
+      if (data.d === 'success') {
+        App.showToast('Reply deleted', 'success');
+        await this.openThread(this.currentThread.id);
+        this.fetchThreads();
+      } else {
+        App.showToast(data.d, 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      App.showToast('Error deleting reply', 'error');
     }
   },
 

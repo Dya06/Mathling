@@ -150,5 +150,75 @@ namespace Mathling
             }
             return activity;
         }
+
+        [WebMethod(EnableSession = true)]
+        public static string UpdateUser(int targetUserId, string name, string role)
+        {
+            if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")
+                return "error|Unauthorized";
+
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                // Avatar is linked to role, so we update it as well if it's one of the defaults
+                string query = "UPDATE Users SET Name = @Name, Role = @Role, Avatar = @Role WHERE Id = @Id";
+                using(SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", name);
+                    cmd.Parameters.AddWithValue("@Role", role);
+                    cmd.Parameters.AddWithValue("@Id", targetUserId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod(EnableSession = true)]
+        public static string DeleteUser(int targetUserId)
+        {
+            if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")
+                return "error|Unauthorized";
+
+            if (HttpContext.Current.Session["UserId"]?.ToString() == targetUserId.ToString())
+                return "error|Cannot delete your own admin account";
+
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        ExecuteNonQuery("DELETE FROM ForumReplies WHERE ThreadId IN (SELECT Id FROM ForumThreads WHERE AuthorId = @Id)", targetUserId, conn, trans);
+                        ExecuteNonQuery("DELETE FROM ForumReplies WHERE AuthorId = @Id", targetUserId, conn, trans);
+                        ExecuteNonQuery("DELETE FROM ForumThreads WHERE AuthorId = @Id", targetUserId, conn, trans);
+                        ExecuteNonQuery("DELETE FROM Submissions WHERE InstructorId = @Id", targetUserId, conn, trans);
+                        ExecuteNonQuery("DELETE FROM QuizResults WHERE UserId = @Id", targetUserId, conn, trans);
+                        ExecuteNonQuery("DELETE FROM UserBadges WHERE UserId = @Id", targetUserId, conn, trans);
+                        ExecuteNonQuery("DELETE FROM ParentStudentLinks WHERE ParentId = @Id OR StudentId = @Id", targetUserId, conn, trans);
+                        ExecuteNonQuery("DELETE FROM Users WHERE Id = @Id", targetUserId, conn, trans);
+
+                        trans.Commit();
+                        return "success";
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return "error|" + ex.Message;
+                    }
+                }
+            }
+        }
+
+        private static void ExecuteNonQuery(string query, int userId, SqlConnection conn, SqlTransaction trans)
+        {
+            using (SqlCommand cmd = new SqlCommand(query, conn, trans))
+            {
+                cmd.Parameters.AddWithValue("@Id", userId);
+                cmd.ExecuteNonQuery();
+            }
+        }
     }
 }

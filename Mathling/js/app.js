@@ -146,6 +146,7 @@ const App = {
         { label: 'Dashboard', href: 'Admin.aspx', icon: 'dashboard' },
         { label: 'Moderate', href: 'Moderate.aspx', icon: 'shield' },
         { label: 'Progress', href: 'Progress.aspx', icon: 'chart' },
+        { label: 'Forum', href: 'Forum.aspx', icon: 'forum' },
         { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
     };

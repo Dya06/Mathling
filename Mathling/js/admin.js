@@ -27,6 +27,7 @@
 const Admin = {
   init() {
     if (!App.requireAuth(['admin'])) return;
+    this.setupModals();
     this.renderStats();
     this.renderUsers();
     this.renderActivity();
@@ -78,10 +79,12 @@ const Admin = {
       }
 
       container.innerHTML = users.map(u => `
-        <div class="user-row">
+        <div class="user-row" style="display:flex;align-items:center;gap:var(--space-sm)">
           <div class="avatar avatar-sm">${u.avatar || '👤'}</div>
-          <span class="user-name">${u.name}</span>
+          <span class="user-name" style="flex:1">${u.name}</span>
           <span class="badge badge-${u.role === 'admin' ? 'red' : u.role === 'instructor' ? 'purple' : u.role === 'parent' ? 'blue' : 'green'}">${u.role}</span>
+          <button class="btn btn-ghost btn-sm" onclick="Admin.editUser(${u.id}, '${u.name}', '${u.role}')">✏️</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Admin.deleteUser(${u.id})">🗑️</button>
         </div>
       `).join('');
     } catch(e) { console.error('Failed to load users', e); }
@@ -174,6 +177,90 @@ const Admin = {
       ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || 'rgba(0,0,0,0.08)';
     });
   },
+
+  setupModals() {
+    const modalHtml = `
+      <div class="modal" id="edit-user-modal">
+        <div class="modal-content" style="max-width: 400px;">
+          <h2 style="margin-bottom: var(--space-md)">Edit User Profile</h2>
+          <input type="hidden" id="edit-user-id" />
+          <div class="form-group">
+            <label class="form-label" for="edit-user-name">Name</label>
+            <input type="text" id="edit-user-name" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-user-role">Role</label>
+            <select id="edit-user-role" class="form-input">
+              <option value="student">Student</option>
+              <option value="parent">Parent</option>
+              <option value="instructor">Instructor</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-md)">
+            <button class="btn btn-primary" onclick="Admin.saveUser()" style="flex:1">Save Changes</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('edit-user-modal').classList.remove('active')" style="flex:1">Cancel</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  },
+
+  editUser(id, name, role) {
+    document.getElementById('edit-user-id').value = id;
+    document.getElementById('edit-user-name').value = name;
+    document.getElementById('edit-user-role').value = role;
+    document.getElementById('edit-user-modal').classList.add('active');
+  },
+
+  async saveUser() {
+    const id = document.getElementById('edit-user-id').value;
+    const name = document.getElementById('edit-user-name').value.trim();
+    const role = document.getElementById('edit-user-role').value;
+
+    if (!name) return App.showToast('Name is required', 'error');
+
+    try {
+      const response = await fetch('Admin.aspx/UpdateUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUserId: parseInt(id), name, role })
+      });
+      const data = await response.json();
+      if (data.d === 'success') {
+        App.showToast('User updated successfully', 'success');
+        document.getElementById('edit-user-modal').classList.remove('active');
+        this.renderUsers();
+      } else {
+        App.showToast(data.d, 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      App.showToast('Error updating user', 'error');
+    }
+  },
+
+  async deleteUser(id) {
+    if (!confirm('Are you sure you want to permanently delete this user? ALL of their activity (posts, submissions, quiz results) will be erased!')) return;
+    try {
+      const response = await fetch('Admin.aspx/DeleteUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUserId: parseInt(id) })
+      });
+      const data = await response.json();
+      if (data.d === 'success') {
+        App.showToast('User deleted successfully', 'success');
+        this.renderUsers();
+      } else {
+        App.showToast(data.d, 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      App.showToast('Error deleting user', 'error');
+    }
+  }
 };
 
 document.addEventListener('DOMContentLoaded', () => Admin.init());
