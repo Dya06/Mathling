@@ -60,7 +60,10 @@ const Profile = {
             const res = await fetch('Profile.aspx/LinkStudent', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ studentEmail: email })
+                body: JSON.stringify({ 
+                    parentId: App.state.currentUser.id, 
+                    studentEmail: email 
+                })
             });
             const data = await res.json();
             if (data.d && data.d.success) {

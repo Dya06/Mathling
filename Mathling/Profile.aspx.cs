@@ -287,18 +287,12 @@ namespace Mathling
             public string errorMessage { get; set; }
         }
 
-        [System.Web.Services.WebMethod(EnableSession = true)]
-        public static LinkStudentResponse LinkStudent(string studentEmail)
+        [System.Web.Services.WebMethod]
+        public static LinkStudentResponse LinkStudent(string parentId, string studentEmail)
         {
             var res = new LinkStudentResponse { success = false };
             try
             {
-                if (System.Web.HttpContext.Current.Session["UserId"] == null)
-                {
-                    res.errorMessage = "Not logged in.";
-                    return res;
-                }
-                string parentId = System.Web.HttpContext.Current.Session["UserId"].ToString();
                 string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
                 
                 using (SqlConnection conn = new SqlConnection(connStr))
