@@ -39,7 +39,7 @@ const Forum = {
     list.style.display = 'flex';
 
     list.innerHTML = threads.length ? threads.map(t => `
-      <div class="thread-card" onclick="Forum.openThread(${t.id})">
+      <div class="thread-card" onclick="Forum.openThread('${t.id}')">
         <div class="thread-card-header">
           <div class="avatar avatar-sm">${this.getAvatarHtml(t.avatar)}</div>
           <h3>${t.title}</h3>
