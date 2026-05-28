@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Quiz" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
+<%@ Page Title="Quiz" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href='<%= ResolveUrl("~/css/quiz.css") %>'>
@@ -35,13 +35,14 @@
                 <img src="/favicon.svg" alt="Mathlings" class="navbar-logo">
                 <span class="navbar-title">Math<span>lings</span></span>
             </a>
-            <div class="navbar-nav">
-                <a href="Quiz.aspx" class="nav-link active">Quiz</a>
-                <a href="Progress.aspx" class="nav-link">Progress</a>
-                <a href="Forum.aspx" class="nav-link">Forum</a>
+            <div class="navbar-nav" id="main-nav"></div>
+            <div class="navbar-actions">
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+                <button type="button" class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
             </div>
         </div>
     </nav>
+    <div class="mobile-nav" id="mobile-nav"></div>
 
     <main class="main">
         <asp:UpdatePanel ID="QuizUpdatePanel" runat="server" UpdateMode="Conditional">
