@@ -317,15 +317,19 @@ namespace Mathling
                         return res;
                     }
 
+                    // Generate random 8-character ID
+                    string linkId = Guid.NewGuid().ToString().Substring(0, 8);
+
                     // Insert the link
                     using (SqlCommand cmd = new SqlCommand(@"
                         IF NOT EXISTS (SELECT 1 FROM ParentStudentLinks WHERE ParentId = TRY_CAST(@ParentId AS INT) AND StudentId = TRY_CAST(@StudentId AS INT))
                         BEGIN
-                            INSERT INTO ParentStudentLinks (ParentId, StudentId, CreatedAt)
-                            VALUES (TRY_CAST(@ParentId AS INT), TRY_CAST(@StudentId AS INT), GETDATE())
+                            INSERT INTO ParentStudentLinks (Id, ParentId, StudentId, LinkedAt)
+                            VALUES (@LinkId, TRY_CAST(@ParentId AS INT), TRY_CAST(@StudentId AS INT), GETDATE())
                         END
                     ", conn))
                     {
+                        cmd.Parameters.AddWithValue("@LinkId", linkId);
                         cmd.Parameters.AddWithValue("@ParentId", parentId);
                         cmd.Parameters.AddWithValue("@StudentId", studentId);
                         cmd.ExecuteNonQuery();
