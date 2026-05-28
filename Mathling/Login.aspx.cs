@@ -54,7 +54,7 @@ namespace Mathling
                     string storedHash = reader["PasswordHash"].ToString();
                     string role = reader["Role"].ToString();
                     string name = reader["Name"].ToString();
-                    int id = Convert.ToInt32(reader["Id"]);
+                    string id = reader["Id"].ToString();
 
                     string inputHash = HashPassword(password);
 
@@ -153,20 +153,31 @@ namespace Mathling
                     }
                 }
 
+                // Generate the next VARCHAR user ID because Users.Id is VARCHAR(10), not INT.
+                string newUserId;
+                using (SqlCommand idCmd = new SqlCommand(@"
+                    SELECT ISNULL(MAX(CAST([Id] AS INT)), 0) + 1
+                    FROM [Users]
+                    WHERE ISNUMERIC([Id]) = 1", conn))
+                {
+                    int nextId = Convert.ToInt32(idCmd.ExecuteScalar());
+                    newUserId = nextId.ToString("000");
+                }
+
                 // Insert user
                 string insertQuery = @"
-                    INSERT INTO Users (Name, Email, PasswordHash, Role, Level, XP)
-                    OUTPUT INSERTED.Id
-                    VALUES (@Name, @Email, @PasswordHash, @Role, 1, 0)";
-                
+                    INSERT INTO Users (Id, Name, Email, PasswordHash, Role, Level, XP)
+                    VALUES (@Id, @Name, @Email, @PasswordHash, @Role, 1, 0)";
+
                 using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
                 {
+                    cmd.Parameters.AddWithValue("@Id", newUserId);
                     cmd.Parameters.AddWithValue("@Name", name);
                     cmd.Parameters.AddWithValue("@Email", email);
                     cmd.Parameters.AddWithValue("@PasswordHash", HashPassword(password));
                     cmd.Parameters.AddWithValue("@Role", role);
 
-                    int newUserId = (int)cmd.ExecuteScalar();
+                    cmd.ExecuteNonQuery();
 
                     // ✅ Log them in automatically
                     Session["UserId"] = newUserId;

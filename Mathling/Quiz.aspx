@@ -214,7 +214,7 @@
                             </div>
                             <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap;margin-top:var(--space-xl)">
                                 <asp:Button ID="RetryButton" runat="server" Text="↺ Retry" CssClass="btn btn-secondary" OnClick="RetryButton_Click" />
-                                <asp:Button ID="BackToModuleButton" runat="server" Text="← Back to Module" CssClass="btn btn-primary" OnClick="BackToModuleButton_Click" />
+                                <asp:Button ID="BackToModuleButton" runat="server" Text="Finish Module" CssClass="btn btn-primary" OnClick="BackToModuleButton_Click" CausesValidation="false" UseSubmitBehavior="false" />
                             </div>
                         </asp:Panel>
                     </div>

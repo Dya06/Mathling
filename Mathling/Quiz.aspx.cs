@@ -82,7 +82,20 @@ namespace Mathling
 
         private string CurrentUserId
         {
-            get { return Session["UserId"] == null ? string.Empty : Session["UserId"].ToString(); }
+            get
+            {
+                if (Session["UserId"] == null) return string.Empty;
+
+                string id = Session["UserId"].ToString().Trim();
+
+                int numericId;
+                if (int.TryParse(id, out numericId) && id.Length < 3)
+                {
+                    return numericId.ToString("000");
+                }
+
+                return id;
+            }
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -644,6 +657,7 @@ namespace Mathling
                 return;
             }
 
+            SelectedSetId = string.Empty;
             CurrentAnswer = string.Empty;
             QuestionIndex = 0;
             TotalCorrect = 0;
@@ -651,7 +665,11 @@ namespace Mathling
             AssessmentTimer.Enabled = false;
             FlashTimer.Enabled = false;
             Session["QuizSetSaved"] = false;
+            Session["QuizCompleteAction"] = "back";
+            Session["QuizJumpFormula"] = string.Empty;
 
+            CurrentFormula = LoadFormulaFromDatabase(SelectedFormulaName);
+            BindBaseContent();
             BindModuleSidebar();
             ShowModuleIntro();
         }
