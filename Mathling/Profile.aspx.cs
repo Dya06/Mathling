@@ -173,7 +173,7 @@ namespace Mathling
                                    (SELECT ISNULL(AVG(Percentage), 0) FROM QuizResults qr WHERE qr.UserId = u.Id) as AvgScore
                             FROM ParentStudentLinks psl
                             JOIN Users u ON psl.StudentId = u.Id
-                            WHERE psl.ParentId = TRY_CAST(@Id AS INT)", conn))
+                            WHERE psl.ParentId = @Id", conn))
                         {
                             cmd.Parameters.AddWithValue("@Id", userId);
                             using (var reader = cmd.ExecuteReader())
@@ -322,10 +322,10 @@ namespace Mathling
 
                     // Insert the link
                     using (SqlCommand cmd = new SqlCommand(@"
-                        IF NOT EXISTS (SELECT 1 FROM ParentStudentLinks WHERE ParentId = TRY_CAST(@ParentId AS INT) AND StudentId = TRY_CAST(@StudentId AS INT))
+                        IF NOT EXISTS (SELECT 1 FROM ParentStudentLinks WHERE ParentId = @ParentId AND StudentId = @StudentId)
                         BEGIN
                             INSERT INTO ParentStudentLinks (Id, ParentId, StudentId, LinkedAt)
-                            VALUES (@LinkId, TRY_CAST(@ParentId AS INT), TRY_CAST(@StudentId AS INT), GETDATE())
+                            VALUES (@LinkId, @ParentId, @StudentId, GETDATE())
                         END
                     ", conn))
                     {
