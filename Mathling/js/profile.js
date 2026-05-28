@@ -192,8 +192,14 @@ const Profile = {
 
   renderParent(container, user, data) {
     const students = data.linkedStudents || [];
-    const totalQuizzes = students.reduce((sum, s) => sum + (s.totalQuizzes || 0), 0);
-    const avgScore = 0; // Requires actual math on child scores
+    let totalScoreSum = 0;
+    let totalQuizzes = 0;
+    students.forEach(s => {
+        const q = s.totalQuizzes || 0;
+        totalQuizzes += q;
+        totalScoreSum += (s.avgScore || 0) * q;
+    });
+    const avgScore = totalQuizzes ? Math.round(totalScoreSum / totalQuizzes) : 0;
 
     container.innerHTML = `
       <div class="profile-grid">
@@ -207,7 +213,7 @@ const Profile = {
               </div>
             `).join('') : '<p style="color:var(--text-tertiary);padding:var(--space-lg)">No students linked yet.</p>'}
           </div>
-          <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:var(--space-md)">+ Link a Student</button>
+          <button class="btn btn-secondary btn-sm" id="link-student-btn" style="width:100%;margin-top:var(--space-md)">+ Link a Student</button>
         </div>
         <div>
           <h3 class="profile-section-title">Performance Overview</h3>
@@ -218,6 +224,29 @@ const Profile = {
           <a href="Progress.aspx" class="btn btn-accent-blue btn-sm" style="width:100%;margin-top:var(--space-lg)">View Full Progress</a>
         </div>
       </div>`;
+
+    document.getElementById('link-student-btn')?.addEventListener('click', async () => {
+        const email = prompt("Enter the student's email address to link them:");
+        if (!email) return;
+
+        try {
+            const res = await fetch('Profile.aspx/LinkStudent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentEmail: email })
+            });
+            const data = await res.json();
+            if (data.d && data.d.success) {
+                App.showToast('Student successfully linked!', 'success');
+                Profile.fetchData(); // Reload profile to show new student
+            } else {
+                App.showToast(data.d.errorMessage || 'Failed to link student', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            App.showToast('Error linking student', 'error');
+        }
+    });
   },
 
   renderInstructor(container, user, data) {

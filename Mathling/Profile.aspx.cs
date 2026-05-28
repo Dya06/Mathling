@@ -58,6 +58,8 @@ namespace Mathling
             public string name { get; set; }
             public int level { get; set; }
             public int xp { get; set; }
+            public int totalQuizzes { get; set; }
+            public int avgScore { get; set; }
         }
 
         public class InstructorData
@@ -166,10 +168,12 @@ namespace Mathling
                         
                         // Fetch Linked Students
                         using (SqlCommand cmd = new SqlCommand(@"
-                            SELECT u.Name, u.Level, u.XP
+                            SELECT u.Name, u.Level, u.XP,
+                                   (SELECT COUNT(*) FROM QuizResults qr WHERE qr.UserId = u.Id) as TotalQuizzes,
+                                   (SELECT ISNULL(AVG(Percentage), 0) FROM QuizResults qr WHERE qr.UserId = u.Id) as AvgScore
                             FROM ParentStudentLinks psl
                             JOIN Users u ON psl.StudentId = u.Id
-                            WHERE psl.ParentId = @Id", conn))
+                            WHERE psl.ParentId = TRY_CAST(@Id AS INT)", conn))
                         {
                             cmd.Parameters.AddWithValue("@Id", userId);
                             using (var reader = cmd.ExecuteReader())
@@ -180,7 +184,9 @@ namespace Mathling
                                     {
                                         name = reader["Name"].ToString(),
                                         level = Convert.ToInt32(reader["Level"]),
-                                        xp = Convert.ToInt32(reader["XP"])
+                                        xp = Convert.ToInt32(reader["XP"]),
+                                        totalQuizzes = Convert.ToInt32(reader["TotalQuizzes"]),
+                                        avgScore = Convert.ToInt32(reader["AvgScore"])
                                     });
                                 }
                             }
@@ -265,6 +271,72 @@ namespace Mathling
 
                 System.Web.HttpContext.Current.Session["UserName"] = name;
                 System.Web.HttpContext.Current.Session["UserAvatar"] = avatar;
+
+                res.success = true;
+            }
+            catch (Exception ex)
+            {
+                res.errorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public class LinkStudentResponse
+        {
+            public bool success { get; set; }
+            public string errorMessage { get; set; }
+        }
+
+        [System.Web.Services.WebMethod(EnableSession = true)]
+        public static LinkStudentResponse LinkStudent(string studentEmail)
+        {
+            var res = new LinkStudentResponse { success = false };
+            try
+            {
+                if (System.Web.HttpContext.Current.Session["UserId"] == null)
+                {
+                    res.errorMessage = "Not logged in.";
+                    return res;
+                }
+                string parentId = System.Web.HttpContext.Current.Session["UserId"].ToString();
+                string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+                
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    conn.Open();
+                    
+                    // Look up the student by email
+                    string studentId = null;
+                    using (SqlCommand cmd = new SqlCommand("SELECT Id FROM Users WHERE Email = @Email AND Role = 'student'", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Email", studentEmail);
+                        object result = cmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            studentId = result.ToString();
+                        }
+                    }
+
+                    if (studentId == null)
+                    {
+                        res.errorMessage = "No student found with that email address.";
+                        return res;
+                    }
+
+                    // Insert the link
+                    using (SqlCommand cmd = new SqlCommand(@"
+                        IF NOT EXISTS (SELECT 1 FROM ParentStudentLinks WHERE ParentId = TRY_CAST(@ParentId AS INT) AND StudentId = TRY_CAST(@StudentId AS INT))
+                        BEGIN
+                            INSERT INTO ParentStudentLinks (ParentId, StudentId, CreatedAt)
+                            VALUES (TRY_CAST(@ParentId AS INT), TRY_CAST(@StudentId AS INT), GETDATE())
+                        END
+                    ", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ParentId", parentId);
+                        cmd.Parameters.AddWithValue("@StudentId", studentId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
                 res.success = true;
             }
