@@ -60,7 +60,7 @@ namespace Mathling
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
-                using (SqlCommand cmd = new SqlCommand("SELECT Id, Name, Rule FROM Formulas WHERE IsActive = 1 ORDER BY SortOrder", conn))
+                using (SqlCommand cmd = new SqlCommand("SELECT Id, Name, [Rule] FROM Formulas WHERE IsActive = 1 ORDER BY SortOrder", conn))
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
