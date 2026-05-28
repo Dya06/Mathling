@@ -21,7 +21,7 @@ namespace Mathling
             public string content { get; set; }
             public string category { get; set; }
             public string author { get; set; }
-            public int authorId { get; set; }
+            public string authorId { get; set; }
             public string role { get; set; }
             public string avatar { get; set; }
             public int replies { get; set; }
@@ -33,7 +33,7 @@ namespace Mathling
         {
             public string id { get; set; }
             public string author { get; set; }
-            public int authorId { get; set; }
+            public string authorId { get; set; }
             public string role { get; set; }
             public string avatar { get; set; }
             public string content { get; set; }
@@ -69,10 +69,10 @@ namespace Mathling
                             title = reader["Title"].ToString(),
                             category = reader["Category"].ToString(),
                             author = reader["AuthorName"].ToString(),
-                            authorId = (int)reader["AuthorId"],
+                            authorId = reader["AuthorId"].ToString(),
                             role = reader["AuthorRole"].ToString(),
                             avatar = reader["Avatar"].ToString(),
-                            replies = (int)reader["ReplyCount"],
+                            replies = Convert.ToInt32(reader["ReplyCount"]),
                             date = Convert.ToDateTime(reader["CreatedAt"]).ToString("yyyy-MM-dd")
                         });
                     }
@@ -116,7 +116,7 @@ namespace Mathling
                                     content = reader["Content"].ToString(),
                                     category = reader["Category"].ToString(),
                                     author = reader["AuthorName"].ToString(),
-                                    authorId = (int)reader["AuthorId"],
+                                    authorId = reader["AuthorId"].ToString(),
                                     role = reader["AuthorRole"].ToString(),
                                     avatar = reader["Avatar"].ToString(),
                                     date = Convert.ToDateTime(reader["CreatedAt"]).ToString("yyyy-MM-dd"),
@@ -149,7 +149,7 @@ namespace Mathling
                                     {
                                         id = rReader["Id"].ToString(),
                                         author = rReader["AuthorName"].ToString(),
-                                        authorId = (int)rReader["AuthorId"],
+                                        authorId = rReader["AuthorId"].ToString(),
                                         role = rReader["AuthorRole"].ToString(),
                                         avatar = rReader["Avatar"].ToString(),
                                         content = rReader["Content"].ToString(),
