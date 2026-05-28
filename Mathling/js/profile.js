@@ -15,6 +15,13 @@ const Profile = {
       });
       const result = await response.json();
       const profileData = result.d;
+      
+      if (profileData && profileData.errorMessage) {
+        console.error("Backend Error:", profileData.errorMessage);
+        App.showToast('Backend Error: ' + profileData.errorMessage, 'error');
+        return;
+      }
+      
       this.render(user, profileData);
     } catch (e) {
       console.error('Failed to load profile data', e);
