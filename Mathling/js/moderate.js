@@ -204,7 +204,7 @@ const Moderate = {
       const data = await res.json();
 
       if (data.d === 'success') {
-        App.showToast('Quiz submitted for review! 📤', 'success');
+        App.showToast('Quiz submitted for review!', 'success');
         // Reset form
         document.getElementById('quiz-label').value = '';
         document.getElementById('questions-container').innerHTML = '';
@@ -252,18 +252,18 @@ const Moderate = {
           <span class="status-pill status-${s.status}">${s.status}</span>
         </div>
         <div class="review-card-meta">
-          <span>📐 ${s.formulaName}</span>
-          <span>📚 ${s.moduleTitle}</span>
-          <span>🖥️ ${s.displayMode}</span>
-          <span>❓ ${s.questionCount} questions</span>
-          ${s.instructor ? `<span>👨‍🏫 ${s.instructor}</span>` : ''}
-          ${s.date ? `<span>📅 ${s.date}</span>` : ''}
+          <span>Formula: ${s.formulaName}</span>
+          <span>Module: ${s.moduleTitle}</span>
+          <span>Mode: ${s.displayMode}</span>
+          <span>Questions: ${s.questionCount}</span>
+          ${s.instructor ? `<span>Instructor: ${s.instructor}</span>` : ''}
+          ${s.date ? `<span>Date: ${s.date}</span>` : ''}
         </div>
-        ${s.reason ? `<div class="reject-reason">📝 Reason: ${s.reason}</div>` : ''}
+        ${s.reason ? `<div class="reject-reason">Reason: ${s.reason}</div>` : ''}
         ${isAdmin && s.status === 'pending' ? `
           <div class="review-card-actions">
-            <button type="button" class="btn btn-accent-green btn-sm" onclick="Moderate.approveItem('${s.id}')">✓ Approve</button>
-            <button type="button" class="btn btn-accent-red btn-sm" onclick="Moderate.rejectPrompt('${s.id}')">✗ Reject</button>
+            <button type="button" class="btn btn-accent-green btn-sm" onclick="Moderate.approveItem('${s.id}')">Approve</button>
+            <button type="button" class="btn btn-accent-red btn-sm" onclick="Moderate.rejectPrompt('${s.id}')">Reject</button>
           </div>
         ` : ''}
       </div>
@@ -279,7 +279,7 @@ const Moderate = {
       });
       const data = await res.json();
       if (data.d === 'success') {
-        App.showToast('Quiz approved! It will now appear for students ✅', 'success');
+        App.showToast('Quiz approved! It will now appear for students', 'success');
         await this.fetchSubs();
         this.renderList();
       } else {
@@ -307,7 +307,7 @@ const Moderate = {
       });
       const data = await res.json();
       if (data.d === 'success') {
-        App.showToast('Quiz rejected ❌', 'error');
+        App.showToast('Quiz rejected', 'error');
         await this.fetchSubs();
         this.renderList();
       } else {

@@ -18,13 +18,13 @@
   <main class="main">
     <div class="moderate-page container">
       <div class="moderate-header">
-        <h1>📝 Content Moderation</h1>
+        <h1>Content Moderation</h1>
         <p style="color:var(--text-secondary)">Create quizzes for students or review pending content</p>
       </div>
 
       <!-- Quiz Builder (Instructor Only) -->
       <div id="submit-section" class="submission-form card" style="margin-bottom:var(--space-2xl);display:none">
-        <h3>🧩 Create New Quiz</h3>
+        <h3>Create New Quiz</h3>
         <p style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:var(--space-md)">
           Build a question set and submit it for admin review. Once approved, it will appear on the quiz page for students.
         </p>
@@ -69,20 +69,20 @@
           <div id="questions-container"></div>
         </div>
 
-        <button type="button" class="btn btn-accent-green" id="submit-quiz-btn">📤 Submit for Review</button>
+        <button type="button" class="btn btn-accent-green" id="submit-quiz-btn">Submit for Review</button>
       </div>
 
       <!-- Review Section -->
       <div>
-        <h3 style="margin-bottom:var(--space-md)">📋 Review Queue</h3>
+        <h3 style="margin-bottom:var(--space-md)">Review Queue</h3>
         <p id="review-actions-note" style="display:none;font-size:var(--text-sm);color:var(--accent-blue);margin-bottom:var(--space-md)">
           As an admin, you can approve or reject submissions below.
         </p>
         <div class="status-filters">
           <button type="button" class="tag status-filter active" data-status="all">All</button>
-          <button type="button" class="tag status-filter" data-status="pending">⏳ Pending</button>
-          <button type="button" class="tag status-filter" data-status="approved">✅ Approved</button>
-          <button type="button" class="tag status-filter" data-status="rejected">❌ Rejected</button>
+          <button type="button" class="tag status-filter" data-status="pending">Pending</button>
+          <button type="button" class="tag status-filter" data-status="approved">Approved</button>
+          <button type="button" class="tag status-filter" data-status="rejected">Rejected</button>
         </div>
         <div class="review-list" id="review-list"></div>
       </div>
@@ -92,5 +92,5 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=10"></script>
-    <script src="/js/moderate.js?v=2"></script>
+    <script src="/js/moderate.js?v=4"></script>
 </asp:Content>
