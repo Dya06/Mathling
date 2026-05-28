@@ -146,26 +146,15 @@ const Profile = {
 
     const totalQuizzes = history.length;
     const avgScore = totalQuizzes ? Math.round(history.reduce((a, h) => a + h.score, 0) / totalQuizzes) : 0;
-    const badgesEarned = badges.filter(b => b.earned).length;
     const chaptersDone = chapters.filter(c => c.completed).length;
 
     container.innerHTML = `
       <div class="profile-grid">
         <div>
-          <h3 class="profile-section-title">Achievements</h3>
-          <div class="badges-grid" id="badges-grid">
-            ${badges.length ? badges.map(b => `
-              <div class="badge-item ${b.earned ? '' : 'locked'}">
-                <span class="badge-icon">${b.icon}</span>
-                <span class="badge-label">${b.name}</span>
-              </div>
-            `).join('') : '<p style="color:var(--text-tertiary);grid-column:span 3;text-align:center">No badges yet start quizzing to earn them!</p>'}
-          </div>
-          <h3 class="profile-section-title" style="margin-top:var(--space-2xl)">Quick Stats</h3>
+          <h3 class="profile-section-title">Quick Stats</h3>
           <div class="stats-cards">
             <div class="stat-card"><div class="stat-value">${totalQuizzes}</div><div class="stat-label">Quizzes Taken</div></div>
             <div class="stat-card"><div class="stat-value">${avgScore}%</div><div class="stat-label">Avg Score</div></div>
-            <div class="stat-card"><div class="stat-value">${badgesEarned}</div><div class="stat-label">Badges Earned</div></div>
             <div class="stat-card"><div class="stat-value">${chaptersDone}/${chapters.length}</div><div class="stat-label">Chapters Done</div></div>
           </div>
         </div>

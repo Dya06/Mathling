@@ -26,16 +26,8 @@ namespace Mathling
         {
             public int xp { get; set; }
             public int level { get; set; }
-            public List<BadgeDto> badges { get; set; }
             public List<ChapterDto> chapters { get; set; }
             public List<ActivityDto> history { get; set; }
-        }
-
-        public class BadgeDto
-        {
-            public string icon { get; set; }
-            public string name { get; set; }
-            public bool earned { get; set; }
         }
 
         public class ChapterDto
@@ -100,7 +92,7 @@ namespace Mathling
 
                     if (role == "student" || role == "Student")
                     {
-                        res.student = new StudentData { badges = new List<BadgeDto>(), chapters = new List<ChapterDto>(), history = new List<ActivityDto>() };
+                        res.student = new StudentData { chapters = new List<ChapterDto>(), history = new List<ActivityDto>() };
                         
                         // Fetch Level and XP
                         using (SqlCommand cmd = new SqlCommand("SELECT Level, XP FROM Users WHERE Id = @Id", conn))
