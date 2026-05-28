@@ -1,21 +1,30 @@
-/* ============================================
-   MATHLINGS DATABASE SCHEMA - REBUILT
-   SQL Server LocalDB
-   ============================================ */
-
--- Drop and recreate the database
-DROP DATABASE IF EXISTS MathlingDB;
+-- =========================================================================
+-- STEP 1: FORCE CLOSE ALL APPS USING MATHLINGDB AND WIPE IT CLEAN
+-- =========================================================================
+USE master;
 GO
+
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'MathlingDB')
+BEGIN
+    ALTER DATABASE MathlingDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE MathlingDB;
+END
+GO
+
+-- =========================================================================
+-- STEP 2: CREATE DATABASE
+-- =========================================================================
 CREATE DATABASE MathlingDB;
 GO
+
 USE MathlingDB;
 GO
 
--- =============================================
+-- =========================================================================
 -- USERS
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[Users] (
-    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [Id]            INT             IDENTITY(1,1) NOT NULL PRIMARY KEY,
     [Name]          NVARCHAR(100)   NOT NULL,
     [Email]         NVARCHAR(256)   NOT NULL UNIQUE,
     [PasswordHash]  NVARCHAR(256)   NOT NULL,
@@ -29,10 +38,11 @@ CREATE TABLE [dbo].[Users] (
     CONSTRAINT [CK_Users_Role]
     CHECK ([Role] IN ('student','parent','instructor','admin'))
 );
+GO
 
--- =============================================
+-- =========================================================================
 -- FORMULAS
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[Formulas] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [Name]          NVARCHAR(50)    NOT NULL UNIQUE,
@@ -41,10 +51,22 @@ CREATE TABLE [dbo].[Formulas] (
     [SortOrder]     INT             NOT NULL DEFAULT 0,
     [IsActive]      BIT             NOT NULL DEFAULT 1
 );
+GO
 
--- =============================================
+-- =========================================================================
+-- BADGES
+-- =========================================================================
+CREATE TABLE [dbo].[Badges] (
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [Name]          NVARCHAR(100)   NOT NULL,
+    [Icon]          NVARCHAR(50)    NULL,
+    [Description]   NVARCHAR(255)   NULL
+);
+GO
+
+-- =========================================================================
 -- MODULES
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[Modules] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [FormulaId]     VARCHAR(10)     NOT NULL,
@@ -62,10 +84,11 @@ CREATE TABLE [dbo].[Modules] (
     FOREIGN KEY ([FormulaId])
     REFERENCES [dbo].[Formulas]([Id])
 );
+GO
 
--- =============================================
+-- =========================================================================
 -- QUESTION SETS
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[QuestionSets] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [ModuleId]      VARCHAR(10)     NOT NULL,
@@ -80,10 +103,11 @@ CREATE TABLE [dbo].[QuestionSets] (
     CONSTRAINT [CK_QuestionSets_Mode]
     CHECK ([DisplayMode] IN ('static','flash'))
 );
+GO
 
--- =============================================
+-- =========================================================================
 -- QUESTIONS
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[Questions] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [SetId]         VARCHAR(10)     NOT NULL,
@@ -94,10 +118,11 @@ CREATE TABLE [dbo].[Questions] (
     FOREIGN KEY ([SetId])
     REFERENCES [dbo].[QuestionSets]([Id])
 );
+GO
 
--- =============================================
+-- =========================================================================
 -- QUESTION ROWS
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[QuestionRows] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [QuestionId]    VARCHAR(10)     NOT NULL,
@@ -108,13 +133,14 @@ CREATE TABLE [dbo].[QuestionRows] (
     FOREIGN KEY ([QuestionId])
     REFERENCES [dbo].[Questions]([Id])
 );
+GO
 
--- =============================================
+-- =========================================================================
 -- QUIZ RESULTS
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[QuizResults] (
     [Id]             VARCHAR(10)    NOT NULL PRIMARY KEY,
-    [UserId]         VARCHAR(10)    NOT NULL,
+    [UserId]         INT            NOT NULL,
     [SetId]          VARCHAR(10)    NOT NULL,
     [Score]          INT            NOT NULL DEFAULT 0,
     [TotalCorrect]   INT            NOT NULL DEFAULT 0,
@@ -131,13 +157,14 @@ CREATE TABLE [dbo].[QuizResults] (
     FOREIGN KEY ([SetId])
     REFERENCES [dbo].[QuestionSets]([Id])
 );
+GO
 
--- =============================================
+-- =========================================================================
 -- MODULE PROGRESS
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[ModuleProgress] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
-    [UserId]        VARCHAR(10)     NOT NULL,
+    [UserId]        INT             NOT NULL,
     [ModuleId]      VARCHAR(10)     NOT NULL,
     [IsCompleted]   BIT             NOT NULL DEFAULT 0,
     [CompletedAt]   DATETIME2       NULL,
@@ -153,31 +180,33 @@ CREATE TABLE [dbo].[ModuleProgress] (
     CONSTRAINT [UQ_ModuleProgress]
     UNIQUE ([UserId], [ModuleId])
 );
+GO
 
--- =============================================
+-- =========================================================================
 -- FORUM THREADS
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[ForumThreads] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [Title]         NVARCHAR(200)   NOT NULL,
     [Content]       NVARCHAR(MAX)   NOT NULL,
     [Category]      NVARCHAR(50)    NOT NULL DEFAULT 'General',
-    [AuthorId]      VARCHAR(10)     NOT NULL,
+    [AuthorId]      INT             NOT NULL,
     [CreatedAt]     DATETIME2       NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_ForumThreads_Users]
     FOREIGN KEY ([AuthorId])
     REFERENCES [dbo].[Users]([Id])
 );
+GO
 
--- =============================================
+-- =========================================================================
 -- FORUM REPLIES
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[ForumReplies] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [ThreadId]      VARCHAR(10)     NOT NULL,
     [Content]       NVARCHAR(MAX)   NOT NULL,
-    [AuthorId]      VARCHAR(10)     NOT NULL,
+    [AuthorId]      INT             NOT NULL,
     [CreatedAt]     DATETIME2       NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_ForumReplies_Threads]
@@ -188,10 +217,11 @@ CREATE TABLE [dbo].[ForumReplies] (
     FOREIGN KEY ([AuthorId])
     REFERENCES [dbo].[Users]([Id])
 );
+GO
 
--- =============================================
+-- =========================================================================
 -- SUBMISSIONS
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[Submissions] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
     [Title]         NVARCHAR(200)   NOT NULL,
@@ -199,7 +229,7 @@ CREATE TABLE [dbo].[Submissions] (
     [Difficulty]    NVARCHAR(20)    NULL,
     [Status]        NVARCHAR(20)    NOT NULL DEFAULT 'pending',
     [Reason]        NVARCHAR(500)   NULL,
-    [InstructorId]  VARCHAR(10)     NOT NULL,
+    [InstructorId]  INT             NOT NULL,
     [CreatedAt]     DATETIME2       NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_Submissions_Users]
@@ -209,23 +239,14 @@ CREATE TABLE [dbo].[Submissions] (
     CONSTRAINT [CK_Submissions_Status]
     CHECK ([Status] IN ('pending','approved','rejected'))
 );
+GO
 
--- =============================================
--- BADGES
--- =============================================
-CREATE TABLE [dbo].[Badges] (
-    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
-    [Name]          NVARCHAR(100)   NOT NULL,
-    [Icon]          NVARCHAR(50)    NULL,
-    [Description]   NVARCHAR(255)   NULL
-);
-
--- =============================================
+-- =========================================================================
 -- USER BADGES
--- =============================================
+-- =========================================================================
 CREATE TABLE [dbo].[UserBadges] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
-    [UserId]        VARCHAR(10)     NOT NULL,
+    [UserId]        INT             NOT NULL,
     [BadgeId]       VARCHAR(10)     NOT NULL,
     [EarnedAt]      DATETIME2       NOT NULL DEFAULT GETDATE(),
 
@@ -240,14 +261,15 @@ CREATE TABLE [dbo].[UserBadges] (
     CONSTRAINT [UQ_UserBadges]
     UNIQUE ([UserId], [BadgeId])
 );
+GO
 
--- =============================================
--- PARENT-STUDENT LINKS
--- =============================================
+-- =========================================================================
+-- PARENT STUDENT LINKS
+-- =========================================================================
 CREATE TABLE [dbo].[ParentStudentLinks] (
     [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
-    [ParentId]      VARCHAR(10)     NOT NULL,
-    [StudentId]     VARCHAR(10)     NOT NULL,
+    [ParentId]      INT             NOT NULL,
+    [StudentId]     INT             NOT NULL,
     [LinkedAt]      DATETIME2       NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT [FK_PSL_Parent]
@@ -261,27 +283,41 @@ CREATE TABLE [dbo].[ParentStudentLinks] (
     CONSTRAINT [UQ_ParentStudent]
     UNIQUE ([ParentId], [StudentId])
 );
+GO
 
--- =============================================
--- SEED DATA
--- =============================================
-INSERT INTO [dbo].[Users] ([Id],[Name],[Email],[PasswordHash],[Role],[Avatar])
+-- =========================================================================
+-- SEED USERS
+-- =========================================================================
+INSERT INTO [dbo].[Users]
+([Name],[Email],[PasswordHash],[Role],[Avatar])
 VALUES
-('001', 'Alex Student',      'student@demo.com',    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'student',    'student'),
-('002', 'Sarah Parent',      'parent@demo.com',     CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'parent',     'parent'),
-('003', 'Robert Instructor', 'instructor@demo.com', CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'instructor', 'instructor'),
-('004', 'Admin User',        'admin@demo.com',      CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'admin',      'admin');
+('Alex Student',      'student@demo.com',    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'student',    'student'),
+('Sarah Parent',      'parent@demo.com',     CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'parent',     'parent'),
+('Robert Instructor', 'instructor@demo.com', CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'instructor', 'instructor'),
+('Admin User',        'admin@demo.com',      CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'admin',      'admin');
+GO
 
-INSERT INTO [dbo].[Formulas] ([Id],[Name],[Rule],[Description],[SortOrder])
-VALUES ('001', 'SF+4', '+5 - 1', 'Small Friend +4', 1);
+-- =========================================================================
+-- SEED FORMULAS
+-- =========================================================================
+INSERT INTO [dbo].[Formulas]
+([Id],[Name],[Rule],[Description],[SortOrder])
+VALUES
+('001', 'SF+4', '+5 - 1', 'Small Friend +4', 1);
+GO
 
-INSERT INTO [dbo].[Modules] ([Id],[FormulaId],[ModuleKey],[Title],[Icon],[Description],[UseAbacus],[MentalMode],[IsTimed],[TimeLimitSec],[SortOrder])
+-- =========================================================================
+-- SEED MODULES
+-- =========================================================================
+INSERT INTO [dbo].[Modules]
+([Id],[FormulaId],[ModuleKey],[Title],[Icon],[Description],[UseAbacus],[MentalMode],[IsTimed],[TimeLimitSec],[SortOrder])
 VALUES
 ('001', '001', 'learning',       'A. Learning Module',   'book',   'Learn how the abacus moves for this formula', 1, 0, 0, NULL, 1),
 ('002', '001', 'exerciseAbacus', 'B. Exercise (Abacus)', 'abacus', 'Solve using the abacus',                      1, 0, 0, NULL, 2),
 ('003', '001', 'exerciseMental', 'C. Exercise (Mental)', 'brain',  'No abacus. Imagine the beads moving mentally.',0, 1, 0, NULL, 3),
 ('004', '001', 'preparation',    'D. Preparation',       'prep',   'Prepare for the final assessment.',           0, 1, 0, NULL, 4),
 ('005', '001', 'assessment',     'E. Assessment',        'trophy', 'Timed final assessment.',                     0, 1, 1, 60,   5);
+GO
 
-PRINT 'MathlingDB rebuilt successfully with padded IDs!';
+PRINT 'MathlingDB rebuilt successfully with all missing tables restored!';
 GO

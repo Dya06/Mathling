@@ -21,12 +21,11 @@
     </div>
   </nav>
   <div class="mobile-nav" id="mobile-nav"></div>
-
   <main class="main">
     <section class="profile-hero">
       <div class="container">
         <!-- Matches 'profile_avatar' in your Canvas -->
-        <div class="profile-avatar" id="profile_avatar" runat="server">&#128100;</div>
+         <div class="profile-avatar" id="profileAvatar" runat="server">&#128100;</div>
         
         <!-- Matches 'profileName' in your Canvas -->
         <h1 class="profile-name" id="profileName" runat="server">User</h1>

@@ -15,13 +15,13 @@ namespace Mathling
     {
 
         /// <summary>
-        /// profile_avatar control.
+        /// profileAvatar control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl profile_avatar;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl profileAvatar;
 
         /// <summary>
         /// profileName control.

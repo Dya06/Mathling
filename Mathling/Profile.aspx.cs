@@ -23,23 +23,25 @@ namespace Mathling
             }
         }
 
+        /// <summary>
+        /// Fetches user profile details from the database and binds them to the page controls.
+        /// </summary>
         private void LoadUserProfile()
         {
-            // Keep it as a string to preserve any padded zeros (like "001")
-            string userId = Session["UserId"]?.ToString();
+            // Now that your database uses INT IDENTITY, we parse the session safely as an integer
+            int userId = Convert.ToInt32(Session["UserId"]);
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
 
-                // Select Avatar column too since it exists in your schema
                 string query = "SELECT Name, Email, Role, Avatar, Level, XP FROM Users WHERE Id = @Id";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    // Explicitly pass it as a VarChar to match your VARCHAR(10) column perfectly
-                    cmd.Parameters.Add("@Id", SqlDbType.VarChar, 10).Value = userId;
+                    // Updated to SqlDbType.Int to match your shiny new INT database primary key!
+                    cmd.Parameters.Add("@Id", SqlDbType.Int).Value = userId;
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -51,15 +53,15 @@ namespace Mathling
                             int level = Convert.ToInt32(reader["Level"]);
                             int xp = Convert.ToInt32(reader["XP"]);
 
-                            // 2. Bind straight to your elements
+                            // 2. Bind straight to your elements declared in Profile.aspx
                             profileName.InnerText = name;
                             profileRoleBadge.InnerText = role.ToUpper();
                             lblEmail.InnerText = email;
 
-                            // Assign customizable dynamic avatars / styles
+                            // Assign customizable dynamic avatars and styles
                             if (role.Equals("student", StringComparison.OrdinalIgnoreCase))
                             {
-                                profile_avatar.InnerHtml = "&#129330;"; // Student emoji
+                                profileAvatar.InnerHtml = "&#129330;"; // Student emoji
                                 profileRoleBadge.Attributes["class"] = "badge badge-blue profile-role";
 
                                 // Show level tracker section
@@ -74,14 +76,20 @@ namespace Mathling
                             }
                             else if (role.Equals("instructor", StringComparison.OrdinalIgnoreCase))
                             {
-                                profile_avatar.InnerHtml = "&#128104;&#2005;"; // Instructor emoji
+                                profileAvatar.InnerHtml = "&#128104;&#2005;"; // Instructor emoji
                                 profileRoleBadge.Attributes["class"] = "badge badge-purple profile-role";
                                 levelSection.Style["display"] = "none";
                             }
                             else if (role.Equals("parent", StringComparison.OrdinalIgnoreCase))
                             {
-                                profile_avatar.InnerHtml = "&#128105;"; // Parent emoji
+                                profileAvatar.InnerHtml = "&#128105;"; // Parent emoji
                                 profileRoleBadge.Attributes["class"] = "badge badge-green profile-role";
+                                levelSection.Style["display"] = "none";
+                            }
+                            else if (role.Equals("admin", StringComparison.OrdinalIgnoreCase))
+                            {
+                                profileAvatar.InnerHtml = "&#128100;"; // Admin/Default profile emoji
+                                profileRoleBadge.Attributes["class"] = "badge badge-red profile-role";
                                 levelSection.Style["display"] = "none";
                             }
                         }
