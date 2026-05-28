@@ -108,8 +108,8 @@ namespace Mathling
                             'quiz_' + CAST(q.Id AS VARCHAR) as id,
                             u.Name as [user],
                             'completed quiz' as action,
-                            q.ModuleId as target,
-                            q.Date as time
+                            q.SetId as target,
+                            q.CompletedAt as time
                         FROM QuizResults q
                         JOIN Users u ON q.UserId = u.Id
                         
@@ -120,7 +120,7 @@ namespace Mathling
                             u.Name as [user],
                             'submitted content' as action,
                             s.Title as target,
-                            s.SubmittedAt as time
+                            s.CreatedAt as time
                         FROM Submissions s
                         JOIN Users u ON s.InstructorId = u.Id
                     ) ActivityFeed
