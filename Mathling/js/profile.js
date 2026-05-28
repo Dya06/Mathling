@@ -272,7 +272,7 @@ const Profile = {
               </div>
             `).join('') : '<p style="color:var(--text-tertiary);padding:var(--space-lg)">No students linked yet.</p>'}
           </div>
-          <button class="btn btn-secondary btn-sm" id="link-student-btn" style="width:100%;margin-top:var(--space-md)">+ Link a Student</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="link-student-btn" style="width:100%;margin-top:var(--space-md)">+ Link a Student</button>
         </div>
         <div>
           <h3 class="profile-section-title">Performance Overview</h3>
