@@ -254,14 +254,51 @@ const Profile = {
 
   renderParent(container, user, data) {
     const students = data.linkedStudents || [];
-    let totalScoreSum = 0;
-    let totalQuizzes = 0;
-    students.forEach(s => {
-        const q = s.totalQuizzes || 0;
-        totalQuizzes += q;
-        totalScoreSum += (s.avgScore || 0) * q;
-    });
-    const avgScore = totalQuizzes ? Math.round(totalScoreSum / totalQuizzes) : 0;
+    let selectedStudentId = null;
+
+    const renderStats = () => {
+      let filteredStudents = selectedStudentId ? students.filter(s => s.id === selectedStudentId) : students;
+      let totalScoreSum = 0;
+      let totalQuizzes = 0;
+      filteredStudents.forEach(s => {
+          const q = s.totalQuizzes || 0;
+          totalQuizzes += q;
+          totalScoreSum += (s.avgScore || 0) * q;
+      });
+      const avgScore = totalQuizzes ? Math.round(totalScoreSum / totalQuizzes) : 0;
+      return `
+          <div class="stats-cards">
+            <div class="stat-card"><div class="stat-value">${totalQuizzes}</div><div class="stat-label">Quizzes Taken</div></div>
+            <div class="stat-card"><div class="stat-value">${avgScore}%</div><div class="stat-label">Avg Score</div></div>
+          </div>
+      `;
+    };
+
+    const reRenderStats = () => {
+        const statsContainer = document.getElementById('parent-stats-container');
+        if (statsContainer) statsContainer.innerHTML = renderStats();
+    };
+
+    window.unlinkStudent = async (studentId) => {
+        if (!confirm('Are you sure you want to remove this student?')) return;
+        try {
+            const res = await fetch('Profile.aspx/UnlinkStudent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ parentId: user.id, studentId: studentId })
+            });
+            const result = await res.json();
+            if (result.d && result.d.success) {
+                App.showToast('Student removed successfully!', 'success');
+                Profile.fetchData();
+            } else {
+                App.showToast('Failed to remove student', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            App.showToast('Network error while removing student', 'error');
+        }
+    };
 
     container.innerHTML = `
       <div class="profile-grid">
@@ -269,19 +306,29 @@ const Profile = {
           <h3 class="profile-section-title">Linked Students</h3>
           <div id="linked-students">
             ${students.length ? students.map(s => `
-              <div class="card" style="margin-bottom:var(--space-sm);display:flex;justify-content:space-between">
-                <div><strong>${s.name}</strong></div>
-                <div style="color:var(--text-tertiary)">Level ${s.level} | ${s.xp} XP</div>
+              <div class="card" style="margin-bottom:var(--space-sm);display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div><strong>${s.name}</strong></div>
+                    <div style="color:var(--text-tertiary);font-size:var(--text-sm)">Level ${s.level} | ${s.xp} XP</div>
+                </div>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="window.unlinkStudent('${s.id}')" style="color:var(--accent-red);padding:var(--space-xs) var(--space-sm);background:transparent;border:1px solid var(--border-light)">Remove</button>
               </div>
             `).join('') : '<p style="color:var(--text-tertiary);padding:var(--space-lg)">No students linked yet.</p>'}
           </div>
           <button type="button" class="btn btn-secondary btn-sm" id="link-student-btn" style="width:100%;margin-top:var(--space-md)">+ Link a Student</button>
         </div>
         <div>
-          <h3 class="profile-section-title">Performance Overview</h3>
-          <div class="stats-cards">
-            <div class="stat-card"><div class="stat-value">${totalQuizzes}</div><div class="stat-label">Quizzes Taken</div></div>
-            <div class="stat-card"><div class="stat-value">${avgScore}%</div><div class="stat-label">Avg Score</div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
+              <h3 class="profile-section-title" style="margin-bottom:0">Performance Overview</h3>
+              ${students.length ? `
+              <select id="student-filter" class="form-input" style="width:auto;min-width:150px;padding:var(--space-xs) var(--space-sm)">
+                  <option value="">All Students</option>
+                  ${students.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+              </select>
+              ` : ''}
+          </div>
+          <div id="parent-stats-container">
+            ${renderStats()}
           </div>
           <a href="Progress.aspx" class="btn btn-accent-blue btn-sm" style="width:100%;margin-top:var(--space-lg)">View Full Progress</a>
         </div>
@@ -291,6 +338,11 @@ const Profile = {
         if (Profile.openLinkModal) {
             Profile.openLinkModal();
         }
+    });
+
+    document.getElementById('student-filter')?.addEventListener('change', (e) => {
+        selectedStudentId = e.target.value;
+        reRenderStats();
     });
   },
 

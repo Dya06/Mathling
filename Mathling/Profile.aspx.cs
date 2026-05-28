@@ -55,6 +55,7 @@ namespace Mathling
 
         public class LinkedStudentDto
         {
+            public string id { get; set; }
             public string name { get; set; }
             public int level { get; set; }
             public int xp { get; set; }
@@ -168,7 +169,7 @@ namespace Mathling
                         
                         // Fetch Linked Students
                         using (SqlCommand cmd = new SqlCommand(@"
-                            SELECT u.Name, u.Level, u.XP,
+                            SELECT u.Id, u.Name, u.Level, u.XP,
                                    (SELECT COUNT(*) FROM QuizResults qr WHERE qr.UserId = u.Id) as TotalQuizzes,
                                    (SELECT ISNULL(AVG(Percentage), 0) FROM QuizResults qr WHERE qr.UserId = u.Id) as AvgScore
                             FROM ParentStudentLinks psl
@@ -182,6 +183,7 @@ namespace Mathling
                                 {
                                     res.parent.linkedStudents.Add(new LinkedStudentDto
                                     {
+                                        id = reader["Id"].ToString(),
                                         name = reader["Name"].ToString(),
                                         level = Convert.ToInt32(reader["Level"]),
                                         xp = Convert.ToInt32(reader["XP"]),
@@ -336,6 +338,39 @@ namespace Mathling
                     }
                 }
 
+                res.success = true;
+            }
+            catch (Exception ex)
+            {
+                res.errorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public class UnlinkStudentResponse
+        {
+            public bool success { get; set; }
+            public string errorMessage { get; set; }
+        }
+
+        [System.Web.Services.WebMethod]
+        public static UnlinkStudentResponse UnlinkStudent(string parentId, string studentId)
+        {
+            var res = new UnlinkStudentResponse { success = false };
+            try
+            {
+                string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+                
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand("DELETE FROM ParentStudentLinks WHERE ParentId = @ParentId AND StudentId = @StudentId", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ParentId", parentId);
+                        cmd.Parameters.AddWithValue("@StudentId", studentId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
                 res.success = true;
             }
             catch (Exception ex)
