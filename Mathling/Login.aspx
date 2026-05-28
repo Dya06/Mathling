@@ -85,7 +85,7 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=9"></script>
+    <script src="/js/app.js?v=10"></script>
     <script>
         function fillDemo(email, password) {
             document.getElementById('<%= LoginEmail.ClientID %>').value = email;

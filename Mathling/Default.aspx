@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Home" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Mathling._Default" %>
+<%@ Page Title="Home" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Mathling._Default" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/home.css" />
@@ -280,7 +280,7 @@
 </asp:Content>
 
 <asp:Content ID="Scripts" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=9"></script>
+    <script src="/js/app.js?v=10"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('[data-count]').forEach(function(el) {
