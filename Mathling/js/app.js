@@ -230,7 +230,7 @@ const App = {
   logout() {
     this.state.currentUser = null;
     localStorage.removeItem('mathlings-user');
-    window.location.href = 'Default.aspx';
+    window.location.href = 'Logout.aspx';
   },
 
   /*
