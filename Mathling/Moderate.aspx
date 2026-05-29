@@ -92,5 +92,5 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=10"></script>
-    <script src="/js/moderate.js?v=4"></script>
+    <script src="/js/moderate.js?v=5"></script>
 </asp:Content>
