@@ -83,8 +83,8 @@ const Admin = {
           <div class="avatar avatar-sm">${u.avatar || ''}</div>
           <span class="user-name" style="flex:1">${u.name}</span>
           <span class="badge badge-${u.role === 'admin' ? 'red' : u.role === 'instructor' ? 'purple' : u.role === 'parent' ? 'blue' : 'green'}">${u.role}</span>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.editUser(${u.id}, '${u.name}', '${u.role}')">️</button>
-          <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Admin.deleteUser(${u.id})">️</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.editUser(${u.id}, '${u.name}', '${u.role}')">Edit</button>
+          <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Admin.deleteUser(${u.id})">Delete</button>
         </div>
       `).join('');
     } catch(e) { console.error('Failed to load users', e); }
@@ -133,8 +133,8 @@ const Admin = {
           </span>
           <span class="badge badge-${item.status === 'approved' ? 'green' : item.status === 'pending' ? 'yellow' : 'red'}" style="font-size:var(--text-xs)">${item.status}</span>
           ${item.status === 'pending' ? `
-            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--accent-green);padding:0 4px" onclick="Admin.approveContent('${item.id}')" title="Approve"></button>
-            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);padding:0 4px" onclick="Admin.rejectContent('${item.id}')" title="Reject"></button>
+            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--accent-green);padding:0 4px" onclick="Admin.approveContent('${item.id}')" title="Approve">Approve</button>
+            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);padding:0 4px" onclick="Admin.rejectContent('${item.id}')" title="Reject">Reject</button>
           ` : ''}
         </div>
       `).join('');
