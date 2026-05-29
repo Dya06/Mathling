@@ -101,8 +101,10 @@ const Progress = {
       const data = result.d;
 
       this.renderStats(data);
-      this.drawLineChart(data.History);
-      this.drawDonutChart(data.ChaptersDone, data.TotalChapters);
+      setTimeout(() => {
+        this.drawLineChart(data.History);
+        this.drawDonutChart(data.ChaptersDone, data.TotalChapters);
+      }, 50);
       this.renderHistory(data.History);
     } catch (error) {
       console.error('Failed to load progress data:', error);
