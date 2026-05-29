@@ -195,13 +195,6 @@ namespace Mathling
                         return "error|Email already in use";
                 }
 
-                string newId;
-                using (SqlCommand maxIdCmd = new SqlCommand("SELECT ISNULL(MAX(CAST(Id AS INT)), 0) + 1 FROM Users", conn))
-                {
-                    int nextNum = (int)maxIdCmd.ExecuteScalar();
-                    newId = nextNum.ToString("D3");
-                }
-
                 string passwordHash;
                 using (System.Security.Cryptography.SHA256 sha256 = System.Security.Cryptography.SHA256.Create())
                 {
@@ -211,10 +204,9 @@ namespace Mathling
                     passwordHash = sb.ToString();
                 }
 
-                string query = "INSERT INTO Users (Id, Name, Email, PasswordHash, Role, Avatar, Level, XP, CreatedAt, IsActive) VALUES (@Id, @Name, @Email, @PasswordHash, @Role, @Avatar, 1, 0, GETDATE(), 1)";
+                string query = "INSERT INTO Users (Name, Email, PasswordHash, Role, Avatar, Level, XP, CreatedAt, IsActive) VALUES (@Name, @Email, @PasswordHash, @Role, @Avatar, 1, 0, GETDATE(), 1)";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Id", newId);
                     cmd.Parameters.AddWithValue("@Name", name);
                     cmd.Parameters.AddWithValue("@Email", email);
                     cmd.Parameters.AddWithValue("@PasswordHash", passwordHash);
