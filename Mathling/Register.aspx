@@ -71,7 +71,6 @@
                             <asp:ListItem Text="Select Role" Value=""></asp:ListItem>
                             <asp:ListItem Text="Student" Value="student"></asp:ListItem>
                             <asp:ListItem Text="Parent" Value="parent"></asp:ListItem>
-                            <asp:ListItem Text="Instructor" Value="instructor"></asp:ListItem>
                         </asp:DropDownList>
                     </div>
 

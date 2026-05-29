@@ -176,6 +176,40 @@ namespace Mathling
         }
 
         [WebMethod(EnableSession = true)]
+        public static string AddUser(string name, string email, string password, string role)
+        {
+            if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")
+                return "error|Unauthorized";
+
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(role))
+                return "error|All fields are required";
+
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                using (SqlCommand checkCmd = new SqlCommand("SELECT COUNT(1) FROM Users WHERE Email = @Email", conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@Email", email);
+                    if ((int)checkCmd.ExecuteScalar() > 0)
+                        return "error|Email already in use";
+                }
+
+                string query = "INSERT INTO Users (Name, Email, Password, Role, Avatar) VALUES (@Name, @Email, @Password, @Role, @Avatar)";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", name);
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    cmd.Parameters.AddWithValue("@Password", password);
+                    cmd.Parameters.AddWithValue("@Role", role);
+                    cmd.Parameters.AddWithValue("@Avatar", role);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod(EnableSession = true)]
         public static string DeleteUser(int targetUserId)
         {
             if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")

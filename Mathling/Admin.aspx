@@ -41,7 +41,10 @@
       <!-- Users & Feedback -->
       <div class="admin-grid">
         <div class="admin-card">
-          <h3> User Management</h3>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md)">
+            <h3 style="margin:0"> User Management</h3>
+            <button type="button" class="btn btn-primary btn-sm" onclick="Admin.showAddUserModal()">Add User</button>
+          </div>
           <div id="user-list"></div>
           <div style="margin-top:var(--space-md);display:flex;gap:var(--space-sm)">
             <a href="progress.aspx" class="btn btn-secondary btn-sm" style="flex:1">View Reports</a>

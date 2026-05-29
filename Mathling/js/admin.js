@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    MATHLINGS — Admin Dashboard Logic
    ============================================ */
 
@@ -271,8 +271,78 @@ const Admin = {
           </div>
         </div>
       </div>
+
+      <div class="modal-overlay" id="add-user-modal">
+        <div class="modal" style="max-width: 400px; padding: var(--space-xl)">
+          <h2 style="margin-bottom: var(--space-md)">Add New User</h2>
+          <div class="form-group">
+            <label class="form-label" for="add-user-name">Name</label>
+            <input type="text" id="add-user-name" class="form-input" placeholder="Full name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="add-user-email">Email</label>
+            <input type="email" id="add-user-email" class="form-input" placeholder="Email address" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="add-user-password">Password</label>
+            <input type="password" id="add-user-password" class="form-input" placeholder="Temporary password" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="add-user-role">Role</label>
+            <select id="add-user-role" class="form-input">
+              <option value="student">Student</option>
+              <option value="parent">Parent</option>
+              <option value="instructor">Instructor</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-md)">
+            <button type="button" class="btn btn-primary" onclick="Admin.submitAddUser()" style="flex:1">Create User</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('add-user-modal').classList.remove('active')" style="flex:1">Cancel</button>
+          </div>
+        </div>
+      </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+  },
+
+  showAddUserModal() {
+    document.getElementById('add-user-name').value = '';
+    document.getElementById('add-user-email').value = '';
+    document.getElementById('add-user-password').value = '';
+    document.getElementById('add-user-role').value = 'student';
+    document.getElementById('add-user-modal').classList.add('active');
+  },
+
+  async submitAddUser() {
+    const name = document.getElementById('add-user-name').value.trim();
+    const email = document.getElementById('add-user-email').value.trim();
+    const password = document.getElementById('add-user-password').value.trim();
+    const role = document.getElementById('add-user-role').value;
+
+    if (!name || !email || !password) {
+      return App.showToast('Please fill in all fields', 'error');
+    }
+
+    try {
+      const response = await fetch('Admin.aspx/AddUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role })
+      });
+      const data = await response.json();
+      if (data.d === 'success') {
+        App.showToast('User created successfully!', 'success');
+        document.getElementById('add-user-modal').classList.remove('active');
+        this.renderUsers();
+        this.renderStats();
+      } else {
+        App.showToast(data.d, 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      App.showToast('Error creating user', 'error');
+    }
   },
 
   editUser(id, name, role) {
