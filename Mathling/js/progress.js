@@ -34,6 +34,15 @@ const Progress = {
       }
 
       await this.loadData(studentIdParam);
+
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        if (this.currentData) {
+          setTimeout(() => {
+            this.drawLineChart(this.currentData.History);
+            this.drawDonutChart(this.currentData.ChaptersDone, this.currentData.TotalChapters);
+          }, 50);
+        }
+      });
     } catch (error) {
       console.error('Failed to init progress:', error);
     }
@@ -99,6 +108,7 @@ const Progress = {
       });
       const result = await response.json();
       const data = result.d;
+      this.currentData = data;
 
       this.renderStats(data);
       setTimeout(() => {
