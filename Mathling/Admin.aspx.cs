@@ -195,12 +195,29 @@ namespace Mathling
                         return "error|Email already in use";
                 }
 
-                string query = "INSERT INTO Users (Name, Email, Password, Role, Avatar) VALUES (@Name, @Email, @Password, @Role, @Avatar)";
+                string newId;
+                using (SqlCommand maxIdCmd = new SqlCommand("SELECT ISNULL(MAX(CAST(Id AS INT)), 0) + 1 FROM Users", conn))
+                {
+                    int nextNum = (int)maxIdCmd.ExecuteScalar();
+                    newId = nextNum.ToString("D3");
+                }
+
+                string passwordHash;
+                using (System.Security.Cryptography.SHA256 sha256 = System.Security.Cryptography.SHA256.Create())
+                {
+                    byte[] bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    foreach (byte b in bytes) sb.Append(b.ToString("X2"));
+                    passwordHash = sb.ToString();
+                }
+
+                string query = "INSERT INTO Users (Id, Name, Email, PasswordHash, Role, Avatar, Level, XP, CreatedAt, IsActive) VALUES (@Id, @Name, @Email, @PasswordHash, @Role, @Avatar, 1, 0, GETDATE(), 1)";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
+                    cmd.Parameters.AddWithValue("@Id", newId);
                     cmd.Parameters.AddWithValue("@Name", name);
                     cmd.Parameters.AddWithValue("@Email", email);
-                    cmd.Parameters.AddWithValue("@Password", password);
+                    cmd.Parameters.AddWithValue("@PasswordHash", passwordHash);
                     cmd.Parameters.AddWithValue("@Role", role);
                     cmd.Parameters.AddWithValue("@Avatar", role);
                     cmd.ExecuteNonQuery();
