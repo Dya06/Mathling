@@ -260,10 +260,13 @@ const Moderate = {
           ${s.date ? `<span>Date: ${s.date}</span>` : ''}
         </div>
         ${s.reason ? `<div class="reject-reason">Reason: ${s.reason}</div>` : ''}
-        ${isAdmin && s.status === 'pending' ? `
+        ${isAdmin ? `
           <div class="review-card-actions">
+            ${s.status === 'pending' ? `
             <button type="button" class="btn btn-accent-green btn-sm" onclick="Moderate.approveItem('${s.id}')">Approve</button>
             <button type="button" class="btn btn-accent-red btn-sm" onclick="Moderate.rejectPrompt('${s.id}')">Reject</button>
+            ` : ''}
+            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--accent-red)" onclick="Moderate.deletePrompt('${s.id}')">Delete</button>
           </div>
         ` : ''}
       </div>
@@ -316,6 +319,33 @@ const Moderate = {
     } catch (e) {
       console.error(e);
       App.showToast('Error rejecting content', 'error');
+    }
+  },
+
+  deletePrompt(id) {
+    if (confirm('Are you sure you want to permanently delete this quiz set? This action cannot be undone.')) {
+      this.deleteItem(id);
+    }
+  },
+
+  async deleteItem(id) {
+    try {
+      const res = await fetch('Moderate.aspx/DeleteContent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ setId: id })
+      });
+      const data = await res.json();
+      if (data.d === 'success') {
+        App.showToast('Quiz set deleted permanently', 'success');
+        await this.fetchSubs();
+        this.renderList();
+      } else {
+        App.showToast(data.d, 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      App.showToast('Error deleting content', 'error');
     }
   },
 

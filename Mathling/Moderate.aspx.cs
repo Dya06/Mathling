@@ -279,5 +279,64 @@ namespace Mathling
                 }
             }
         }
+
+        // ---- Delete Set (admin deletes approved/rejected set) ----
+        [WebMethod(EnableSession = true)]
+        public static string DeleteContent(string setId)
+        {
+            if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")
+                return "error|Unauthorized";
+
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Delete QuestionRows
+                        using (SqlCommand cmd = new SqlCommand(@"
+                            DELETE qr FROM QuestionRows qr
+                            INNER JOIN Questions q ON qr.QuestionId = q.Id
+                            WHERE q.SetId = @Id", conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", setId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Delete QuizResults
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM QuizResults WHERE SetId = @Id", conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", setId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Delete Questions
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM Questions WHERE SetId = @Id", conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", setId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Delete QuestionSet
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM QuestionSets WHERE Id = @Id", conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", setId);
+                            int rows = cmd.ExecuteNonQuery();
+                            if (rows == 0) throw new Exception("Set not found");
+                        }
+
+                        trans.Commit();
+                        return "success";
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return "error|" + ex.Message;
+                    }
+                }
+            }
+        }
     }
 }

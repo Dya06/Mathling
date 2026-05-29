@@ -17,9 +17,16 @@
 
   <main class="main">
     <div class="progress-page container">
-      <div class="progress-header">
-        <h1> Progress &amp; Performance</h1>
-        <p>Track your learning journey and see how you're improving over time.</p>
+      <div class="progress-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+        <div>
+          <h1> Progress &amp; Performance</h1>
+          <p>Track your learning journey and see how you're improving over time.</p>
+        </div>
+        <div id="student-selector-container" style="display:none; margin-top: 10px;">
+          <select id="student-selector" class="form-select" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-weight: 600; cursor: pointer;">
+            <option value="">All Students</option>
+          </select>
+        </div>
       </div>
 
       <div class="stats-row" id="stats-row"></div>
