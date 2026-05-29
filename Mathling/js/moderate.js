@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    MATHLINGS — Content Moderation Logic
    Complete quiz builder + review queue
    ============================================ */
@@ -100,7 +100,7 @@ const Moderate = {
     card.innerHTML = `
       <div class="question-builder-header">
         <strong>Question ${idx}</strong>
-        <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Moderate.removeQuestion(${idx})">✕</button>
+        <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Moderate.removeQuestion(${idx})"></button>
       </div>
       <div class="question-builder-body">
         <div class="operand-grid">
@@ -362,3 +362,4 @@ const Moderate = {
 };
 
 document.addEventListener('DOMContentLoaded', () => Moderate.init());
+

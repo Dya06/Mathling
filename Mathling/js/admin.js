@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    MATHLINGS — Admin Dashboard Logic
    ============================================ */
 
@@ -6,15 +6,15 @@
  * BACKEND TODO:
  * Admin dashboard data should come from these endpoints:
  *
- *   GET /api/admin/stats           → { totalUsers, totalQuizzes, contentItems, pendingReviews }
- *   GET /api/admin/users           → paginated user list with search/filter
- *   GET /api/admin/users?role=X    → filter users by role
- *   GET /api/admin/activity        → recent platform activity feed
- *   GET /api/admin/feedback        → user feedback/reports list
- *   GET /api/admin/analytics/weekly → chart data for weekly activity
- *   PUT /api/admin/users/:id       → update user (enable/disable, change role)
- *   DELETE /api/admin/users/:id    → delete user account
- *   GET /api/admin/reports/export?format=csv → export reports
+ *   GET /api/admin/stats           -> { totalUsers, totalQuizzes, contentItems, pendingReviews }
+ *   GET /api/admin/users           -> paginated user list with search/filter
+ *   GET /api/admin/users?role=X    -> filter users by role
+ *   GET /api/admin/activity        -> recent platform activity feed
+ *   GET /api/admin/feedback        -> user feedback/reports list
+ *   GET /api/admin/analytics/weekly -> chart data for weekly activity
+ *   PUT /api/admin/users/:id       -> update user (enable/disable, change role)
+ *   DELETE /api/admin/users/:id    -> delete user account
+ *   GET /api/admin/reports/export?format=csv -> export reports
  *
  * Server should:
  *   - Enforce admin-only access on all these endpoints
@@ -45,9 +45,9 @@ const Admin = {
       const s = result.d;
 
       const stats = [
-        { icon: '👥', bg: 'var(--accent-blue-light)', value: s.totalUsers, label: 'Total Users' },
-        { icon: '📝', bg: 'var(--accent-green-light)', value: s.totalQuizzes, label: 'Total Quizzes' },
-        { icon: '📦', bg: 'var(--accent-yellow-light)', value: s.contentItems, label: 'Content Items' },
+        { icon: '', bg: 'var(--accent-blue-light)', value: s.totalUsers, label: 'Total Users' },
+        { icon: '', bg: 'var(--accent-green-light)', value: s.totalQuizzes, label: 'Total Quizzes' },
+        { icon: '', bg: 'var(--accent-yellow-light)', value: s.contentItems, label: 'Content Items' },
         { icon: '⏳', bg: 'var(--accent-orange-light)', value: s.pendingReviews, label: 'Pending Review' },
       ];
 
@@ -80,11 +80,11 @@ const Admin = {
 
       container.innerHTML = users.map(u => `
         <div class="user-row" style="display:flex;align-items:center;gap:var(--space-sm)">
-          <div class="avatar avatar-sm">${u.avatar || '👤'}</div>
+          <div class="avatar avatar-sm">${u.avatar || ''}</div>
           <span class="user-name" style="flex:1">${u.name}</span>
           <span class="badge badge-${u.role === 'admin' ? 'red' : u.role === 'instructor' ? 'purple' : u.role === 'parent' ? 'blue' : 'green'}">${u.role}</span>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.editUser(${u.id}, '${u.name}', '${u.role}')">✏️</button>
-          <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Admin.deleteUser(${u.id})">🗑️</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.editUser(${u.id}, '${u.name}', '${u.role}')">️</button>
+          <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Admin.deleteUser(${u.id})">️</button>
         </div>
       `).join('');
     } catch(e) { console.error('Failed to load users', e); }
@@ -133,8 +133,8 @@ const Admin = {
           </span>
           <span class="badge badge-${item.status === 'approved' ? 'green' : item.status === 'pending' ? 'yellow' : 'red'}" style="font-size:var(--text-xs)">${item.status}</span>
           ${item.status === 'pending' ? `
-            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--accent-green);padding:0 4px" onclick="Admin.approveContent('${item.id}')" title="Approve">✓</button>
-            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);padding:0 4px" onclick="Admin.rejectContent('${item.id}')" title="Reject">✗</button>
+            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--accent-green);padding:0 4px" onclick="Admin.approveContent('${item.id}')" title="Approve"></button>
+            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);padding:0 4px" onclick="Admin.rejectContent('${item.id}')" title="Reject"></button>
           ` : ''}
         </div>
       `).join('');
@@ -153,7 +153,7 @@ const Admin = {
       });
       const data = await res.json();
       if (data.d === 'success') {
-        App.showToast('Content approved! ✅', 'success');
+        App.showToast('Content approved! ', 'success');
         this.renderModeration();
         this.renderStats();
       } else {
@@ -176,7 +176,7 @@ const Admin = {
       });
       const data = await res.json();
       if (data.d === 'success') {
-        App.showToast('Content rejected ❌', 'error');
+        App.showToast('Content rejected ', 'error');
         this.renderModeration();
         this.renderStats();
       } else {
@@ -332,3 +332,4 @@ const Admin = {
 };
 
 document.addEventListener('DOMContentLoaded', () => Admin.init());
+

@@ -50,8 +50,8 @@
         </div>
         <div class="admin-card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md)">
-            <h3 style="margin:0">📋 Content Moderation</h3>
-            <a href="moderate.aspx" class="btn btn-ghost btn-sm">View All →</a>
+            <h3 style="margin:0"> Content Moderation</h3>
+            <a href="moderate.aspx" class="btn btn-ghost btn-sm">View All -></a>
           </div>
           <div id="moderation-list"></div>
         </div>
@@ -63,8 +63,9 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=10"></script>
-    <script src="/js/admin.js?v=4"></script>
+    <script src="/js/admin.js?v=5"></script>
 </asp:Content>
+
 
 
 
