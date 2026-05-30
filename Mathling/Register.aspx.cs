@@ -55,24 +55,16 @@ namespace Mathling
                         }
                     }
 
-                    string newId;
-                    string maxIdQuery = "SELECT ISNULL(MAX(CAST(Id AS INT)), 0) + 1 FROM Users";
-                    using (SqlCommand maxIdCmd = new SqlCommand(maxIdQuery, conn))
-                    {
-                        int nextNum = (int)maxIdCmd.ExecuteScalar();
-                        newId = nextNum.ToString("D3");
-                    }
                     string passwordHash = HashPassword(password);
 
                     string insertQuery = @"
                         INSERT INTO Users 
-                            (Id, Name, Email, PasswordHash, Role, Avatar, Level, XP, CreatedAt, IsActive)
+                            (Name, Email, PasswordHash, Role, Avatar, Level, XP, CreatedAt, IsActive)
                         VALUES 
-                            (@Id, @Name, @Email, @PasswordHash, @Role, @Avatar, @Level, @XP, @CreatedAt, @IsActive)";
+                            (@Name, @Email, @PasswordHash, @Role, @Avatar, @Level, @XP, @CreatedAt, @IsActive)";
 
                     using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
                     {
-                        insertCmd.Parameters.AddWithValue("@Id", newId);
                         insertCmd.Parameters.AddWithValue("@Name", name);
                         insertCmd.Parameters.AddWithValue("@Email", email);
                         insertCmd.Parameters.AddWithValue("@PasswordHash", passwordHash);

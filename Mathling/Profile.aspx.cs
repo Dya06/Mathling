@@ -1,121 +1,383 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-using System.Diagnostics;
+using System.Web.Services;
+using System.Web.UI;
 
 namespace Mathling
 {
-    public partial class Profile : System.Web.UI.Page
+    public partial class Profile : Page
     {
-        string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
-
         protected void Page_Load(object sender, EventArgs e)
         {
-            // ============================================
-            // DEBUG: PRINT ALL SESSION VALUES
-            // ============================================
-            Debug.WriteLine("====== SESSION DEBUG ======");
-            Debug.WriteLine("UserId:    " + (Session["UserId"] ?? "NULL"));
-            Debug.WriteLine("UserName:  " + (Session["UserName"] ?? "NULL"));
-            Debug.WriteLine("UserRole:  " + (Session["UserRole"] ?? "NULL"));
-            Debug.WriteLine("UserEmail: " + (Session["UserEmail"] ?? "NULL"));
-            Debug.WriteLine("===========================");
-
-            if (!IsPostBack)
-            {
-                LoadProfile();
-            }
         }
 
-        private void LoadProfile()
+        public class ProfileResponse
         {
-            if (Session["UserId"] == null)
+            public StudentData student { get; set; }
+            public ParentData parent { get; set; }
+            public InstructorData instructor { get; set; }
+            public AdminData admin { get; set; }
+            public string errorMessage { get; set; }
+        }
+
+        public class StudentData
+        {
+            public int xp { get; set; }
+            public int level { get; set; }
+            public List<ChapterDto> chapters { get; set; }
+            public List<ActivityDto> history { get; set; }
+        }
+
+        public class ChapterDto
+        {
+            public string title { get; set; }
+            public string description { get; set; }
+            public bool completed { get; set; }
+            public bool unlocked { get; set; }
+            public int stars { get; set; }
+        }
+
+        public class ActivityDto
+        {
+            public int score { get; set; }
+            public string chapter { get; set; }
+            public string date { get; set; }
+        }
+
+        public class ParentData
+        {
+            public List<LinkedStudentDto> linkedStudents { get; set; }
+            public int totalQuizzes { get; set; }
+            public int avgScore { get; set; }
+        }
+
+        public class LinkedStudentDto
+        {
+            public string id { get; set; }
+            public string name { get; set; }
+            public int level { get; set; }
+            public int xp { get; set; }
+            public int totalQuizzes { get; set; }
+            public int avgScore { get; set; }
+        }
+
+        public class InstructorData
+        {
+            public List<SubmissionDto> submissions { get; set; }
+        }
+
+        public class SubmissionDto
+        {
+            public string title { get; set; }
+            public string chapter { get; set; }
+            public string status { get; set; }
+        }
+
+        public class AdminData
+        {
+            public int totalUsers { get; set; }
+            public int totalStudents { get; set; }
+        }
+
+        [WebMethod]
+        public static ProfileResponse GetProfileData(string userId, string role)
+        {
+            var res = new ProfileResponse();
+            try
             {
-                Debug.WriteLine("PROFILE: UserId is null, redirecting to Login");
-                Response.Redirect("Login.aspx");
-                return;
+                string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    conn.Open();
+
+                    if (role == "student" || role == "Student")
+                    {
+                        res.student = new StudentData { chapters = new List<ChapterDto>(), history = new List<ActivityDto>() };
+                        
+                        // Fetch Level and XP
+                        using (SqlCommand cmd = new SqlCommand("SELECT Level, XP FROM Users WHERE Id = @Id", conn))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", userId);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    res.student.level = Convert.ToInt32(reader["Level"]);
+                                    res.student.xp = Convert.ToInt32(reader["XP"]);
+                                }
+                            }
+                        }
+
+                        // Fetch Chapters
+                        using (SqlCommand cmd = new SqlCommand(@"
+                            SELECT m.Id, m.Title, m.Description, ISNULL(mp.IsCompleted, 0) as IsCompleted
+                            FROM Modules m
+                            LEFT JOIN ModuleProgress mp ON m.Id = mp.ModuleId AND mp.UserId = @Id
+                            ORDER BY m.SortOrder ASC", conn))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", userId);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                bool previousCompleted = true; // First one is unlocked
+                                while (reader.Read())
+                                {
+                                    bool completed = Convert.ToBoolean(reader["IsCompleted"]);
+                                    res.student.chapters.Add(new ChapterDto
+                                    {
+                                        title = reader["Title"].ToString(),
+                                        description = reader["Description"].ToString(),
+                                        completed = completed,
+                                        unlocked = previousCompleted || completed,
+                                        stars = completed ? 3 : 0 // Simplified stars
+                                    });
+                                    previousCompleted = completed;
+                                }
+                            }
+                        }
+
+                        // Fetch History (last 4)
+                        using (SqlCommand cmd = new SqlCommand(@"
+                            SELECT TOP 4 qr.Percentage as Score, m.Title as Chapter, qr.CompletedAt
+                            FROM QuizResults qr
+                            JOIN QuestionSets qs ON qr.SetId = qs.Id
+                            JOIN Modules m ON qs.ModuleId = m.Id
+                            WHERE qr.UserId = @Id
+                            ORDER BY qr.CompletedAt DESC", conn))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", userId);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    int score = reader["Score"] != DBNull.Value ? Convert.ToInt32(reader["Score"]) : 0;
+                                    res.student.history.Add(new ActivityDto
+                                    {
+                                        score = score,
+                                        chapter = reader["Chapter"].ToString(),
+                                        date = Convert.ToDateTime(reader["CompletedAt"]).ToString("MM-dd")
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    else if (role == "parent" || role == "Parent")
+                    {
+                        res.parent = new ParentData { linkedStudents = new List<LinkedStudentDto>() };
+                        
+                        // Fetch Linked Students
+                        using (SqlCommand cmd = new SqlCommand(@"
+                            SELECT u.Id, u.Name, u.Level, u.XP,
+                                   (SELECT COUNT(*) FROM QuizResults qr WHERE qr.UserId = u.Id) as TotalQuizzes,
+                                   (SELECT ISNULL(AVG(Percentage), 0) FROM QuizResults qr WHERE qr.UserId = u.Id) as AvgScore
+                            FROM ParentStudentLinks psl
+                            JOIN Users u ON psl.StudentId = u.Id
+                            WHERE psl.ParentId = @Id", conn))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", userId);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    res.parent.linkedStudents.Add(new LinkedStudentDto
+                                    {
+                                        id = reader["Id"].ToString(),
+                                        name = reader["Name"].ToString(),
+                                        level = Convert.ToInt32(reader["Level"]),
+                                        xp = Convert.ToInt32(reader["XP"]),
+                                        totalQuizzes = Convert.ToInt32(reader["TotalQuizzes"]),
+                                        avgScore = Convert.ToInt32(reader["AvgScore"])
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    else if (role == "instructor" || role == "Instructor")
+                    {
+                        res.instructor = new InstructorData { submissions = new List<SubmissionDto>() };
+                        
+                        using (SqlCommand cmd = new SqlCommand("SELECT Title, Chapter, Status FROM Submissions WHERE InstructorId = @Id ORDER BY CreatedAt DESC", conn))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", userId);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    res.instructor.submissions.Add(new SubmissionDto
+                                    {
+                                        title = reader["Title"].ToString(),
+                                        chapter = reader["Chapter"].ToString(),
+                                        status = reader["Status"].ToString()
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    else if (role == "admin" || role == "Admin")
+                    {
+                        res.admin = new AdminData();
+                        using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Users", conn))
+                            res.admin.totalUsers = Convert.ToInt32(cmd.ExecuteScalar());
+                            
+                        using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Users WHERE Role = 'student'", conn))
+                            res.admin.totalStudents = Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                    else 
+                    {
+                        res.errorMessage = "Role not recognized: " + role;
+                    }
+                }
             }
-
-            int userId = Convert.ToInt32(Session["UserId"]);
-            Debug.WriteLine("PROFILE: Loading profile for UserId = " + userId);
-
-            using (SqlConnection conn = new SqlConnection(connStr))
+            catch (Exception ex)
             {
-                conn.Open();
-
-                // Load Name, Role, Level, XP from DB
-                string userQuery = @"
-                    SELECT Name, Role, Level, XP
-                    FROM Users
-                    WHERE Id = @Id";
-
-                using (SqlCommand cmd = new SqlCommand(userQuery, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Id", userId);
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        lblName.Text = reader["Name"].ToString();
-                        lblRole.Text = reader["Role"].ToString();
-                        lblLevel.Text = "Level " + reader["Level"].ToString();
-                        lblXP.Text = reader["XP"].ToString() + " XP";
-
-                        Debug.WriteLine("PROFILE: Name=" + lblName.Text);
-                        Debug.WriteLine("PROFILE: Role=" + lblRole.Text);
-                        Debug.WriteLine("PROFILE: Level=" + lblLevel.Text);
-                        Debug.WriteLine("PROFILE: XP=" + lblXP.Text);
-                    }
-                    else
-                    {
-                        Debug.WriteLine("PROFILE: No user found in DB for Id = " + userId);
-                    }
-                    reader.Close();
-                }
-
-                // Load Quiz Count + Average Score
-                string statsQuery = @"
-                    SELECT 
-                        COUNT(*) AS QuizCount,
-                        ISNULL(AVG(Percentage), 0) AS AvgScore
-                    FROM QuizResults
-                    WHERE UserId = @Id";
-
-                using (SqlCommand cmd = new SqlCommand(statsQuery, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Id", userId);
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        lblQuizCount.Text = reader["QuizCount"].ToString();
-                        lblAverage.Text = reader["AvgScore"].ToString() + "%";
-
-                        Debug.WriteLine("PROFILE: QuizCount=" + lblQuizCount.Text);
-                        Debug.WriteLine("PROFILE: AvgScore=" + lblAverage.Text);
-                    }
-                    reader.Close();
-                }
-
-                // Load Recent Activity
-                string historyQuery = @"
-                    SELECT TOP 10
-                        m.Title        AS ChapterName,
-                        qr.Percentage  AS Score,
-                        qr.CompletedAt AS DateTaken
-                    FROM QuizResults qr
-                    JOIN QuestionSets qs ON qr.SetId   = qs.Id
-                    JOIN Modules      m  ON qs.ModuleId = m.Id
-                    WHERE qr.UserId = @Id
-                    ORDER BY qr.CompletedAt DESC";
-
-                using (SqlCommand cmd = new SqlCommand(historyQuery, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Id", userId);
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    rptHistory.DataSource = reader;
-                    rptHistory.DataBind();
-                    reader.Close();
-                }
+                res.errorMessage = ex.Message;
             }
+            return res;
+        }
+
+        public class UpdateProfileResponse
+        {
+            public bool success { get; set; }
+            public string errorMessage { get; set; }
+        }
+
+        [System.Web.Services.WebMethod]
+        public static UpdateProfileResponse UpdateProfile(string name, string avatar)
+        {
+            var res = new UpdateProfileResponse { success = false };
+            try
+            {
+                if (System.Web.HttpContext.Current.Session["UserId"] == null)
+                {
+                    res.errorMessage = "Not logged in.";
+                    return res;
+                }
+
+                string userId = System.Web.HttpContext.Current.Session["UserId"].ToString();
+
+                string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    conn.Open();
+                    string query = "UPDATE Users SET Name = @Name, Avatar = @Avatar WHERE Id = @Id";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Name", name);
+                        cmd.Parameters.AddWithValue("@Avatar", avatar);
+                        cmd.Parameters.AddWithValue("@Id", userId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                System.Web.HttpContext.Current.Session["UserName"] = name;
+                System.Web.HttpContext.Current.Session["UserAvatar"] = avatar;
+
+                res.success = true;
+            }
+            catch (Exception ex)
+            {
+                res.errorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public class LinkStudentResponse
+        {
+            public bool success { get; set; }
+            public string errorMessage { get; set; }
+        }
+
+        [System.Web.Services.WebMethod]
+        public static LinkStudentResponse LinkStudent(string parentId, string studentEmail)
+        {
+            var res = new LinkStudentResponse { success = false };
+            try
+            {
+                string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+                
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    conn.Open();
+                    
+                    // Look up the student by email
+                    string studentId = null;
+                    using (SqlCommand cmd = new SqlCommand("SELECT Id FROM Users WHERE Email = @Email AND Role = 'student'", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Email", studentEmail);
+                        object result = cmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            studentId = result.ToString();
+                        }
+                    }
+
+                    if (studentId == null)
+                    {
+                        res.errorMessage = "No student found with that email address.";
+                        return res;
+                    }
+
+                    // Generate random 8-character ID
+                    string linkId = Guid.NewGuid().ToString().Substring(0, 8);
+
+                    // Insert the link
+                    using (SqlCommand cmd = new SqlCommand(@"
+                        IF NOT EXISTS (SELECT 1 FROM ParentStudentLinks WHERE ParentId = @ParentId AND StudentId = @StudentId)
+                        BEGIN
+                            INSERT INTO ParentStudentLinks (Id, ParentId, StudentId, LinkedAt)
+                            VALUES (@LinkId, @ParentId, @StudentId, GETDATE())
+                        END
+                    ", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@LinkId", linkId);
+                        cmd.Parameters.AddWithValue("@ParentId", parentId);
+                        cmd.Parameters.AddWithValue("@StudentId", studentId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                res.success = true;
+            }
+            catch (Exception ex)
+            {
+                res.errorMessage = ex.Message;
+            }
+            return res;
+        }
+
+        public class UnlinkStudentResponse
+        {
+            public bool success { get; set; }
+            public string errorMessage { get; set; }
+        }
+
+        [System.Web.Services.WebMethod]
+        public static UnlinkStudentResponse UnlinkStudent(string parentId, string studentId)
+        {
+            var res = new UnlinkStudentResponse { success = false };
+            try
+            {
+                string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+                
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand("DELETE FROM ParentStudentLinks WHERE ParentId = @ParentId AND StudentId = @StudentId", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ParentId", parentId);
+                        cmd.Parameters.AddWithValue("@StudentId", studentId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                res.success = true;
+            }
+            catch (Exception ex)
+            {
+                res.errorMessage = ex.Message;
+            }
+            return res;
         }
     }
 }

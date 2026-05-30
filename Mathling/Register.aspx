@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Register" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Register.aspx.cs" Inherits="Mathling.Register" %>
+<%@ Page Title="Register" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Register.aspx.cs" Inherits="Mathling.Register" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/login.css">
@@ -71,7 +71,6 @@
                             <asp:ListItem Text="Select Role" Value=""></asp:ListItem>
                             <asp:ListItem Text="Student" Value="student"></asp:ListItem>
                             <asp:ListItem Text="Parent" Value="parent"></asp:ListItem>
-                            <asp:ListItem Text="Instructor" Value="instructor"></asp:ListItem>
                         </asp:DropDownList>
                     </div>
 
@@ -106,7 +105,7 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=9"></script>
+    <script src="/js/app.js?v=10"></script>
 </asp:Content>
 
 

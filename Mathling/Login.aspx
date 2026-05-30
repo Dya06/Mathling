@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Mathling.Login" %>
+<%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="Mathling.Login" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/login.css">
@@ -25,14 +25,7 @@
         <p id="auth-subtitle">Log in to continue your learning adventure</p>
       </div>
 
-      <!-- Tabs -->
-      <div class="auth-tabs">
-        <button type="button" class="auth-tab active" data-mode="login">Log In</button>
-        <button type="button" class="auth-tab" data-mode="register">Register</button>
-      </div>
-
-      <div class="auth-card" id="auth-form">
-
+      <div class="auth-card" id="auth-form" style="margin-top: 2rem;">
         <!-- Login Form -->
         <div id="login-form">
           <div class="form-group">
@@ -53,50 +46,10 @@
               CssClass="btn btn-primary btn-lg"
               Style="width:100%" />
         </div>
+      </div>
 
-        <!-- Register Form (hidden) -->
-        <div id="register-form" style="display:none">
-          <div class="form-group">
-            <label class="form-label" for="RegName">Full Name</label>
-            <asp:TextBox ID="RegName" runat="server" CssClass="form-input" placeholder="Enter your name" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="RegEmail">Email</label>
-            <asp:TextBox ID="RegEmail" runat="server" CssClass="form-input" placeholder="Enter your email" TextMode="Email" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="RegPassword">Password</label>
-            <asp:TextBox ID="RegPassword" runat="server" CssClass="form-input" placeholder="Create a password" TextMode="Password" />
-          </div>
-          <asp:HiddenField ID="RegRole" runat="server" ClientIDMode="Static" />
-          <div class="role-selector">
-            <label class="form-label">I am a...</label>
-            <div class="role-grid">
-              <div class="role-option" data-role="student">
-                <span class="role-emoji"></span>
-                <span class="role-name">Student</span>
-              </div>
-              <div class="role-option" data-role="parent">
-                <span class="role-emoji"></span>
-                <span class="role-name">Parent</span>
-              </div>
-              <div class="role-option" data-role="instructor">
-                <span class="role-emoji"></span>
-                <span class="role-name">Instructor</span>
-              </div>
-              <div class="role-option" data-role="admin">
-                <span class="role-emoji"></span>
-                <span class="role-name">Admin</span>
-              </div>
-            </div>
-          </div>
-          <asp:Button ID="RegBtn" runat="server" Text="Create Account"
-              OnClick="RegBtn_Click"
-              OnClientClick="return validateRegistration();"
-              CssClass="btn btn-primary btn-lg"
-              Style="width:100%" />
-        </div>
-
+      <div style="text-align: center; margin-top: 1rem;">
+        <p>Don't have an account? <a href="Register.aspx" style="color: var(--accent-blue); font-weight: bold; text-decoration: none;">Register</a></p>
       </div>
 
       <!-- Demo Accounts -->
@@ -132,19 +85,12 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=9"></script>
-    <script src="/js/auth.js?v=7"></script>
+    <script src="/js/app.js?v=10"></script>
     <script>
         function fillDemo(email, password) {
-            // Switch to login tab
-            document.querySelector('[data-mode="login"]').click();
-            // Fill the ASP.NET TextBox controls (they render with the ID intact)
             document.getElementById('<%= LoginEmail.ClientID %>').value = email;
-        document.getElementById('<%= LoginPassword.ClientID %>').value = password;
+            document.getElementById('<%= LoginPassword.ClientID %>').value = password;
             App.showToast('Demo credentials filled! Click Log In.', 'info');
         }
     </script>
 </asp:Content>
-
-
-

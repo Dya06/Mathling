@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -39,7 +39,7 @@ namespace Mathling
                 conn.Open();
 
                 string query = @"
-                    SELECT Id, Name, Role, PasswordHash
+                    SELECT Id, Name, Role, PasswordHash, Avatar
                     FROM Users
                     WHERE Email = @Email
                     AND IsActive = 1";
@@ -55,6 +55,7 @@ namespace Mathling
                     string role = reader["Role"].ToString();
                     string name = reader["Name"].ToString();
                     string id = reader["Id"].ToString();
+                    string avatar = reader["Avatar"] == DBNull.Value ? null : reader["Avatar"].ToString();
 
                     string inputHash = HashPassword(password);
 
@@ -64,6 +65,7 @@ namespace Mathling
                         Session["UserRole"] = role;
                         Session["UserName"] = name;
                         Session["UserEmail"] = email;
+                        Session["UserAvatar"] = avatar;
 
 
                         RedirectByRole(role);
@@ -117,78 +119,5 @@ namespace Mathling
                 return builder.ToString();
             }
         }
-
-        // =========================
-        //  REGISTER BUTTON CLICK
-        // =========================
-        protected void RegBtn_Click(object sender, EventArgs e)
-        {
-            string name = RegName.Text.Trim();
-            string email = RegEmail.Text.Trim();
-            string password = RegPassword.Text;
-            string role = RegRole.Value; // Gets value from HiddenField set by JS
-
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(role))
-            {
-                ShowError("Please fill in all registration fields and select a role.");
-                return;
-            }
-
-            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
-
-            using (SqlConnection conn = new SqlConnection(connStr))
-            {
-                conn.Open();
-
-                // Check if email exists
-                string checkQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
-                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
-                {
-                    checkCmd.Parameters.AddWithValue("@Email", email);
-                    int exists = (int)checkCmd.ExecuteScalar();
-                    if (exists > 0)
-                    {
-                        ShowError("An account with that email already exists.");
-                        return;
-                    }
-                }
-
-                // Generate the next VARCHAR user ID because Users.Id is VARCHAR(10), not INT.
-                string newUserId;
-                using (SqlCommand idCmd = new SqlCommand(@"
-                    SELECT ISNULL(MAX(CAST([Id] AS INT)), 0) + 1
-                    FROM [Users]
-                    WHERE ISNUMERIC([Id]) = 1", conn))
-                {
-                    int nextId = Convert.ToInt32(idCmd.ExecuteScalar());
-                    newUserId = nextId.ToString("000");
-                }
-
-                // Insert user
-                string insertQuery = @"
-                    INSERT INTO Users (Id, Name, Email, PasswordHash, Role, Level, XP)
-                    VALUES (@Id, @Name, @Email, @PasswordHash, @Role, 1, 0)";
-
-                using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Id", newUserId);
-                    cmd.Parameters.AddWithValue("@Name", name);
-                    cmd.Parameters.AddWithValue("@Email", email);
-                    cmd.Parameters.AddWithValue("@PasswordHash", HashPassword(password));
-                    cmd.Parameters.AddWithValue("@Role", role);
-
-                    cmd.ExecuteNonQuery();
-
-                    //  Log them in automatically
-                    Session["UserId"] = newUserId;
-                    Session["UserRole"] = role;
-                    Session["UserName"] = name;
-                    Session["UserEmail"] = email;
-
-                    RedirectByRole(role);
-                }
-            }
-        }
     }
 }
-

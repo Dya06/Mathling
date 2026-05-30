@@ -988,7 +988,7 @@ namespace Mathling
                     SELECT qs.[Id], qs.[ModuleId], qs.[Label], qs.[DisplayMode], qs.[SortOrder]
                     FROM [QuestionSets] qs
                     INNER JOIN [Modules] m ON qs.[ModuleId] = m.[Id]
-                    WHERE m.[FormulaId] = @FormulaId
+                    WHERE m.[FormulaId] = @FormulaId AND qs.[Status] = 'approved'
                     ORDER BY m.[SortOrder], qs.[SortOrder]", conn))
                 {
                     cmd.Parameters.AddWithValue("@FormulaId", formula.Id);
@@ -1139,4 +1139,5 @@ namespace Mathling
         public List<int> Rows { get; set; }
     }
 }
+
 

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Forum" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Forum.aspx.cs" Inherits="Mathling.Forum" %>
+<%@ Page Title="Forum" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Forum.aspx.cs" Inherits="Mathling.Forum" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/forum.css">
@@ -63,8 +63,8 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=9"></script>
-    <script src="/js/forum.js"></script>
+    <script src="/js/app.js?v=10"></script>
+    <script src="/js/forum.js?v=2"></script>
 </asp:Content>
 
 
