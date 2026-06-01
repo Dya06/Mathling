@@ -113,11 +113,7 @@
           <p>Our platform combines proven abacus techniques with modern gamification to make learning math genuinely enjoyable.</p>
         </div>
         <div class="feature-grid">
-          <div class="feature-card" data-animate>
-            <div class="feature-icon yellow">&#x1F9EE;</div>
-            <h3>Interactive Abacus</h3>
-            <p>A beautifully designed digital abacus with smooth bead interactions that makes learning tactile and fun.</p>
-          </div>
+         
           <div class="feature-card" data-animate>
             <div class="feature-icon blue">&#x1F3AE;</div>
             <h3>Gamified Learning</h3>
