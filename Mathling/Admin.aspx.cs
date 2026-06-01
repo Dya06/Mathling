@@ -49,16 +49,16 @@ namespace Mathling
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
-                
+
                 using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Users", conn))
                     stats.totalUsers = (int)cmd.ExecuteScalar();
-                    
+
                 using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM QuizResults", conn))
                     stats.totalQuizzes = (int)cmd.ExecuteScalar();
-                    
+
                 using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Submissions", conn))
                     stats.contentItems = (int)cmd.ExecuteScalar();
-                    
+
                 using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Submissions WHERE Status = 'pending'", conn))
                     stats.pendingReviews = (int)cmd.ExecuteScalar();
             }
@@ -164,11 +164,54 @@ namespace Mathling
                 conn.Open();
                 // Avatar is linked to role, so we update it as well if it's one of the defaults
                 string query = "UPDATE Users SET Name = @Name, Role = @Role, Avatar = @Role WHERE Id = @Id";
-                using(SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@Name", name);
                     cmd.Parameters.AddWithValue("@Role", role);
                     cmd.Parameters.AddWithValue("@Id", targetUserId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod(EnableSession = true)]
+        public static string AddUser(string name, string email, string password, string role)
+        {
+            if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")
+                return "error|Unauthorized";
+
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(role))
+                return "error|All fields are required";
+
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                using (SqlCommand checkCmd = new SqlCommand("SELECT COUNT(1) FROM Users WHERE Email = @Email", conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@Email", email);
+                    if ((int)checkCmd.ExecuteScalar() > 0)
+                        return "error|Email already in use";
+                }
+
+                string passwordHash;
+                using (System.Security.Cryptography.SHA256 sha256 = System.Security.Cryptography.SHA256.Create())
+                {
+                    byte[] bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    foreach (byte b in bytes) sb.Append(b.ToString("X2"));
+                    passwordHash = sb.ToString();
+                }
+
+                string query = "INSERT INTO Users (Name, Email, PasswordHash, Role, Avatar, Level, XP, CreatedAt, IsActive) VALUES (@Name, @Email, @PasswordHash, @Role, @Avatar, 1, 0, GETDATE(), 1)";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", name);
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    cmd.Parameters.AddWithValue("@PasswordHash", passwordHash);
+                    cmd.Parameters.AddWithValue("@Role", role);
+                    cmd.Parameters.AddWithValue("@Avatar", role);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -236,23 +279,32 @@ namespace Mathling
 
             var items = new List<ContentItemDto>();
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
+                EnsureModerationTables(conn);
+
                 string query = @"
-                    SELECT 
-                        qs.Id, qs.Label, qs.DisplayMode, qs.Status, qs.Reason, qs.SubmittedAt,
-                        f.Name as FormulaName,
-                        m.Title as ModuleTitle,
-                        u.Name as InstructorName,
-                        (SELECT COUNT(*) FROM Questions q WHERE q.SetId = qs.Id) as QuestionCount
-                    FROM QuestionSets qs
-                    INNER JOIN Modules m ON qs.ModuleId = m.Id
-                    INNER JOIN Formulas f ON m.FormulaId = f.Id
-                    LEFT JOIN Users u ON qs.CreatedBy = u.Id
-                    ORDER BY 
-                        CASE qs.Status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END,
-                        qs.SubmittedAt DESC, qs.Id DESC";
+                    SELECT
+                        s.[Id],
+                        COALESCE(s.[Label], s.[Title]) AS [Label],
+                        COALESCE(s.[DisplayMode], s.[Difficulty]) AS [DisplayMode],
+                        s.[Status],
+                        s.[Reason],
+                        s.[CreatedAt],
+                        f.[Name] AS [FormulaName],
+                        m.[Title] AS [ModuleTitle],
+                        u.[Name] AS [InstructorName],
+                        (SELECT COUNT(*) FROM [SubmissionQuestions] sq WHERE sq.[SubmissionId] = s.[Id]) AS [QuestionCount]
+                    FROM [Submissions] s
+                    LEFT JOIN [Modules] m ON s.[ModuleId] = m.[Id]
+                    LEFT JOIN [Formulas] f ON m.[FormulaId] = f.[Id]
+                    LEFT JOIN [Users] u ON s.[InstructorId] = u.[Id]
+                    ORDER BY
+                        CASE s.[Status] WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END,
+                        s.[CreatedAt] DESC,
+                        s.[Id] DESC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 using (SqlDataReader reader = cmd.ExecuteReader())
@@ -263,20 +315,21 @@ namespace Mathling
                         {
                             id = reader["Id"].ToString(),
                             label = reader["Label"].ToString(),
-                            formulaName = reader["FormulaName"].ToString(),
-                            moduleTitle = reader["ModuleTitle"].ToString(),
-                            displayMode = reader["DisplayMode"].ToString(),
+                            formulaName = reader["FormulaName"] != DBNull.Value ? reader["FormulaName"].ToString() : "",
+                            moduleTitle = reader["ModuleTitle"] != DBNull.Value ? reader["ModuleTitle"].ToString() : "",
+                            displayMode = reader["DisplayMode"] != DBNull.Value ? reader["DisplayMode"].ToString() : "",
                             status = reader["Status"].ToString(),
                             reason = reader["Reason"] != DBNull.Value ? reader["Reason"].ToString() : "",
-                            instructor = reader["InstructorName"] != DBNull.Value ? reader["InstructorName"].ToString() : "System",
+                            instructor = reader["InstructorName"] != DBNull.Value ? reader["InstructorName"].ToString() : "Unknown",
                             questionCount = Convert.ToInt32(reader["QuestionCount"]),
-                            date = reader["SubmittedAt"] != DBNull.Value
-                                ? Convert.ToDateTime(reader["SubmittedAt"]).ToString("yyyy-MM-dd")
+                            date = reader["CreatedAt"] != DBNull.Value
+                                ? Convert.ToDateTime(reader["CreatedAt"]).ToString("yyyy-MM-dd")
                                 : ""
                         });
                     }
                 }
             }
+
             return items;
         }
 
@@ -287,13 +340,35 @@ namespace Mathling
                 return "error|Unauthorized";
 
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
-                using (SqlCommand cmd = new SqlCommand("UPDATE QuestionSets SET Status = 'approved', Reason = NULL WHERE Id = @Id", conn))
+                EnsureModerationTables(conn);
+
+                using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    cmd.Parameters.AddWithValue("@Id", setId);
-                    return cmd.ExecuteNonQuery() > 0 ? "success" : "error|Not found";
+                    try
+                    {
+                        ApproveSubmissionIntoQuizTables(conn, trans, setId);
+
+                        using (SqlCommand cmd = new SqlCommand(@"
+                            UPDATE [Submissions]
+                            SET [Status] = 'approved', [Reason] = NULL
+                            WHERE [Id] = @Id", conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", setId);
+                            if (cmd.ExecuteNonQuery() == 0) throw new Exception("Submission not found");
+                        }
+
+                        trans.Commit();
+                        return "success";
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return "error|" + ex.Message;
+                    }
                 }
             }
         }
@@ -308,12 +383,204 @@ namespace Mathling
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
-                using (SqlCommand cmd = new SqlCommand("UPDATE QuestionSets SET Status = 'rejected', Reason = @Reason WHERE Id = @Id", conn))
+                EnsureModerationTables(conn);
+
+                using (SqlCommand cmd = new SqlCommand(@"
+                    UPDATE [Submissions]
+                    SET [Status] = 'rejected', [Reason] = @Reason
+                    WHERE [Id] = @Id", conn))
                 {
-                    cmd.Parameters.AddWithValue("@Reason", string.IsNullOrEmpty(reason) ? (object)DBNull.Value : reason);
+                    cmd.Parameters.AddWithValue("@Reason", string.IsNullOrWhiteSpace(reason) ? (object)DBNull.Value : reason);
                     cmd.Parameters.AddWithValue("@Id", setId);
                     return cmd.ExecuteNonQuery() > 0 ? "success" : "error|Not found";
                 }
+            }
+        }
+
+        private static void ApproveSubmissionIntoQuizTables(SqlConnection conn, SqlTransaction trans, string submissionId)
+        {
+            string moduleId = null;
+            string label = null;
+            string displayMode = null;
+            int sortOrder = 1;
+            string existingLiveSetId = null;
+
+            using (SqlCommand cmd = new SqlCommand(@"
+                SELECT [ModuleId], COALESCE([Label], [Title]) AS [Label],
+                       COALESCE([DisplayMode], [Difficulty]) AS [DisplayMode],
+                       ISNULL([SortOrder], 1) AS [SortOrder],
+                       [LiveSetId]
+                FROM [Submissions]
+                WHERE [Id] = @Id", conn, trans))
+            {
+                cmd.Parameters.AddWithValue("@Id", submissionId);
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (!reader.Read()) throw new Exception("Submission not found");
+
+                    moduleId = reader["ModuleId"] != DBNull.Value ? reader["ModuleId"].ToString() : "";
+                    label = reader["Label"].ToString();
+                    displayMode = reader["DisplayMode"].ToString();
+                    sortOrder = Convert.ToInt32(reader["SortOrder"]);
+                    existingLiveSetId = reader["LiveSetId"] != DBNull.Value ? reader["LiveSetId"].ToString() : null;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(moduleId)) throw new Exception("Submission has no module");
+            if (!string.IsNullOrWhiteSpace(existingLiveSetId)) return;
+
+            string liveSetId = GenerateId("S", 10);
+
+            using (SqlCommand cmd = new SqlCommand(@"
+                INSERT INTO [QuestionSets] ([Id], [ModuleId], [Label], [DisplayMode], [SortOrder])
+                VALUES (@Id, @ModuleId, @Label, @DisplayMode, @SortOrder)", conn, trans))
+            {
+                cmd.Parameters.AddWithValue("@Id", liveSetId);
+                cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+                cmd.Parameters.AddWithValue("@Label", label);
+                cmd.Parameters.AddWithValue("@DisplayMode", displayMode);
+                cmd.Parameters.AddWithValue("@SortOrder", sortOrder);
+                cmd.ExecuteNonQuery();
+            }
+
+            var questionMap = new Dictionary<string, string>();
+
+            using (SqlCommand cmd = new SqlCommand(@"
+                SELECT [Id]
+                FROM [SubmissionQuestions]
+                WHERE [SubmissionId] = @SubmissionId
+                ORDER BY [SortOrder]", conn, trans))
+            {
+                cmd.Parameters.AddWithValue("@SubmissionId", submissionId);
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string submissionQuestionId = reader["Id"].ToString();
+                        questionMap[submissionQuestionId] = GenerateId("Q", 10);
+                    }
+                }
+            }
+
+            foreach (var pair in questionMap)
+            {
+                int answer;
+                int qSortOrder;
+
+                using (SqlCommand cmd = new SqlCommand(@"
+                    SELECT [Answer], [SortOrder]
+                    FROM [SubmissionQuestions]
+                    WHERE [Id] = @Id", conn, trans))
+                {
+                    cmd.Parameters.AddWithValue("@Id", pair.Key);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read()) throw new Exception("Submission question missing");
+                        answer = Convert.ToInt32(reader["Answer"]);
+                        qSortOrder = Convert.ToInt32(reader["SortOrder"]);
+                    }
+                }
+
+                using (SqlCommand cmd = new SqlCommand(@"
+                    INSERT INTO [Questions] ([Id], [SetId], [Answer], [SortOrder])
+                    VALUES (@Id, @SetId, @Answer, @SortOrder)", conn, trans))
+                {
+                    cmd.Parameters.AddWithValue("@Id", pair.Value);
+                    cmd.Parameters.AddWithValue("@SetId", liveSetId);
+                    cmd.Parameters.AddWithValue("@Answer", answer);
+                    cmd.Parameters.AddWithValue("@SortOrder", qSortOrder);
+                    cmd.ExecuteNonQuery();
+                }
+
+                var rowsToInsert = new List<Tuple<int, int>>();
+                using (SqlCommand cmd = new SqlCommand(@"
+                    SELECT [Value], [SortOrder]
+                    FROM [SubmissionQuestionRows]
+                    WHERE [SubmissionQuestionId] = @SubmissionQuestionId
+                    ORDER BY [SortOrder]", conn, trans))
+                {
+                    cmd.Parameters.AddWithValue("@SubmissionQuestionId", pair.Key);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            rowsToInsert.Add(new Tuple<int, int>(
+                                Convert.ToInt32(reader["Value"]),
+                                Convert.ToInt32(reader["SortOrder"])
+                            ));
+                        }
+                    }
+                }
+
+                foreach (var row in rowsToInsert)
+                {
+                    using (SqlCommand rowCmd = new SqlCommand(@"
+                        INSERT INTO [QuestionRows] ([Id], [QuestionId], [Value], [SortOrder])
+                        VALUES (@Id, @QuestionId, @Value, @SortOrder)", conn, trans))
+                    {
+                        rowCmd.Parameters.AddWithValue("@Id", GenerateId("R", 10));
+                        rowCmd.Parameters.AddWithValue("@QuestionId", pair.Value);
+                        rowCmd.Parameters.AddWithValue("@Value", row.Item1);
+                        rowCmd.Parameters.AddWithValue("@SortOrder", row.Item2);
+                        rowCmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            using (SqlCommand cmd = new SqlCommand("UPDATE [Submissions] SET [LiveSetId] = @LiveSetId WHERE [Id] = @Id", conn, trans))
+            {
+                cmd.Parameters.AddWithValue("@LiveSetId", liveSetId);
+                cmd.Parameters.AddWithValue("@Id", submissionId);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private static string GenerateId(string prefix, int maxLength)
+        {
+            string suffix = Guid.NewGuid().ToString("N").Substring(0, Math.Max(1, maxLength - prefix.Length)).ToUpper();
+            return (prefix + suffix).Substring(0, maxLength);
+        }
+
+        private static void EnsureModerationTables(SqlConnection conn)
+        {
+            string sql = @"
+IF COL_LENGTH('dbo.Submissions', 'ModuleId') IS NULL
+    ALTER TABLE [dbo].[Submissions] ADD [ModuleId] VARCHAR(10) NULL;
+
+IF COL_LENGTH('dbo.Submissions', 'Label') IS NULL
+    ALTER TABLE [dbo].[Submissions] ADD [Label] NVARCHAR(100) NULL;
+
+IF COL_LENGTH('dbo.Submissions', 'DisplayMode') IS NULL
+    ALTER TABLE [dbo].[Submissions] ADD [DisplayMode] NVARCHAR(20) NULL;
+
+IF COL_LENGTH('dbo.Submissions', 'SortOrder') IS NULL
+    ALTER TABLE [dbo].[Submissions] ADD [SortOrder] INT NULL;
+
+IF COL_LENGTH('dbo.Submissions', 'LiveSetId') IS NULL
+    ALTER TABLE [dbo].[Submissions] ADD [LiveSetId] VARCHAR(10) NULL;
+
+IF OBJECT_ID('dbo.SubmissionQuestions', 'U') IS NULL
+BEGIN
+    CREATE TABLE [dbo].[SubmissionQuestions] (
+        [Id] VARCHAR(10) NOT NULL PRIMARY KEY,
+        [SubmissionId] VARCHAR(10) NOT NULL,
+        [Answer] INT NOT NULL,
+        [SortOrder] INT NOT NULL
+    );
+END;
+
+IF OBJECT_ID('dbo.SubmissionQuestionRows', 'U') IS NULL
+BEGIN
+    CREATE TABLE [dbo].[SubmissionQuestionRows] (
+        [Id] VARCHAR(10) NOT NULL PRIMARY KEY,
+        [SubmissionQuestionId] VARCHAR(10) NOT NULL,
+        [Value] INT NOT NULL,
+        [SortOrder] INT NOT NULL
+    );
+END;";
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.ExecuteNonQuery();
             }
         }
 

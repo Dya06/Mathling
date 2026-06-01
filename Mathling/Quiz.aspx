@@ -1,4 +1,4 @@
-<%@ Page Title="Quiz" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
+﻿<%@ Page Title="Quiz" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/quiz.css?v=2">
@@ -48,7 +48,7 @@
         <asp:UpdatePanel ID="QuizUpdatePanel" runat="server" UpdateMode="Conditional">
             <ContentTemplate>
                 <asp:Timer ID="FlashTimer" runat="server" Interval="1000" Enabled="false" OnTick="FlashTimer_Tick" />
-                <asp:Timer ID="AssessmentTimer" runat="server" Interval="1000" Enabled="false" OnTick="AssessmentTimer_Tick" />
+                <asp:Timer ID="AssessmentTimer" runat="server" Interval="1000" Enabled="false" OnTick="AssessmentTimer_Tick" /> 
 
                 <div class="quiz-layout">
                     <aside class="quiz-sidebar">
@@ -75,13 +75,7 @@
                                         <span class="mod-icon"><%# GetModuleIcon(Eval("Icon")) %></span>
                                         <span class="mod-label"><%# Eval("Title") %></span>
                                         <asp:Literal ID="CompletedLiteral" runat="server" />
-                                    </asp:LinkButton>
-                                </ItemTemplate>
-                            </asp:Repeater>
-                        </div>
-                    </aside>
-
-                    <div class="quiz-main">
+                                    </asp:LinkButton></ItemTemplate></asp:Repeater></div></aside><div class="quiz-main">
                         <asp:Panel ID="MessagePanel" runat="server" Visible="false" CssClass="instruction-card">
                             <h3><asp:Literal ID="MessageTitleLiteral" runat="server" /></h3>
                             <p><asp:Literal ID="MessageBodyLiteral" runat="server" /></p>
@@ -95,9 +89,7 @@
                                 <strong><asp:Literal ID="StartRuleLiteral" runat="server" /></strong>
                             </p>
                             <p style="color:var(--text-tertiary);font-size:var(--text-sm);margin-bottom:var(--space-xl)">
-                                Select a module from the sidebar to begin learning.
-                            </p>
-                            <asp:Button ID="StartLearningButton" runat="server" Text=" Start Learning"
+                                Select a module from the sidebar to begin learning. </p><asp:Button ID="StartLearningButton" runat="server" Text=" Start Learning"
                                 CssClass="btn btn-primary btn-lg" OnClick="StartLearningButton_Click" />
                         </asp:Panel>
 
@@ -113,13 +105,8 @@
 
                             <asp:Panel ID="MentalBannerPanel" runat="server" Visible="false" CssClass="mental-banner">
                                 <div class="mental-icon"></div>
-                                <h3>Mental Mode</h3>
-                                <p>You cannot use the abacus for this module.<br />Imagine the beads moving in your mind.</p>
-                            </asp:Panel>
-
-                            <div style="text-align:center">
-                                <h3 style="margin-bottom:var(--space-lg)">Choose a Set</h3>
-                                <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
+                                <h3>Mental Mode</h3><p>You cannot use the abacus for this module.<br />Imagine the beads moving in your mind.</p></asp:Panel><div style="text-align:center">
+                                <h3 style="margin-bottom:var(--space-lg)">Choose a Set</h3><div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
                                     <asp:Repeater ID="SetRepeater" runat="server" OnItemCommand="SetRepeater_ItemCommand" OnItemDataBound="SetRepeater_ItemDataBound">
                                         <ItemTemplate>
                                             <asp:LinkButton ID="SetButton" runat="server" CssClass="btn btn-primary"
@@ -129,14 +116,7 @@
                                                     <%# Eval("QuestionCount") %> questions  <%# Eval("DisplayMode") %>
                                                 </span>
                                                 <asp:Literal ID="SetCompletedLiteral" runat="server" />
-                                            </asp:LinkButton>
-                                        </ItemTemplate>
-                                    </asp:Repeater>
-                                </div>
-                            </div>
-                        </asp:Panel>
-
-                        <asp:Panel ID="QuestionPanel" runat="server" Visible="false">
+                                            </asp:LinkButton></ItemTemplate></asp:Repeater></div></div></asp:Panel><asp:Panel ID="QuestionPanel" runat="server" Visible="false">
                             <div class="module-header" style="padding-bottom:var(--space-md);margin-bottom:var(--space-lg)">
                                 <span class="module-tag" id="QuestionTagSpan" runat="server">
                                     <asp:Literal ID="QuestionTagLiteral" runat="server" />
@@ -145,19 +125,14 @@
 
                             <asp:Panel ID="TimerPanel" runat="server" Visible="false" CssClass="assessment-timer">
                                 <div class="timer-value"><asp:Literal ID="TimerValueLiteral" runat="server" /></div>
-                                <div class="timer-label">Time Remaining</div>
-                                <div class="timer-bar">
+                                <div class="timer-label">Time Remaining</div><div class="timer-bar">
                                     <div class="timer-bar-fill" id="TimerFillDiv" runat="server"></div>
                                 </div>
                             </asp:Panel>
 
                             <asp:Panel ID="QuestionMentalBannerPanel" runat="server" Visible="false" CssClass="mental-banner" Style="margin-bottom:var(--space-lg)">
                                 <div class="mental-icon"></div>
-                                <h3>Use Mental Only!</h3>
-                                <p>Imagine the abacus beads moving. Use your hand movements!</p>
-                            </asp:Panel>
-
-                            <div class="quiz-progress">
+                                <h3>Use Mental Only!</h3><p>Imagine the abacus beads moving. Use your hand movements!</p></asp:Panel><div class="quiz-progress">
                                 <div class="quiz-progress-info">
                                     <span><asp:Literal ID="QuestionNumberLiteral" runat="server" /></span>
                                     <span><asp:Literal ID="ScoreLiteral" runat="server" /></span>
@@ -206,14 +181,9 @@
                             <div class="completion-stats">
                                 <div class="completion-stat">
                                     <div class="cs-value"><asp:Literal ID="CompleteCorrectLiteral" runat="server" /></div>
-                                    <div class="cs-label">Correct</div>
-                                </div>
-                                <div class="completion-stat">
+                                    <div class="cs-label">Correct</div></div><div class="completion-stat">
                                     <div class="cs-value"><asp:Literal ID="CompletePercentageLiteral" runat="server" /></div>
-                                    <div class="cs-label">Score</div>
-                                </div>
-                            </div>
-                            <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap;margin-top:var(--space-xl)">
+                                    <div class="cs-label">Score</div></div></div><div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap;margin-top:var(--space-xl)">
                                 <asp:Button ID="RetryButton" runat="server" Text=" Retry" CssClass="btn btn-secondary" OnClick="RetryButton_Click" />
                                 <asp:Button ID="BackToModuleButton" runat="server" Text="Finish Module" CssClass="btn btn-primary" OnClick="BackToModuleButton_Click" CausesValidation="false" UseSubmitBehavior="false" />
                             </div>
@@ -229,5 +199,6 @@
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=10"></script>
 </asp:Content>
+
 
 

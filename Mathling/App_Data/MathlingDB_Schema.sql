@@ -231,13 +231,52 @@ CREATE TABLE [dbo].[Submissions] (
     [Reason]        NVARCHAR(500)   NULL,
     [InstructorId]  INT             NOT NULL,
     [CreatedAt]     DATETIME2       NOT NULL DEFAULT GETDATE(),
+    [ModuleId]      VARCHAR(10)     NULL,
+    [Label]         NVARCHAR(100)   NULL,
+    [DisplayMode]   NVARCHAR(20)    NULL,
+    [SortOrder]     INT             NULL,
+    [LiveSetId]     VARCHAR(10)     NULL,
 
     CONSTRAINT [FK_Submissions_Users]
     FOREIGN KEY ([InstructorId])
     REFERENCES [dbo].[Users]([Id]),
 
+    CONSTRAINT [FK_Submissions_Modules]
+    FOREIGN KEY ([ModuleId])
+    REFERENCES [dbo].[Modules]([Id]),
+
     CONSTRAINT [CK_Submissions_Status]
     CHECK ([Status] IN ('pending','approved','rejected'))
+);
+GO
+
+-- =========================================================================
+-- SUBMISSION QUESTIONS (draft questions before admin approval)
+-- =========================================================================
+CREATE TABLE [dbo].[SubmissionQuestions] (
+    [Id]            VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [SubmissionId]  VARCHAR(10)     NOT NULL,
+    [Answer]        INT             NOT NULL,
+    [SortOrder]     INT             NOT NULL,
+
+    CONSTRAINT [FK_SubmissionQuestions_Submissions]
+    FOREIGN KEY ([SubmissionId])
+    REFERENCES [dbo].[Submissions]([Id])
+);
+GO
+
+-- =========================================================================
+-- SUBMISSION QUESTION ROWS (draft row values before admin approval)
+-- =========================================================================
+CREATE TABLE [dbo].[SubmissionQuestionRows] (
+    [Id]                    VARCHAR(10)     NOT NULL PRIMARY KEY,
+    [SubmissionQuestionId]  VARCHAR(10)     NOT NULL,
+    [Value]                 INT             NOT NULL,
+    [SortOrder]             INT             NOT NULL,
+
+    CONSTRAINT [FK_SubmissionQuestionRows_SubmissionQuestions]
+    FOREIGN KEY ([SubmissionQuestionId])
+    REFERENCES [dbo].[SubmissionQuestions]([Id])
 );
 GO
 

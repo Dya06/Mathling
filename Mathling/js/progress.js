@@ -27,8 +27,76 @@ const Progress = {
     
     try {
       const urlParams = new URLSearchParams(window.location.search);
-      const studentId = urlParams.get('studentId') || '';
+      const studentIdParam = urlParams.get('studentId') || '';
 
+      if (App.state.currentUser.role === 'admin' || App.state.currentUser.role === 'parent') {
+          await this.loadStudents(studentIdParam);
+      }
+
+      await this.loadData(studentIdParam);
+
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        if (this.currentData) {
+          setTimeout(() => {
+            this.drawLineChart(this.currentData.History);
+            this.drawDonutChart(this.currentData.ChaptersDone, this.currentData.TotalChapters);
+          }, 50);
+        }
+      });
+    } catch (error) {
+      console.error('Failed to init progress:', error);
+    }
+  },
+
+  async loadStudents(activeStudentId) {
+    try {
+      const response = await fetch('Progress.aspx/GetStudents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            userId: App.state.currentUser.id,
+            role: App.state.currentUser.role
+        })
+      });
+      const result = await response.json();
+      const students = result.d;
+
+      const container = document.getElementById('student-selector-container');
+      const select = document.getElementById('student-selector');
+      
+      if (students && students.length > 0) {
+          container.style.display = 'block';
+          select.innerHTML = '<option value="">All Linked Students</option>';
+          if (App.state.currentUser.role === 'admin') {
+              select.innerHTML = '<option value="">All Students (Global)</option>';
+          }
+          
+          students.forEach(s => {
+              const option = document.createElement('option');
+              option.value = s.Id;
+              option.textContent = s.Name;
+              if (s.Id === activeStudentId) option.selected = true;
+              select.appendChild(option);
+          });
+
+          select.addEventListener('change', (e) => {
+              const val = e.target.value;
+              const url = new URL(window.location);
+              if (val) url.searchParams.set('studentId', val);
+              else url.searchParams.delete('studentId');
+              
+              // Push state and reload data without refreshing page
+              window.history.pushState({}, '', url);
+              this.loadData(val);
+          });
+      }
+    } catch (error) {
+      console.error('Failed to load students:', error);
+    }
+  },
+
+  async loadData(studentId) {
+    try {
       const response = await fetch('Progress.aspx/GetProgressData', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -40,10 +108,13 @@ const Progress = {
       });
       const result = await response.json();
       const data = result.d;
+      this.currentData = data;
 
       this.renderStats(data);
-      this.drawLineChart(data.History);
-      this.drawDonutChart(data.ChaptersDone, data.TotalChapters);
+      setTimeout(() => {
+        this.drawLineChart(data.History);
+        this.drawDonutChart(data.ChaptersDone, data.TotalChapters);
+      }, 50);
       this.renderHistory(data.History);
     } catch (error) {
       console.error('Failed to load progress data:', error);

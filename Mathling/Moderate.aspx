@@ -1,4 +1,4 @@
-<%@ Page Title="Moderation" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Moderate.aspx.cs" Inherits="Mathling.Moderate" %>
+﻿<%@ Page Title="Moderation" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Moderate.aspx.cs" Inherits="Mathling.Moderate" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/moderate.css">
@@ -92,5 +92,6 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=10"></script>
-    <script src="/js/moderate.js?v=4"></script>
+    <script src="/js/moderate.js?v=5"></script>
 </asp:Content>
+

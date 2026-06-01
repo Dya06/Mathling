@@ -249,34 +249,6 @@
     </section>
   </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid" style="grid-template-columns: 2fr 1fr 1fr;">
-        <div>
-          <div class="footer-brand">
-            <img src="/favicon.svg" alt="Mathlings" width="32" height="32" />
-            <span class="navbar-title">Math<span>lings</span></span>
-          </div>
-          <p class="footer-desc">Making mental arithmetic fun and accessible for every child through the timeless power of the abacus.</p>
-        </div>
-        <div>
-          <h4 class="footer-title">Platform</h4>
-          <a href="Quiz.aspx" class="footer-link">Learning Center</a>
-          <a href="Progress.aspx" class="footer-link">Progress Tracking</a>
-          <a href="Forum.aspx" class="footer-link">Community Forum</a>
-        </div>
-        <div>
-          <h4 class="footer-title">Company</h4>
-          <a href="#" class="footer-link">About Us</a>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>&copy; 2026 Mathlings. All rights reserved.</span>
-      </div>
-    </div>
-  </footer>
-
 </asp:Content>
 
 <asp:Content ID="Scripts" ContentPlaceHolderID="ScriptContent" runat="server">

@@ -32,6 +32,64 @@ namespace Mathling
             public int stars { get; set; }
         }
 
+        public class StudentItem
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        [WebMethod]
+        public static List<StudentItem> GetStudents(string userId, string role)
+        {
+            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
+            List<StudentItem> students = new List<StudentItem>();
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+                string query = "";
+
+                if (role == "parent" || role == "Parent")
+                {
+                    query = @"
+                        SELECT u.Id, u.Name
+                        FROM Users u
+                        JOIN ParentStudentLinks psl ON u.Id = psl.StudentId
+                        WHERE psl.ParentId = @UserId AND u.Role = 'student'
+                        ORDER BY u.Name";
+                }
+                else if (role == "admin" || role == "Admin")
+                {
+                    query = @"
+                        SELECT Id, Name
+                        FROM Users
+                        WHERE Role = 'student'
+                        ORDER BY Name";
+                }
+                else
+                {
+                    return students; // return empty for students
+                }
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            students.Add(new StudentItem
+                            {
+                                Id = reader["Id"].ToString(),
+                                Name = reader["Name"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return students;
+        }
+
         [WebMethod]
         public static ProgressData GetProgressData(string userId, string role, string studentId)
         {
@@ -43,11 +101,40 @@ namespace Mathling
             {
                 conn.Open();
 
-                // Build query based on role
                 string historyQuery = "";
                 string compQuery = "";
 
-                if (role == "parent" || role == "Parent")
+                if (role == "admin" || role == "Admin")
+                {
+                    if (!string.IsNullOrEmpty(studentId))
+                    {
+                        historyQuery = @"
+                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
+                            FROM QuizResults qr
+                            JOIN QuestionSets qs ON qr.SetId = qs.Id
+                            JOIN Modules m ON qs.ModuleId = m.Id
+                            WHERE qr.UserId = @StudentId
+                            ORDER BY qr.CompletedAt ASC";
+                        compQuery = @"
+                            SELECT 
+                                (SELECT COUNT(*) FROM ModuleProgress WHERE UserId = @StudentId AND IsCompleted = 1) as ChaptersDone,
+                                (SELECT COUNT(*) FROM Modules) as TotalChapters";
+                    }
+                    else
+                    {
+                        historyQuery = @"
+                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
+                            FROM QuizResults qr
+                            JOIN QuestionSets qs ON qr.SetId = qs.Id
+                            JOIN Modules m ON qs.ModuleId = m.Id
+                            ORDER BY qr.CompletedAt ASC";
+                        compQuery = @"
+                            SELECT 
+                                (SELECT COUNT(*) FROM ModuleProgress WHERE IsCompleted = 1) as ChaptersDone,
+                                (SELECT COUNT(*) FROM Modules) as TotalChapters";
+                    }
+                }
+                else if (role == "parent" || role == "Parent")
                 {
                     if (!string.IsNullOrEmpty(studentId))
                     {
@@ -116,7 +203,6 @@ namespace Mathling
                             totalScore += score;
                             if (score > data.BestScore) data.BestScore = score;
 
-                            // Calculate stars (>=80: 3, >=50: 2, else 1)
                             int stars = score >= 80 ? 3 : (score >= 50 ? 2 : 1);
                             
                             string timeStr = $"{timeSec / 60}:{(timeSec % 60).ToString("D2")}";
