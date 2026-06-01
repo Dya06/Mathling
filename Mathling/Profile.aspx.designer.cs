@@ -77,4 +77,6 @@ namespace Mathling
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater rptHistory;
     }
+
+
 }
