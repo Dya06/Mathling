@@ -60,7 +60,10 @@ const Admin = {
         </div>
       </div>
     `).join('');
-    } catch(e) { console.error('Failed to load stats', e); }
+    } catch(e) { 
+      console.error('Failed to load stats', e); 
+      App.showToast('Stats error: ' + (e.message || e), 'error');
+    }
   },
 
   async renderUsers() {
@@ -88,7 +91,10 @@ const Admin = {
           <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="Admin.deleteUser(${u.id})">Delete</button>
         </div>
       `).join('');
-    } catch(e) { console.error('Failed to load users', e); }
+    } catch(e) { 
+      console.error('Failed to load users', e); 
+      App.showToast('Users error: ' + (e.message || e), 'error');
+    }
   },
 
   async renderActivity() {
@@ -107,7 +113,10 @@ const Admin = {
           <span class="activity-time">${a.time}</span>
         </div>
       `).join('');
-    } catch(e) { console.error('Failed to load activity', e); }
+    } catch(e) { 
+      console.error('Failed to load activity', e);
+      App.showToast('Activity error: ' + (e.message || e), 'error');
+    }
   },
 
   async renderModeration() {
@@ -142,7 +151,7 @@ const Admin = {
         </div>
       `).join('');
     } catch(e) {
-      console.error('Failed to load moderation items', e);
+      App.showToast('Moderation error: ' + (e.message || e), 'error');
       container.innerHTML = '<p style="color:var(--text-tertiary);padding:var(--space-md);font-size:var(--text-sm)">Failed to load content.</p>';
     }
   },
