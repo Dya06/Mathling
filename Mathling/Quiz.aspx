@@ -49,7 +49,7 @@
             <ContentTemplate>
                 <asp:Timer ID="FlashTimer" runat="server" Interval="1000" Enabled="false" OnTick="FlashTimer_Tick" />
                 <asp:Timer ID="AssessmentTimer" runat="server" Interval="1000" Enabled="false" OnTick="AssessmentTimer_Tick" /> 
-
+                choo
                 <div class="quiz-layout">
                     <aside class="quiz-sidebar">
                         <div class="formula-badge">
@@ -106,6 +106,22 @@
                             <asp:Panel ID="MentalBannerPanel" runat="server" Visible="false" CssClass="mental-banner">
                                 <div class="mental-icon"></div>
                                 <h3>Mental Mode</h3><p>You cannot use the abacus for this module.<br />Imagine the beads moving in your mind.</p></asp:Panel><div style="text-align:center">
+
+                                <asp:Panel ID="LearningVideoPanel" runat="server" CssClass="learning-video-panel" Visible="false">
+                                    <h3 class="learning-video-title">Watch the lesson first</h3>
+
+                                    <div class="learning-video-box">
+                                        <video 
+                                            id="LearningVideoPlayer"
+                                            runat="server"
+                                            class="learning-video-player"
+                                            controls
+                                            preload="metadata">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                </asp:Panel>
+
                                 <h3 style="margin-bottom:var(--space-lg)">Choose a Set</h3><div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
                                     <asp:Repeater ID="SetRepeater" runat="server" OnItemCommand="SetRepeater_ItemCommand" OnItemDataBound="SetRepeater_ItemDataBound">
                                         <ItemTemplate>
@@ -164,7 +180,6 @@
                                 <asp:Button runat="server" Text="9" CssClass="numpad-btn" CommandArgument="9" OnCommand="Numpad_Command" />
                                 <asp:Button runat="server" Text="0" CssClass="numpad-btn" CommandArgument="0" OnCommand="Numpad_Command" />
                                 <asp:Button runat="server" Text="C" CssClass="numpad-btn clear" CommandArgument="clear" OnCommand="Numpad_Command" />
-                                <asp:Button runat="server" Text="" CssClass="numpad-btn" CommandArgument="back" OnCommand="Numpad_Command" />
                                 <asp:Button runat="server" Text=" Submit" CssClass="numpad-btn submit" CommandArgument="submit" OnCommand="Numpad_Command" />
                             </div>
                         </asp:Panel>

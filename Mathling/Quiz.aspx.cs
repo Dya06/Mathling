@@ -211,6 +211,51 @@ namespace Mathling
             BindBaseContent();
         }
 
+        private void ConfigureLearningVideo(QuizModule module)
+        {
+            LearningVideoPanel.Visible = false;
+            LearningVideoPlayer.Attributes["src"] = "";
+
+            if (module == null)
+            {
+                return;
+            }
+
+            bool isLearningModule = string.Equals(module.ModuleKey, "learning", StringComparison.OrdinalIgnoreCase);
+
+            if (!isLearningModule)
+            {
+                return;
+            }
+
+            string videoPath = "";
+
+            switch (SelectedFormulaName)
+            {
+                case "SF+4":
+                    videoPath = ResolveUrl("~/videos/SF4.mp4");
+                    break;
+
+                case "SF+3":
+                    videoPath = ResolveUrl("~/videos/SF3.mp4");
+                    break;
+
+                case "SF+2":
+                    videoPath = ResolveUrl("~/videos/SF2.mp4");
+                    break;
+
+                case "SF+1":
+                    videoPath = ResolveUrl("~/videos/SF1.mp4");
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(videoPath))
+            {
+                LearningVideoPanel.Visible = true;
+                LearningVideoPlayer.Attributes["src"] = videoPath;
+            }
+        }
+
         private void ShowModuleIntro()
         {
             QuizModule module = GetSelectedModule();
@@ -219,6 +264,8 @@ namespace Mathling
                 ShowStartScreen();
                 return;
             }
+
+            ConfigureLearningVideo(module);
 
             HideAllPanels();
             ModuleIntroPanel.Visible = true;
@@ -241,6 +288,7 @@ namespace Mathling
             }).ToList();
             SetRepeater.DataBind();
         }
+
 
         protected void SetRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
