@@ -27,11 +27,7 @@
       <div class="admin-stats" id="admin-stats"></div>
 
       <!-- Charts & Activity -->
-      <div class="admin-grid">
-        <div class="admin-card">
-          <h3> Weekly Activity</h3>
-          <div class="activity-chart-wrap"><canvas id="bar-chart"></canvas></div>
-        </div>
+      <div class="admin-grid" style="grid-template-columns: 1fr;">
         <div class="admin-card">
           <h3> Recent Activity</h3>
           <div class="activity-list" id="activity-feed"></div>
@@ -66,7 +62,7 @@
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
     <script src="/js/app.js?v=10"></script>
-    <script src="/js/admin.js?v=6"></script>
+    <script src="/js/admin.js?v=7"></script>
 </asp:Content>
 
 
