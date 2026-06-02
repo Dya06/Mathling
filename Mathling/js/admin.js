@@ -32,14 +32,14 @@ const Admin = {
     this.renderUsers();
     this.renderActivity();
     this.renderModeration();
-    this.drawBarChart();
   },
 
   async renderStats() {
     try {
       const response = await fetch('Admin.aspx/GetStats', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
       });
       const result = await response.json();
       const s = result.d;
@@ -67,7 +67,8 @@ const Admin = {
     try {
       const response = await fetch('Admin.aspx/GetUsers', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
       });
       const result = await response.json();
       const users = result.d;
@@ -94,7 +95,8 @@ const Admin = {
     try {
       const response = await fetch('Admin.aspx/GetActivity', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
       });
       const result = await response.json();
       const activity = result.d;
@@ -113,7 +115,8 @@ const Admin = {
     try {
       const response = await fetch('Admin.aspx/GetContentItems', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
       });
       const result = await response.json();
       const items = result.d || [];
@@ -188,63 +191,7 @@ const Admin = {
     }
   },
 
-  drawBarChart() {
-    const canvas = document.getElementById('bar-chart');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 200 * dpr;
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = '200px';
-    ctx.scale(dpr, dpr);
 
-    const w = rect.width, h = 200;
-
-    /*
-     * BACKEND TODO:
-     * Replace with: const weeklyData = await fetch('/api/admin/analytics/weekly').then(r => r.json());
-     * Server should return { labels: ['Mon','Tue',...], values: [12, 19, ...] }
-     */
-
-    // Show placeholder message when no backend data
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#9A9A9A';
-    ctx.font = '13px Nunito, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Weekly activity chart — connect backend for live data', w / 2, h / 2);
-
-    // Draw sample bar structure (light placeholder)
-    const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const pad = { top: 10, right: 10, bottom: 30, left: 10 };
-    const cw = w - pad.left - pad.right;
-    const gap = cw / labels.length;
-    const barW = gap * 0.6;
-
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || 'rgba(0,0,0,0.08)';
-    labels.forEach((label, i) => {
-      const x = pad.left + gap * i + gap / 2 - barW / 2;
-      const barH = 20 + Math.random() * 40;
-      const y = h - pad.bottom - barH;
-
-      ctx.beginPath();
-      const radius = 6;
-      ctx.moveTo(x + radius, y);
-      ctx.lineTo(x + barW - radius, y);
-      ctx.quadraticCurveTo(x + barW, y, x + barW, y + radius);
-      ctx.lineTo(x + barW, h - pad.bottom);
-      ctx.lineTo(x, h - pad.bottom);
-      ctx.lineTo(x, y + radius);
-      ctx.quadraticCurveTo(x, y, x + radius, y);
-      ctx.fill();
-
-      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim() || '#9A9A9A';
-      ctx.font = '11px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(label, pad.left + gap * i + gap / 2, h - 8);
-      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || 'rgba(0,0,0,0.08)';
-    });
-  },
 
   setupModals() {
     const modalHtml = `
