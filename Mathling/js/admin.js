@@ -38,7 +38,8 @@ const Admin = {
     try {
       const response = await fetch('Admin.aspx/GetStats', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
       });
       const result = await response.json();
       const s = result.d;
@@ -66,7 +67,8 @@ const Admin = {
     try {
       const response = await fetch('Admin.aspx/GetUsers', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
       });
       const result = await response.json();
       const users = result.d;
@@ -93,7 +95,8 @@ const Admin = {
     try {
       const response = await fetch('Admin.aspx/GetActivity', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
       });
       const result = await response.json();
       const activity = result.d;
@@ -112,7 +115,8 @@ const Admin = {
     try {
       const response = await fetch('Admin.aspx/GetContentItems', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
       });
       const result = await response.json();
       const items = result.d || [];
@@ -187,7 +191,7 @@ const Admin = {
     }
   },
 
-  },
+
 
   setupModals() {
     const modalHtml = `
