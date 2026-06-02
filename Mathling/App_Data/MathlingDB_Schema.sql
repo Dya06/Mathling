@@ -331,6 +331,7 @@ INSERT INTO [dbo].[Users]
 ([Name],[Email],[PasswordHash],[Role],[Avatar])
 VALUES
 ('Alex Student',      'student@demo.com',    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'student',    'student'),
+('Jeff Student',      'student2@demo.com',    CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'student',    'student'),
 ('Sarah Parent',      'parent@demo.com',     CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'parent',     'parent'),
 ('Robert Instructor', 'instructor@demo.com', CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'instructor', 'instructor'),
 ('Admin User',        'admin@demo.com',      CONVERT(NVARCHAR(256), HASHBYTES('SHA2_256', 'demo123'), 2), 'admin',      'admin');

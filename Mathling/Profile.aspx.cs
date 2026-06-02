@@ -97,7 +97,7 @@ namespace Mathling
                     {
                         res.student = new StudentData { chapters = new List<ChapterDto>(), history = new List<ActivityDto>() };
                         
-                        // Fetch Level and XP
+                     
                         using (SqlCommand cmd = new SqlCommand("SELECT Level, XP FROM Users WHERE Id = @Id", conn))
                         {
                             cmd.Parameters.AddWithValue("@Id", userId);
@@ -111,7 +111,7 @@ namespace Mathling
                             }
                         }
 
-                        // Fetch Chapters
+                      
                         using (SqlCommand cmd = new SqlCommand(@"
                             SELECT m.Id, m.Title, m.Description, ISNULL(mp.IsCompleted, 0) as IsCompleted
                             FROM Modules m
@@ -121,7 +121,7 @@ namespace Mathling
                             cmd.Parameters.AddWithValue("@Id", userId);
                             using (var reader = cmd.ExecuteReader())
                             {
-                                bool previousCompleted = true; // First one is unlocked
+                                bool previousCompleted = true; 
                                 while (reader.Read())
                                 {
                                     bool completed = Convert.ToBoolean(reader["IsCompleted"]);
@@ -131,14 +131,14 @@ namespace Mathling
                                         description = reader["Description"].ToString(),
                                         completed = completed,
                                         unlocked = previousCompleted || completed,
-                                        stars = completed ? 3 : 0 // Simplified stars
+                                        stars = completed ? 3 : 0 
                                     });
                                     previousCompleted = completed;
                                 }
                             }
                         }
 
-                        // Fetch History (last 4)
+                      
                         using (SqlCommand cmd = new SqlCommand(@"
                             SELECT TOP 4 qr.Percentage as Score, m.Title as Chapter, qr.CompletedAt
                             FROM QuizResults qr
@@ -167,7 +167,7 @@ namespace Mathling
                     {
                         res.parent = new ParentData { linkedStudents = new List<LinkedStudentDto>() };
                         
-                        // Fetch Linked Students
+                      
                         using (SqlCommand cmd = new SqlCommand(@"
                             SELECT u.Id, u.Name, u.Level, u.XP,
                                    (SELECT COUNT(*) FROM QuizResults qr WHERE qr.UserId = u.Id) as TotalQuizzes,
@@ -301,7 +301,7 @@ namespace Mathling
                 {
                     conn.Open();
                     
-                    // Look up the student by email
+                   
                     string studentId = null;
                     using (SqlCommand cmd = new SqlCommand("SELECT Id FROM Users WHERE Email = @Email AND Role = 'student'", conn))
                     {
@@ -319,10 +319,10 @@ namespace Mathling
                         return res;
                     }
 
-                    // Generate random 8-character ID
+                   
                     string linkId = Guid.NewGuid().ToString().Substring(0, 8);
 
-                    // Insert the link
+                   
                     using (SqlCommand cmd = new SqlCommand(@"
                         IF NOT EXISTS (SELECT 1 FROM ParentStudentLinks WHERE ParentId = @ParentId AND StudentId = @StudentId)
                         BEGIN
