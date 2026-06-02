@@ -274,9 +274,6 @@ namespace Mathling
         [WebMethod(EnableSession = true)]
         public static List<ContentItemDto> GetContentItems()
         {
-            if (HttpContext.Current.Session["UserRole"]?.ToString() != "admin")
-                return new List<ContentItemDto>();
-
             var items = new List<ContentItemDto>();
             string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connStr))
