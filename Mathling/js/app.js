@@ -140,6 +140,7 @@ const App = {
       instructor: [
         { label: 'Forum', href: 'Forum.aspx', icon: 'forum' },
         { label: 'Moderate', href: 'Moderate.aspx', icon: 'shield' },
+        { label: 'Progress', href: 'Progress.aspx', icon: 'chart' },
         { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
       admin: [

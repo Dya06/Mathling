@@ -29,7 +29,7 @@ const Progress = {
       const urlParams = new URLSearchParams(window.location.search);
       const studentIdParam = urlParams.get('studentId') || '';
 
-      if (App.state.currentUser.role === 'admin' || App.state.currentUser.role === 'parent') {
+      if (App.state.currentUser.role === 'admin' || App.state.currentUser.role === 'parent' || App.state.currentUser.role === 'instructor') {
           await this.loadStudents(studentIdParam);
       }
 
@@ -67,7 +67,7 @@ const Progress = {
       if (students && students.length > 0) {
           container.style.display = 'block';
           select.innerHTML = '<option value="">All Linked Students</option>';
-          if (App.state.currentUser.role === 'admin') {
+          if (App.state.currentUser.role === 'admin' || App.state.currentUser.role === 'instructor') {
               select.innerHTML = '<option value="">All Students (Global)</option>';
           }
           

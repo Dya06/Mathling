@@ -58,7 +58,7 @@ namespace Mathling
                         WHERE psl.ParentId = @UserId AND u.Role = 'student'
                         ORDER BY u.Name";
                 }
-                else if (role == "admin" || role == "Admin")
+                else if (role == "admin" || role == "Admin" || role == "instructor" || role == "Instructor")
                 {
                     query = @"
                         SELECT Id, Name
@@ -104,7 +104,7 @@ namespace Mathling
                 string historyQuery = "";
                 string compQuery = "";
 
-                if (role == "admin" || role == "Admin")
+                if (role == "admin" || role == "Admin" || role == "instructor" || role == "Instructor")
                 {
                     if (!string.IsNullOrEmpty(studentId))
                     {
