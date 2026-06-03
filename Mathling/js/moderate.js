@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    MATHLINGS — Content Moderation Logic
    Complete quiz builder + review queue
    ============================================ */
@@ -65,9 +65,31 @@ const Moderate = {
       this.modules = data.d || [];
       select.disabled = false;
       select.innerHTML = '<option value="">-- Select Module --</option>' +
-        this.modules.map(m => `<option value="${m.id}">${m.title}</option>`).join('');
+        this.modules.map(m => `<option value="${m.id}" data-key="${m.moduleKey}">${m.title}</option>`).join('');
+      this.updateVideoUploadState();
     } catch (e) {
       console.error('Failed to load modules', e);
+    }
+  },
+
+  updateVideoUploadState() {
+    const moduleSelect = document.getElementById('quiz-module');
+    const displaySelect = document.getElementById('quiz-display');
+    const videoInput = document.getElementById('quiz-video');
+
+    if (!moduleSelect || !displaySelect || !videoInput) return;
+
+    const selectedOption = moduleSelect.options[moduleSelect.selectedIndex];
+    const isLearning = selectedOption && selectedOption.dataset.key === 'learning';
+    const isStatic = displaySelect.value === 'static';
+
+    if (isLearning && isStatic) {
+      videoInput.disabled = false;
+      videoInput.closest('.form-group').style.opacity = '1';
+    } else {
+      videoInput.disabled = true;
+      videoInput.value = '';
+      videoInput.closest('.form-group').style.opacity = '0.5';
     }
   },
 
@@ -75,6 +97,14 @@ const Moderate = {
   setupQuizBuilder() {
     document.getElementById('quiz-formula').addEventListener('change', (e) => {
       this.loadModules(e.target.value);
+    });
+
+    document.getElementById('quiz-module').addEventListener('change', () => {
+      this.updateVideoUploadState();
+    });
+
+    document.getElementById('quiz-display').addEventListener('change', () => {
+      this.updateVideoUploadState();
     });
 
     document.getElementById('add-question-btn').addEventListener('click', () => {
@@ -191,6 +221,27 @@ const Moderate = {
     }
 
     try {
+      let videoUrl = '';
+      const videoInput = document.getElementById('quiz-video');
+      if (videoInput.files && videoInput.files.length > 0) {
+        const formData = new FormData();
+        formData.append('video', videoInput.files[0]);
+
+        App.showToast('Uploading video...', 'success');
+        const uploadRes = await fetch('UploadVideo.ashx', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!uploadRes.ok) {
+          const errorData = await uploadRes.json();
+          return App.showToast(errorData.error || 'Failed to upload video', 'error');
+        }
+
+        const uploadData = await uploadRes.json();
+        videoUrl = uploadData.url;
+      }
+
       const res = await fetch('Moderate.aspx/SubmitQuiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -198,7 +249,8 @@ const Moderate = {
           moduleId,
           label,
           displayMode,
-          questionsJson: JSON.stringify(questions)
+          questionsJson: JSON.stringify(questions),
+          videoUrl: videoUrl
         })
       });
       const data = await res.json();
@@ -207,6 +259,7 @@ const Moderate = {
         App.showToast('Quiz submitted for review!', 'success');
         // Reset form
         document.getElementById('quiz-label').value = '';
+        if (videoInput) videoInput.value = '';
         document.getElementById('questions-container').innerHTML = '';
         this.questionCount = 0;
         for (let i = 0; i < 3; i++) this.addQuestion();

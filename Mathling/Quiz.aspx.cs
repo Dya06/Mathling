@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -211,50 +211,7 @@ namespace Mathling
             BindBaseContent();
         }
 
-        private void ConfigureLearningVideo(QuizModule module)
-        {
-            LearningVideoPanel.Visible = false;
-            LearningVideoPlayer.Attributes["src"] = "";
 
-            if (module == null)
-            {
-                return;
-            }
-
-            bool isLearningModule = string.Equals(module.ModuleKey, "learning", StringComparison.OrdinalIgnoreCase);
-
-            if (!isLearningModule)
-            {
-                return;
-            }
-
-            string videoPath = "";
-
-            switch (SelectedFormulaName)
-            {
-                case "SF+4":
-                    videoPath = ResolveUrl("~/videos/SF4.mp4");
-                    break;
-
-                case "SF+3":
-                    videoPath = ResolveUrl("~/videos/SF3.mp4");
-                    break;
-
-                case "SF+2":
-                    videoPath = ResolveUrl("~/videos/SF2.mp4");
-                    break;
-
-                case "SF+1":
-                    videoPath = ResolveUrl("~/videos/SF1.mp4");
-                    break;
-            }
-
-            if (!string.IsNullOrEmpty(videoPath))
-            {
-                LearningVideoPanel.Visible = true;
-                LearningVideoPlayer.Attributes["src"] = videoPath;
-            }
-        }
 
         private void ShowModuleIntro()
         {
@@ -264,8 +221,6 @@ namespace Mathling
                 ShowStartScreen();
                 return;
             }
-
-            ConfigureLearningVideo(module);
 
             HideAllPanels();
             ModuleIntroPanel.Visible = true;
@@ -386,6 +341,16 @@ namespace Mathling
             QuestionTagLiteral.Text = GetModuleIcon(module.Icon) + " " + Server.HtmlEncode(set.Label);
             TimerPanel.Visible = module.IsTimed;
             QuestionMentalBannerPanel.Visible = module.MentalMode && QuestionIndex == 0;
+
+            if (!string.IsNullOrEmpty(set.VideoUrl))
+            {
+                LearningVideoPanel.Visible = true;
+                LearningVideoPlayer.Attributes["src"] = ResolveUrl("~/" + set.VideoUrl);
+            }
+            else
+            {
+                LearningVideoPanel.Visible = false;
+            }
 
             if (module.IsTimed)
             {
@@ -1033,7 +998,7 @@ namespace Mathling
                 }
 
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT qs.[Id], qs.[ModuleId], qs.[Label], qs.[DisplayMode], qs.[SortOrder]
+                    SELECT qs.[Id], qs.[ModuleId], qs.[Label], qs.[DisplayMode], qs.[SortOrder], qs.[VideoUrl]
                     FROM [QuestionSets] qs
                     INNER JOIN [Modules] m ON qs.[ModuleId] = m.[Id]
                     WHERE m.[FormulaId] = @FormulaId
@@ -1051,6 +1016,7 @@ namespace Mathling
                                 Label = reader["Label"].ToString(),
                                 DisplayMode = reader["DisplayMode"].ToString(),
                                 SortOrder = Convert.ToInt32(reader["SortOrder"]),
+                                VideoUrl = reader["VideoUrl"] != DBNull.Value ? reader["VideoUrl"].ToString() : null,
                                 Questions = new List<QuizQuestion>()
                             };
                             sets[set.Id] = set;
@@ -1174,6 +1140,7 @@ namespace Mathling
         public string Label { get; set; }
         public string DisplayMode { get; set; }
         public int SortOrder { get; set; }
+        public string VideoUrl { get; set; }
         public List<QuizQuestion> Questions { get; set; }
     }
 

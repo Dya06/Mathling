@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Quiz" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
+<%@ Page Title="Quiz" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Quiz.aspx.cs" Inherits="Mathling.Quiz" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/quiz.css?v=2">
@@ -107,20 +107,7 @@
                                 <div class="mental-icon"></div>
                                 <h3>Mental Mode</h3><p>You cannot use the abacus for this module.<br />Imagine the beads moving in your mind.</p></asp:Panel><div style="text-align:center">
 
-                                <asp:Panel ID="LearningVideoPanel" runat="server" CssClass="learning-video-panel" Visible="false">
-                                    <h3 class="learning-video-title">Watch the lesson first</h3>
 
-                                    <div class="learning-video-box">
-                                        <video 
-                                            id="LearningVideoPlayer"
-                                            runat="server"
-                                            class="learning-video-player"
-                                            controls
-                                            preload="metadata">
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    </div>
-                                </asp:Panel>
 
                                 <h3 style="margin-bottom:var(--space-lg)">Choose a Set</h3><div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
                                     <asp:Repeater ID="SetRepeater" runat="server" OnItemCommand="SetRepeater_ItemCommand" OnItemDataBound="SetRepeater_ItemDataBound">
@@ -138,6 +125,13 @@
                                     <asp:Literal ID="QuestionTagLiteral" runat="server" />
                                 </span>
                             </div>
+
+                            <asp:Panel ID="LearningVideoPanel" runat="server" CssClass="learning-video-panel" Visible="false" Style="margin-bottom:var(--space-lg)">
+                                <h3 class="learning-video-title">Watch the video</h3>
+                                <div class="learning-video-box">
+                                    <video id="LearningVideoPlayer" runat="server" class="learning-video-player" controls preload="metadata"></video>
+                                </div>
+                            </asp:Panel>
 
                             <asp:Panel ID="TimerPanel" runat="server" Visible="false" CssClass="assessment-timer">
                                 <div class="timer-value"><asp:Literal ID="TimerValueLiteral" runat="server" /></div>

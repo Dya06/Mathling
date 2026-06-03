@@ -95,6 +95,7 @@ CREATE TABLE [dbo].[QuestionSets] (
     [Label]         NVARCHAR(100)   NOT NULL,
     [DisplayMode]   NVARCHAR(20)    NOT NULL DEFAULT 'static',
     [SortOrder]     INT             NOT NULL DEFAULT 0,
+    [VideoUrl]      NVARCHAR(500)   NULL,
 
     CONSTRAINT [FK_QuestionSets_Modules]
     FOREIGN KEY ([ModuleId])
@@ -236,6 +237,7 @@ CREATE TABLE [dbo].[Submissions] (
     [DisplayMode]   NVARCHAR(20)    NULL,
     [SortOrder]     INT             NULL,
     [LiveSetId]     VARCHAR(10)     NULL,
+    [VideoUrl]      NVARCHAR(500)   NULL,
 
     CONSTRAINT [FK_Submissions_Users]
     FOREIGN KEY ([InstructorId])

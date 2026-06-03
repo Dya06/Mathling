@@ -113,7 +113,7 @@ namespace Mathling
         // Instructor-created quiz sets are saved into Submissions + SubmissionQuestions + SubmissionQuestionRows.
         // They are NOT inserted into QuestionSets until an admin approves them.
         [WebMethod(EnableSession = true)]
-        public static string SubmitQuiz(string moduleId, string label, string displayMode, string questionsJson)
+        public static string SubmitQuiz(string moduleId, string label, string displayMode, string questionsJson, string videoUrl)
         {
             try
             {
@@ -161,12 +161,12 @@ namespace Mathling
                                 INSERT INTO [Submissions]
                                 (
                                     [Id], [Title], [Chapter], [Difficulty], [Status], [Reason],
-                                    [InstructorId], [CreatedAt], [ModuleId], [Label], [DisplayMode], [SortOrder], [LiveSetId]
+                                    [InstructorId], [CreatedAt], [ModuleId], [Label], [DisplayMode], [SortOrder], [LiveSetId], [VideoUrl]
                                 )
                                 VALUES
                                 (
                                     @Id, @Title, @Chapter, @Difficulty, 'pending', NULL,
-                                    @InstructorId, GETDATE(), @ModuleId, @Label, @DisplayMode, @SortOrder, NULL
+                                    @InstructorId, GETDATE(), @ModuleId, @Label, @DisplayMode, @SortOrder, NULL, @VideoUrl
                                 )", conn, trans))
                             {
                                 cmd.Parameters.AddWithValue("@Id", submissionId);
@@ -178,6 +178,7 @@ namespace Mathling
                                 cmd.Parameters.AddWithValue("@Label", label);
                                 cmd.Parameters.AddWithValue("@DisplayMode", displayMode);
                                 cmd.Parameters.AddWithValue("@SortOrder", nextSort);
+                                cmd.Parameters.AddWithValue("@VideoUrl", string.IsNullOrWhiteSpace(videoUrl) ? (object)DBNull.Value : videoUrl);
                                 cmd.ExecuteNonQuery();
                             }
 
@@ -432,12 +433,13 @@ namespace Mathling
             string displayMode = null;
             int sortOrder = 1;
             string existingLiveSetId = null;
+            string videoUrl = null;
 
             using (SqlCommand cmd = new SqlCommand(@"
                 SELECT [ModuleId], COALESCE([Label], [Title]) AS [Label],
                        COALESCE([DisplayMode], [Difficulty]) AS [DisplayMode],
                        ISNULL([SortOrder], 1) AS [SortOrder],
-                       [LiveSetId]
+                       [LiveSetId], [VideoUrl]
                 FROM [Submissions]
                 WHERE [Id] = @Id", conn, trans))
             {
@@ -451,6 +453,7 @@ namespace Mathling
                     displayMode = reader["DisplayMode"].ToString();
                     sortOrder = Convert.ToInt32(reader["SortOrder"]);
                     existingLiveSetId = reader["LiveSetId"] != DBNull.Value ? reader["LiveSetId"].ToString() : null;
+                    videoUrl = reader["VideoUrl"] != DBNull.Value ? reader["VideoUrl"].ToString() : null;
                 }
             }
 
@@ -460,14 +463,15 @@ namespace Mathling
             string liveSetId = GenerateId("S", 10);
 
             using (SqlCommand cmd = new SqlCommand(@"
-                INSERT INTO [QuestionSets] ([Id], [ModuleId], [Label], [DisplayMode], [SortOrder])
-                VALUES (@Id, @ModuleId, @Label, @DisplayMode, @SortOrder)", conn, trans))
+                INSERT INTO [QuestionSets] ([Id], [ModuleId], [Label], [DisplayMode], [SortOrder], [VideoUrl])
+                VALUES (@Id, @ModuleId, @Label, @DisplayMode, @SortOrder, @VideoUrl)", conn, trans))
             {
                 cmd.Parameters.AddWithValue("@Id", liveSetId);
                 cmd.Parameters.AddWithValue("@ModuleId", moduleId);
                 cmd.Parameters.AddWithValue("@Label", label);
                 cmd.Parameters.AddWithValue("@DisplayMode", displayMode);
                 cmd.Parameters.AddWithValue("@SortOrder", sortOrder);
+                cmd.Parameters.AddWithValue("@VideoUrl", string.IsNullOrWhiteSpace(videoUrl) ? (object)DBNull.Value : videoUrl);
                 cmd.ExecuteNonQuery();
             }
 
@@ -618,6 +622,9 @@ IF COL_LENGTH('dbo.Submissions', 'SortOrder') IS NULL
 
 IF COL_LENGTH('dbo.Submissions', 'LiveSetId') IS NULL
     ALTER TABLE [dbo].[Submissions] ADD [LiveSetId] VARCHAR(10) NULL;
+
+IF COL_LENGTH('dbo.Submissions', 'VideoUrl') IS NULL
+    ALTER TABLE [dbo].[Submissions] ADD [VideoUrl] NVARCHAR(500) NULL;
 
 IF OBJECT_ID('dbo.SubmissionQuestions', 'U') IS NULL
 BEGIN

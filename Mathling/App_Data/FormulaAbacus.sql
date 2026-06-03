@@ -1152,3 +1152,14 @@ GO
 INSERT INTO [Submissions] ([Id],[InstructorId],[Title],[Difficulty],[CreatedAt],[Status],[ModuleId],[Label],[DisplayMode],[SortOrder],[LiveSetId]) SELECT Id, 3, Label, 'beginner', GETDATE(), 'approved', ModuleId, Label, DisplayMode, SortOrder, Id FROM [QuestionSets] WHERE Id NOT IN (SELECT Id FROM [Submissions]);
 INSERT INTO [SubmissionQuestions] ([Id],[SubmissionId],[Answer],[SortOrder]) SELECT Id, SetId, Answer, SortOrder FROM [Questions] WHERE Id NOT IN (SELECT Id FROM [SubmissionQuestions]);
 INSERT INTO [SubmissionQuestionRows] ([Id],[SubmissionQuestionId],[Value],[SortOrder]) SELECT Id, QuestionId, Value, SortOrder FROM [QuestionRows] WHERE Id NOT IN (SELECT Id FROM [SubmissionQuestionRows]);
+
+/* MIGRATION: SEED VIDEOS */
+UPDATE [QuestionSets] SET [VideoUrl] = 'videos/SF4.mp4' WHERE [Id] = 'S001';
+UPDATE [QuestionSets] SET [VideoUrl] = 'videos/SF3.mp4' WHERE [Id] = 'S009';
+UPDATE [QuestionSets] SET [VideoUrl] = 'videos/SF2.mp4' WHERE [Id] = 'S017';
+UPDATE [QuestionSets] SET [VideoUrl] = 'videos/SF1.mp4' WHERE [Id] = 'S025';
+UPDATE [Submissions] SET [VideoUrl] = 'videos/SF4.mp4' WHERE [Id] = 'S001';
+UPDATE [Submissions] SET [VideoUrl] = 'videos/SF3.mp4' WHERE [Id] = 'S009';
+UPDATE [Submissions] SET [VideoUrl] = 'videos/SF2.mp4' WHERE [Id] = 'S017';
+UPDATE [Submissions] SET [VideoUrl] = 'videos/SF1.mp4' WHERE [Id] = 'S025';
+

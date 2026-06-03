@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Moderation" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Moderate.aspx.cs" Inherits="Mathling.Moderate" %>
+<%@ Page Title="Moderation" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Moderate.aspx.cs" Inherits="Mathling.Moderate" %>
 
 <asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
     <link rel="stylesheet" href="/css/moderate.css">
@@ -46,7 +46,7 @@
         </div>
 
         <!-- Step 2: Set info -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">
           <div class="form-group" style="margin:0">
             <label class="form-label" for="quiz-label">Set Label</label>
             <input type="text" id="quiz-label" class="form-input" placeholder="e.g. Practice Set 3">
@@ -57,6 +57,10 @@
               <option value="static">Static (all numbers shown at once)</option>
               <option value="flash">Flash (numbers shown one at a time)</option>
             </select>
+          </div>
+          <div class="form-group" style="margin:0;opacity:0.5;">
+            <label class="form-label" for="quiz-video">Learning Video (Optional)</label>
+            <input type="file" id="quiz-video" class="form-input" accept="video/mp4,video/webm" style="padding: 6px;" disabled>
           </div>
         </div>
 
