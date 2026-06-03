@@ -1146,3 +1146,9 @@ BEGIN CATCH
     RAISERROR('FormulaAbacus.sql failed at line %d: %s', 16, 1, @ErrorLine, @ErrorMessage);
 END CATCH;
 GO
+
+
+/* MIGRATION: SEED DATA TO SUBMISSIONS PIPELINE */
+INSERT INTO [Submissions] ([Id],[InstructorId],[Title],[Difficulty],[CreatedAt],[Status],[ModuleId],[Label],[DisplayMode],[SortOrder],[LiveSetId]) SELECT Id, 3, Label, 'beginner', GETDATE(), 'approved', ModuleId, Label, DisplayMode, SortOrder, Id FROM [QuestionSets] WHERE Id NOT IN (SELECT Id FROM [Submissions]);
+INSERT INTO [SubmissionQuestions] ([Id],[SubmissionId],[Answer],[SortOrder]) SELECT Id, SetId, Answer, SortOrder FROM [Questions] WHERE Id NOT IN (SELECT Id FROM [SubmissionQuestions]);
+INSERT INTO [SubmissionQuestionRows] ([Id],[SubmissionQuestionId],[Value],[SortOrder]) SELECT Id, QuestionId, Value, SortOrder FROM [QuestionRows] WHERE Id NOT IN (SELECT Id FROM [SubmissionQuestionRows]);
