@@ -40,7 +40,7 @@ const App = {
   // ---- State ----
   state: {
     theme: localStorage.getItem('mathlings-theme') || 'light',
-    audioEnabled: localStorage.getItem('mathlings-audio') === 'true',
+
     /*
      * BACKEND TODO:
      * Replace this with a call to GET /api/auth/me on page load.
@@ -58,7 +58,7 @@ const App = {
     this.applyTheme();
     this.setupNav();
     this.setupThemeToggle();
-    this.setupAudioToggle();
+
     this.renderNav();
     this.setupMobileMenu();
     document.body.classList.add('loaded');
@@ -94,28 +94,6 @@ const App = {
     btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
   },
 
-  // ---- Audio / TTS ----
-  setupAudioToggle() {
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('#audio-toggle');
-      if (btn) {
-        this.state.audioEnabled = !this.state.audioEnabled;
-        localStorage.setItem('mathlings-audio', this.state.audioEnabled);
-        btn.classList.toggle('active', this.state.audioEnabled);
-        this.showToast(this.state.audioEnabled ? 'Audio enabled 🔊' : 'Audio disabled 🔇', 'info');
-      }
-    });
-  },
-
-  speak(text) {
-    if (!this.state.audioEnabled || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.rate = 0.85;
-    utter.pitch = 1.1;
-    window.speechSynthesis.speak(utter);
-  },
-
   // ---- Navigation ----
   getNavItems() {
     const role = this.state.currentUser?.role;
@@ -130,10 +108,12 @@ const App = {
       student: [
         { label: 'Learn', href: 'Quiz.aspx', icon: 'book' },
         { label: 'Progress', href: 'Progress.aspx', icon: 'chart' },
+        { label: 'Leaderboard', href: 'Leaderboard.aspx', icon: 'trophy' },
         { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
       parent: [
         { label: 'Progress', href: 'Progress.aspx', icon: 'chart' },
+        { label: 'Leaderboard', href: 'Leaderboard.aspx', icon: 'trophy' },
         { label: 'Forum', href: 'Forum.aspx', icon: 'forum' },
         { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
@@ -141,12 +121,14 @@ const App = {
         { label: 'Forum', href: 'Forum.aspx', icon: 'forum' },
         { label: 'Moderate', href: 'Moderate.aspx', icon: 'shield' },
         { label: 'Progress', href: 'Progress.aspx', icon: 'chart' },
+        { label: 'Leaderboard', href: 'Leaderboard.aspx', icon: 'trophy' },
         { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
       admin: [
         { label: 'Dashboard', href: 'Admin.aspx', icon: 'dashboard' },
         { label: 'Moderate', href: 'Moderate.aspx', icon: 'shield' },
         { label: 'Progress', href: 'Progress.aspx', icon: 'chart' },
+        { label: 'Leaderboard', href: 'Leaderboard.aspx', icon: 'trophy' },
         { label: 'Forum', href: 'Forum.aspx', icon: 'forum' },
         { label: 'Profile', href: 'Profile.aspx', icon: 'user' },
       ],
@@ -166,6 +148,7 @@ const App = {
       dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
       logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
       login: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>',
+      trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v6a5 5 0 0 1-10 0V4z"/><path d="M7 7H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1"/><path d="M17 7h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>'
     };
     return icons[name] || '';
   },

@@ -1,0 +1,163 @@
+/* ============================================
+   MATHLINGS — Leaderboard Styles
+   ============================================ */
+
+.leaderboard-page {
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-3xl);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.leaderboard-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.leaderboard-header h1 {
+  font-size: var(--text-4xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+  letter-spacing: var(--letter-tight);
+}
+
+.leaderboard-container {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--bg-secondary);
+  transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+.leaderboard-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Rank column */
+.lb-rank {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: var(--text-xl);
+  color: var(--text-tertiary);
+  width: 50px;
+  text-align: center;
+}
+
+/* Top 3 styling */
+.leaderboard-item.rank-1 {
+  background: linear-gradient(135deg, var(--accent-yellow-light), var(--bg-tertiary));
+  border: 1px solid var(--accent-yellow);
+}
+.leaderboard-item.rank-1 .lb-rank {
+  color: var(--accent-yellow-dark);
+  font-size: var(--text-3xl);
+}
+
+.leaderboard-item.rank-2 {
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  border: 1px solid #C0C0C0; /* Silver */
+}
+.leaderboard-item.rank-2 .lb-rank {
+  color: #9E9E9E;
+  font-size: var(--text-2xl);
+}
+
+.leaderboard-item.rank-3 {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), var(--bg-tertiary));
+  border: 1px solid #CD7F32; /* Bronze */
+}
+.leaderboard-item.rank-3 .lb-rank {
+  color: #CD7F32;
+  font-size: var(--text-2xl);
+}
+
+/* User Info */
+.lb-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+.lb-avatar {
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+}
+
+.lb-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--text-primary);
+}
+
+.lb-level {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* Score / XP */
+.lb-score {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--text-xl);
+  color: var(--accent-blue);
+  text-align: right;
+}
+
+.lb-score-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.lb-current-user {
+  border: 2px solid var(--accent-blue);
+  background: var(--accent-blue-light);
+}
+
+/* Animations */
+.animate-in {
+  animation: slideUp 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

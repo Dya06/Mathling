@@ -45,9 +45,9 @@ const Admin = {
       const s = result.d;
 
       const stats = [
-        { icon: '', bg: 'var(--accent-blue-light)', value: s.totalUsers, label: 'Total Users' },
-        { icon: '', bg: 'var(--accent-green-light)', value: s.totalQuizzes, label: 'Total Quizzes' },
-        { icon: '', bg: 'var(--accent-yellow-light)', value: s.contentItems, label: 'Content Items' },
+        { icon: '👥', bg: 'var(--accent-blue-light)', value: s.totalUsers, label: 'Total Users' },
+        { icon: '📝', bg: 'var(--accent-green-light)', value: s.totalQuizzes, label: 'Total Quizzes' },
+        { icon: '📚', bg: 'var(--accent-yellow-light)', value: s.contentItems, label: 'Content Items' },
         { icon: '⏳', bg: 'var(--accent-orange-light)', value: s.pendingReviews, label: 'Pending Review' },
       ];
 
@@ -84,7 +84,7 @@ const Admin = {
 
       container.innerHTML = users.map(u => `
         <div class="user-row" style="display:flex;align-items:center;gap:var(--space-sm)">
-          <div class="avatar avatar-sm">${u.avatar || ''}</div>
+          <div class="avatar avatar-sm">${App.getAvatarEmoji(u.avatar)}</div>
           <span class="user-name" style="flex:1">${u.name}</span>
           <span class="badge badge-${u.role === 'admin' ? 'red' : u.role === 'instructor' ? 'purple' : u.role === 'parent' ? 'blue' : 'green'}">${u.role}</span>
           <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.editUser(${u.id}, '${u.name}', '${u.role}')">Edit</button>

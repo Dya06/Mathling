@@ -15,9 +15,7 @@
       </a>
       <div class="navbar-nav" id="main-nav"></div>
       <div class="navbar-actions">
-        <button type="button" class="audio-toggle" id="audio-toggle" aria-label="Toggle audio">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-        </button>
+
         <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
         <a href="Login.aspx" class="btn btn-primary btn-sm" id="nav-auth-btn">Get Started</a>
         <button type="button" class="hamburger" id="hamburger" aria-label="Menu">
@@ -34,7 +32,7 @@
       <div class="container">
         <div class="hero-content">
           <div class="hero-text">
-            <div class="hero-badge">&#x1F9D2; For ages 411</div>
+            <div class="hero-badge">&#x1F9D2; For ages 4-11</div>
             <h1>Make Math <span class="highlight">Magical</span> with the Abacus</h1>
             <p class="hero-desc">Mathlings turns mental arithmetic into an exciting adventure. Watch your child master numbers through interactive abacus exercises, fun quizzes, and rewarding challenges.</p>
             <div class="hero-buttons">
@@ -134,11 +132,7 @@
             <h3>Family Friendly</h3>
             <p>Parents can link accounts, monitor progress, and connect with instructors through our community forum.</p>
           </div>
-          <div class="feature-card" data-animate>
-            <div class="feature-icon orange">&#x1F50A;</div>
-            <h3>Audio Support</h3>
-            <p>Text-to-speech for young learners who are still developing reading skills. Every question can be read aloud.</p>
-          </div>
+
         </div>
       </div>
     </section>
@@ -248,7 +242,7 @@
 </asp:Content>
 
 <asp:Content ID="Scripts" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=12"></script>
+    <script src="/js/app.js?v=13"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('[data-count]').forEach(function(el) {
