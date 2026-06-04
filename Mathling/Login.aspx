@@ -53,29 +53,7 @@
       </div>
 
       <!-- Demo Accounts -->
-      <div class="demo-accounts">
-        <h4>Try Demo Accounts</h4>
-        <div class="demo-account">
-          <span class="demo-role">Student</span>
-          <span>student@demo.com</span>
-          <button type="button" class="demo-fill" onclick="fillDemo('student@demo.com','demo123')">Fill</button>
-        </div>
-        <div class="demo-account">
-          <span class="demo-role">Parent</span>
-          <span>parent@demo.com</span>
-          <button type="button" class="demo-fill" onclick="fillDemo('parent@demo.com','demo123')">Fill</button>
-        </div>
-        <div class="demo-account">
-          <span class="demo-role">Instructor</span>
-          <span>instructor@demo.com</span>
-          <button type="button" class="demo-fill" onclick="fillDemo('instructor@demo.com','demo123')">Fill</button>
-        </div>
-        <div class="demo-account">
-          <span class="demo-role">Admin</span>
-          <span>admin@demo.com</span>
-          <button type="button" class="demo-fill" onclick="fillDemo('admin@demo.com','demo123')">Fill</button>
-        </div>
-      </div>
+      
 
       <div class="auth-footer">
         <a href="Default.aspx"> Back to Home</a>

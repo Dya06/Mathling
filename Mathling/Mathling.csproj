@@ -101,6 +101,7 @@
     <Content Include="App_Data\FormulaAbacus.sql" />
     <Content Include="App_Data\Migration_ModerationPipeline.sql" />
     <Content Include="App_Data\Migration_QuizPipeline.sql" />
+    <Content Include="App_Data\Migration_QuizVideo.sql" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
