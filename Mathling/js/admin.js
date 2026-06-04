@@ -45,9 +45,9 @@ const Admin = {
       const s = result.d;
 
       const stats = [
-        { icon: '', bg: 'var(--accent-blue-light)', value: s.totalUsers, label: 'Total Users' },
-        { icon: '', bg: 'var(--accent-green-light)', value: s.totalQuizzes, label: 'Total Quizzes' },
-        { icon: '', bg: 'var(--accent-yellow-light)', value: s.contentItems, label: 'Content Items' },
+        { icon: '👥', bg: 'var(--accent-blue-light)', value: s.totalUsers, label: 'Total Users' },
+        { icon: '📝', bg: 'var(--accent-green-light)', value: s.totalQuizzes, label: 'Total Quizzes' },
+        { icon: '📚', bg: 'var(--accent-yellow-light)', value: s.contentItems, label: 'Content Items' },
         { icon: '⏳', bg: 'var(--accent-orange-light)', value: s.pendingReviews, label: 'Pending Review' },
       ];
 
