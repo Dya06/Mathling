@@ -205,7 +205,7 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=12"></script>
+    <script src="/js/app.js?v=13"></script>
 </asp:Content>
 
 

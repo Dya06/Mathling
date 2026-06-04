@@ -248,7 +248,7 @@
 </asp:Content>
 
 <asp:Content ID="Scripts" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=12"></script>
+    <script src="/js/app.js?v=13"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('[data-count]').forEach(function(el) {
