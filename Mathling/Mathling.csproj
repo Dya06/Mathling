@@ -312,7 +312,9 @@
     <Compile Include="ViewSwitcher.ascx.designer.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Leaderboard.aspx.cs" />
+    <Compile Include="Leaderboard.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\MathlingDB_Schema.sql" />
