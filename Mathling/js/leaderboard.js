@@ -51,10 +51,6 @@ const Leaderboard = {
       const isCurrent = u.Id === currentUserId;
       let rankDisplay = u.Rank;
       
-      if (u.Rank === 1) rankDisplay = '🥇';
-      else if (u.Rank === 2) rankDisplay = '🥈';
-      else if (u.Rank === 3) rankDisplay = '🥉';
-
       return `
         <div class="leaderboard-item rank-${u.Rank} ${isCurrent ? 'lb-current-user' : ''} animate-in" style="animation-delay: ${i * 50}ms">
           <div class="lb-rank">${rankDisplay}</div>

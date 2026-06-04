@@ -18,7 +18,7 @@
     <main class="main">
         <div class="container leaderboard-page">
             <div class="leaderboard-header">
-                <h1>🏆 Global Leaderboard</h1>
+                <h1>Global Leaderboard</h1>
                 <p style="color:var(--text-secondary)">See how you stack up against other Mathlings!</p>
             </div>
             
