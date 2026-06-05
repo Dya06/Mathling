@@ -1,1 +1,0 @@
-namespace Mathling {    public partial class ViewSwitcher {    }}
