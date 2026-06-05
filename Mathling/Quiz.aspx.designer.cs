@@ -1,56 +1,1 @@
-
-namespace Mathling
-{
-
-
-    public partial class Quiz
-    {
-        protected global::System.Web.UI.UpdatePanel QuizUpdatePanel;
-        protected global::System.Web.UI.Timer FlashTimer;
-        protected global::System.Web.UI.Timer AssessmentTimer;
-        protected global::System.Web.UI.WebControls.Literal FormulaNameLiteral;
-        protected global::System.Web.UI.WebControls.Literal FormulaRuleLiteral;
-        protected global::System.Web.UI.WebControls.Repeater ModuleRepeater;
-        protected global::System.Web.UI.WebControls.Panel MessagePanel;
-        protected global::System.Web.UI.WebControls.Literal MessageTitleLiteral;
-        protected global::System.Web.UI.WebControls.Literal MessageBodyLiteral;
-        protected global::System.Web.UI.WebControls.Panel StartPanel;
-        protected global::System.Web.UI.WebControls.Literal StartFormulaNameLiteral;
-        protected global::System.Web.UI.WebControls.Literal StartDescriptionLiteral;
-        protected global::System.Web.UI.WebControls.Literal StartRuleLiteral;
-        protected global::System.Web.UI.WebControls.Button StartLearningButton;
-        protected global::System.Web.UI.WebControls.Panel ModuleIntroPanel;
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ModuleTagSpan;
-        protected global::System.Web.UI.WebControls.Literal ModuleTagLiteral;
-        protected global::System.Web.UI.WebControls.Literal ModuleTitleLiteral;
-        protected global::System.Web.UI.WebControls.Literal ModuleDescriptionLiteral;
-        protected global::System.Web.UI.WebControls.Literal ModuleTimerLiteral;
-        protected global::System.Web.UI.WebControls.Panel MentalBannerPanel;
-        protected global::System.Web.UI.WebControls.Panel LearningVideoPanel;
-        protected global::System.Web.UI.HtmlControls.HtmlVideo LearningVideoPlayer;
-        protected global::System.Web.UI.WebControls.Repeater SetRepeater;
-        protected global::System.Web.UI.WebControls.Panel QuestionPanel;
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl QuestionTagSpan;
-        protected global::System.Web.UI.WebControls.Literal QuestionTagLiteral;
-        protected global::System.Web.UI.WebControls.Panel TimerPanel;
-        protected global::System.Web.UI.WebControls.Literal TimerValueLiteral;
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TimerFillDiv;
-        protected global::System.Web.UI.WebControls.Panel QuestionMentalBannerPanel;
-        protected global::System.Web.UI.WebControls.Literal QuestionNumberLiteral;
-        protected global::System.Web.UI.WebControls.Literal ScoreLiteral;
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProgressFillDiv;
-        protected global::System.Web.UI.WebControls.Literal QuestionDisplayLiteral;
-        protected global::System.Web.UI.WebControls.Literal AnswerDisplayLiteral;
-        protected global::System.Web.UI.WebControls.Panel FeedbackPanel;
-        protected global::System.Web.UI.WebControls.Literal FeedbackTitleLiteral;
-        protected global::System.Web.UI.WebControls.Literal FeedbackBodyLiteral;
-        protected global::System.Web.UI.WebControls.Button NextQuestionButton;
-        protected global::System.Web.UI.WebControls.Panel CompletePanel;
-        protected global::System.Web.UI.WebControls.Literal CompleteIconLiteral;
-        protected global::System.Web.UI.WebControls.Literal CompleteTitleLiteral;
-        protected global::System.Web.UI.WebControls.Literal CompleteCorrectLiteral;
-        protected global::System.Web.UI.WebControls.Literal CompletePercentageLiteral;
-        protected global::System.Web.UI.WebControls.Button RetryButton;
-        protected global::System.Web.UI.WebControls.Button BackToModuleButton;
-    }
-}
+namespace Mathling{    public partial class Quiz    {        protected global::System.Web.UI.UpdatePanel QuizUpdatePanel;        protected global::System.Web.UI.Timer FlashTimer;        protected global::System.Web.UI.Timer AssessmentTimer;        protected global::System.Web.UI.WebControls.Literal FormulaNameLiteral;        protected global::System.Web.UI.WebControls.Literal FormulaRuleLiteral;        protected global::System.Web.UI.WebControls.Repeater ModuleRepeater;        protected global::System.Web.UI.WebControls.Panel MessagePanel;        protected global::System.Web.UI.WebControls.Literal MessageTitleLiteral;        protected global::System.Web.UI.WebControls.Literal MessageBodyLiteral;        protected global::System.Web.UI.WebControls.Panel StartPanel;        protected global::System.Web.UI.WebControls.Literal StartFormulaNameLiteral;        protected global::System.Web.UI.WebControls.Literal StartDescriptionLiteral;        protected global::System.Web.UI.WebControls.Literal StartRuleLiteral;        protected global::System.Web.UI.WebControls.Button StartLearningButton;        protected global::System.Web.UI.WebControls.Panel ModuleIntroPanel;        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ModuleTagSpan;        protected global::System.Web.UI.WebControls.Literal ModuleTagLiteral;        protected global::System.Web.UI.WebControls.Literal ModuleTitleLiteral;        protected global::System.Web.UI.WebControls.Literal ModuleDescriptionLiteral;        protected global::System.Web.UI.WebControls.Literal ModuleTimerLiteral;        protected global::System.Web.UI.WebControls.Panel MentalBannerPanel;        protected global::System.Web.UI.WebControls.Panel LearningVideoPanel;        protected global::System.Web.UI.HtmlControls.HtmlVideo LearningVideoPlayer;        protected global::System.Web.UI.WebControls.Repeater SetRepeater;        protected global::System.Web.UI.WebControls.Panel QuestionPanel;        protected global::System.Web.UI.HtmlControls.HtmlGenericControl QuestionTagSpan;        protected global::System.Web.UI.WebControls.Literal QuestionTagLiteral;        protected global::System.Web.UI.WebControls.Panel TimerPanel;        protected global::System.Web.UI.WebControls.Literal TimerValueLiteral;        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TimerFillDiv;        protected global::System.Web.UI.WebControls.Panel QuestionMentalBannerPanel;        protected global::System.Web.UI.WebControls.Literal QuestionNumberLiteral;        protected global::System.Web.UI.WebControls.Literal ScoreLiteral;        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProgressFillDiv;        protected global::System.Web.UI.WebControls.Literal QuestionDisplayLiteral;        protected global::System.Web.UI.WebControls.Literal AnswerDisplayLiteral;        protected global::System.Web.UI.WebControls.Panel FeedbackPanel;        protected global::System.Web.UI.WebControls.Literal FeedbackTitleLiteral;        protected global::System.Web.UI.WebControls.Literal FeedbackBodyLiteral;        protected global::System.Web.UI.WebControls.Button NextQuestionButton;        protected global::System.Web.UI.WebControls.Panel CompletePanel;        protected global::System.Web.UI.WebControls.Literal CompleteIconLiteral;        protected global::System.Web.UI.WebControls.Literal CompleteTitleLiteral;        protected global::System.Web.UI.WebControls.Literal CompleteCorrectLiteral;        protected global::System.Web.UI.WebControls.Literal CompletePercentageLiteral;        protected global::System.Web.UI.WebControls.Button RetryButton;        protected global::System.Web.UI.WebControls.Button BackToModuleButton;    }}

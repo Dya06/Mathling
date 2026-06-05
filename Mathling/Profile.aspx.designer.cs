@@ -1,15 +1,1 @@
-﻿namespace Mathling
-{
-
-
-    public partial class Profile
-    {
-        protected global::System.Web.UI.WebControls.Label lblName;
-        protected global::System.Web.UI.WebControls.Label lblRole;
-        protected global::System.Web.UI.WebControls.Label lblLevel;
-        protected global::System.Web.UI.WebControls.Label lblXP;
-        protected global::System.Web.UI.WebControls.Label lblQuizCount;
-        protected global::System.Web.UI.WebControls.Label lblAverage;
-        protected global::System.Web.UI.WebControls.Repeater rptHistory;
-    }
-}
+﻿namespace Mathling{    public partial class Profile    {        protected global::System.Web.UI.WebControls.Label lblName;        protected global::System.Web.UI.WebControls.Label lblRole;        protected global::System.Web.UI.WebControls.Label lblLevel;        protected global::System.Web.UI.WebControls.Label lblXP;        protected global::System.Web.UI.WebControls.Label lblQuizCount;        protected global::System.Web.UI.WebControls.Label lblAverage;        protected global::System.Web.UI.WebControls.Repeater rptHistory;    }}

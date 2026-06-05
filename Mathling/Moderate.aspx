@@ -1,101 +1,1 @@
-<%@ Page Title="Moderation" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Moderate.aspx.cs" Inherits="Mathling.Moderate" %>
-
-<asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">
-    <link rel="stylesheet" href="/css/moderate.css">
-</asp:Content>
-
-<asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">
-  <nav class="navbar"><div class="navbar-inner">
-    <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>
-    <div class="navbar-nav" id="main-nav"></div>
-    <div class="navbar-actions">
-      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
-      <button type="button" class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>
-    </div>
-  </div></nav>
-  <div class="mobile-nav" id="mobile-nav"></div>
-
-  <main class="main">
-    <div class="moderate-page container">
-      <div class="moderate-header">
-        <h1>Content Moderation</h1>
-        <p style="color:var(--text-secondary)">Create quizzes for students or review pending content</p>
-      </div>
-
-      <!-- Quiz Builder (Instructor Only) -->
-      <div id="submit-section" class="submission-form card" style="margin-bottom:var(--space-2xl);display:none">
-        <h3>Create New Quiz</h3>
-        <p style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:var(--space-md)">
-          Build a question set and submit it for admin review. Once approved, it will appear on the quiz page for students.
-        </p>
-
-        <!-- Step 1: Select Formula & Module -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">
-          <div class="form-group" style="margin:0">
-            <label class="form-label" for="quiz-formula">Formula</label>
-            <select id="quiz-formula" class="form-input form-select">
-              <option value="">Loading formulas...</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label" for="quiz-module">Module</label>
-            <select id="quiz-module" class="form-input form-select" disabled>
-              <option value="">Select a formula first</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Step 2: Set info -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">
-          <div class="form-group" style="margin:0">
-            <label class="form-label" for="quiz-label">Set Label</label>
-            <input type="text" id="quiz-label" class="form-input" placeholder="e.g. Practice Set 3">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label" for="quiz-display">Display Mode</label>
-            <select id="quiz-display" class="form-input form-select">
-              <option value="static">Static (all numbers shown at once)</option>
-              <option value="flash">Flash (numbers shown one at a time)</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin:0;opacity:0.5;">
-            <label class="form-label" for="quiz-video">Learning Video (Optional)</label>
-            <input type="file" id="quiz-video" class="form-input" accept="video/mp4,video/webm" style="padding: 6px;" disabled>
-          </div>
-        </div>
-
-        <!-- Step 3: Question Builder -->
-        <div style="margin-bottom:var(--space-md)">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-sm)">
-            <label class="form-label" style="margin:0">Questions</label>
-            <button type="button" class="btn btn-ghost btn-sm" id="add-question-btn" style="color:var(--accent-green)">+ Add Question</button>
-          </div>
-          <div id="questions-container"></div>
-        </div>
-
-        <button type="button" class="btn btn-accent-green" id="submit-quiz-btn">Submit for Review</button>
-      </div>
-
-      <!-- Review Section -->
-      <div>
-        <h3 style="margin-bottom:var(--space-md)">Review Queue</h3>
-        <p id="review-actions-note" style="display:none;font-size:var(--text-sm);color:var(--accent-blue);margin-bottom:var(--space-md)">
-          As an admin, you can approve or reject submissions below.
-        </p>
-        <div class="status-filters">
-          <button type="button" class="tag status-filter active" data-status="all">All</button>
-          <button type="button" class="tag status-filter" data-status="pending">Pending</button>
-          <button type="button" class="tag status-filter" data-status="approved">Approved</button>
-          <button type="button" class="tag status-filter" data-status="rejected">Rejected</button>
-        </div>
-        <div class="review-list" id="review-list"></div>
-      </div>
-    </div>
-  </main>
-</asp:Content>
-
-<asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">
-    <script src="/js/app.js?v=13"></script>
-    <script src="/js/moderate.js?v=5"></script>
-</asp:Content>
-
+<%@ Page Title="Moderation" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Moderate.aspx.cs" Inherits="Mathling.Moderate" %><asp:Content ID="HeadContent" ContentPlaceHolderID="HeadContent" runat="server">    <link rel="stylesheet" href="/css/moderate.css"></asp:Content><asp:Content ID="MainContent" ContentPlaceHolderID="MainContent" runat="server">  <nav class="navbar"><div class="navbar-inner">    <a href="Default.aspx" class="navbar-brand"><img src="/favicon.svg" alt="Mathlings" class="navbar-logo"><span class="navbar-title">Math<span>lings</span></span></a>    <div class="navbar-nav" id="main-nav"></div>    <div class="navbar-actions">      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>      <button type="button" class="hamburger" id="hamburger" aria-label="Menu"><div class="hamburger-lines"><span></span><span></span><span></span></div></button>    </div>  </div></nav>  <div class="mobile-nav" id="mobile-nav"></div>  <main class="main">    <div class="moderate-page container">      <div class="moderate-header">        <h1>Content Moderation</h1>        <p style="color:var(--text-secondary)">Create quizzes for students or review pending content</p>      </div>      <div id="submit-section" class="submission-form card" style="margin-bottom:var(--space-2xl);display:none">        <h3>Create New Quiz</h3>        <p style="font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:var(--space-md)">          Build a question set and submit it for admin review. Once approved, it will appear on the quiz page for students.        </p>        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">          <div class="form-group" style="margin:0">            <label class="form-label" for="quiz-formula">Formula</label>            <select id="quiz-formula" class="form-input form-select">              <option value="">Loading formulas...</option>            </select>          </div>          <div class="form-group" style="margin:0">            <label class="form-label" for="quiz-module">Module</label>            <select id="quiz-module" class="form-input form-select" disabled>              <option value="">Select a formula first</option>            </select>          </div>        </div>        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">          <div class="form-group" style="margin:0">            <label class="form-label" for="quiz-label">Set Label</label>            <input type="text" id="quiz-label" class="form-input" placeholder="e.g. Practice Set 3">          </div>          <div class="form-group" style="margin:0">            <label class="form-label" for="quiz-display">Display Mode</label>            <select id="quiz-display" class="form-input form-select">              <option value="static">Static (all numbers shown at once)</option>              <option value="flash">Flash (numbers shown one at a time)</option>            </select>          </div>          <div class="form-group" style="margin:0;opacity:0.5;">            <label class="form-label" for="quiz-video">Learning Video (Optional)</label>            <input type="file" id="quiz-video" class="form-input" accept="video/mp4,video/webm" style="padding: 6px;" disabled>          </div>        </div>        <div style="margin-bottom:var(--space-md)">          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-sm)">            <label class="form-label" style="margin:0">Questions</label>            <button type="button" class="btn btn-ghost btn-sm" id="add-question-btn" style="color:var(--accent-green)">+ Add Question</button>          </div>          <div id="questions-container"></div>        </div>        <button type="button" class="btn btn-accent-green" id="submit-quiz-btn">Submit for Review</button>      </div>      <div>        <h3 style="margin-bottom:var(--space-md)">Review Queue</h3>        <p id="review-actions-note" style="display:none;font-size:var(--text-sm);color:var(--accent-blue);margin-bottom:var(--space-md)">          As an admin, you can approve or reject submissions below.        </p>        <div class="status-filters">          <button type="button" class="tag status-filter active" data-status="all">All</button>          <button type="button" class="tag status-filter" data-status="pending">Pending</button>          <button type="button" class="tag status-filter" data-status="approved">Approved</button>          <button type="button" class="tag status-filter" data-status="rejected">Rejected</button>        </div>        <div class="review-list" id="review-list"></div>      </div>    </div>  </main></asp:Content><asp:Content ID="ScriptContent" ContentPlaceHolderID="ScriptContent" runat="server">    <script src="/js/app.js?v=13"></script>    <script src="/js/moderate.js?v=5"></script></asp:Content>

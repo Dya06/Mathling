@@ -1,243 +1,2 @@
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data.SqlClient;
-using System.Web.Services;
-using System.Web.UI;
-
-namespace Mathling
-{
-    public partial class Progress : Page
-    {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-        }
-
-        public class ProgressData
-        {
-            public int QuizzesTaken { get; set; }
-            public int AvgScore { get; set; }
-            public int BestScore { get; set; }
-            public int ChaptersDone { get; set; }
-            public int TotalChapters { get; set; }
-            public List<QuizHistoryItem> History { get; set; }
-        }
-
-        public class QuizHistoryItem
-        {
-            public string date { get; set; }
-            public string chapter { get; set; }
-            public int score { get; set; }
-            public string time { get; set; }
-            public int stars { get; set; }
-        }
-
-        public class StudentItem
-        {
-            public string Id { get; set; }
-            public string Name { get; set; }
-        }
-
-        [WebMethod]
-        public static List<StudentItem> GetStudents(string userId, string role)
-        {
-            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
-            List<StudentItem> students = new List<StudentItem>();
-
-            using (SqlConnection conn = new SqlConnection(connStr))
-            {
-                conn.Open();
-                string query = "";
-
-                if (role == "parent" || role == "Parent")
-                {
-                    query = @"
-                        SELECT u.Id, u.Name
-                        FROM Users u
-                        JOIN ParentStudentLinks psl ON u.Id = psl.StudentId
-                        WHERE psl.ParentId = @UserId AND u.Role = 'student'
-                        ORDER BY u.Name";
-                }
-                else if (role == "admin" || role == "Admin" || role == "instructor" || role == "Instructor")
-                {
-                    query = @"
-                        SELECT Id, Name
-                        FROM Users
-                        WHERE Role = 'student'
-                        ORDER BY Name";
-                }
-                else
-                {
-                    return students; // return empty for students
-                }
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@UserId", userId);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            students.Add(new StudentItem
-                            {
-                                Id = reader["Id"].ToString(),
-                                Name = reader["Name"].ToString()
-                            });
-                        }
-                    }
-                }
-            }
-            return students;
-        }
-
-        [WebMethod]
-        public static ProgressData GetProgressData(string userId, string role, string studentId)
-        {
-            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;
-            ProgressData data = new ProgressData();
-            data.History = new List<QuizHistoryItem>();
-
-            using (SqlConnection conn = new SqlConnection(connStr))
-            {
-                conn.Open();
-
-                string historyQuery = "";
-                string compQuery = "";
-
-                if (role == "admin" || role == "Admin" || role == "instructor" || role == "Instructor")
-                {
-                    if (!string.IsNullOrEmpty(studentId))
-                    {
-                        historyQuery = @"
-                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
-                            FROM QuizResults qr
-                            JOIN QuestionSets qs ON qr.SetId = qs.Id
-                            JOIN Modules m ON qs.ModuleId = m.Id
-                            WHERE qr.UserId = @StudentId
-                            ORDER BY qr.CompletedAt ASC";
-                        compQuery = @"
-                            SELECT 
-                                (SELECT COUNT(*) FROM ModuleProgress WHERE UserId = @StudentId AND IsCompleted = 1) as ChaptersDone,
-                                (SELECT COUNT(*) FROM Modules) as TotalChapters";
-                    }
-                    else
-                    {
-                        historyQuery = @"
-                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
-                            FROM QuizResults qr
-                            JOIN QuestionSets qs ON qr.SetId = qs.Id
-                            JOIN Modules m ON qs.ModuleId = m.Id
-                            ORDER BY qr.CompletedAt ASC";
-                        compQuery = @"
-                            SELECT 
-                                (SELECT COUNT(*) FROM ModuleProgress WHERE IsCompleted = 1) as ChaptersDone,
-                                (SELECT COUNT(*) FROM Modules) as TotalChapters";
-                    }
-                }
-                else if (role == "parent" || role == "Parent")
-                {
-                    if (!string.IsNullOrEmpty(studentId))
-                    {
-                        historyQuery = @"
-                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
-                            FROM QuizResults qr
-                            JOIN QuestionSets qs ON qr.SetId = qs.Id
-                            JOIN Modules m ON qs.ModuleId = m.Id
-                            JOIN ParentStudentLinks psl ON psl.StudentId = qr.UserId
-                            WHERE psl.ParentId = @UserId AND qr.UserId = @StudentId
-                            ORDER BY qr.CompletedAt ASC";
-                        compQuery = @"
-                            SELECT 
-                                (SELECT COUNT(*) FROM ModuleProgress mp JOIN ParentStudentLinks psl ON mp.UserId = psl.StudentId WHERE psl.ParentId = @UserId AND mp.UserId = @StudentId AND mp.IsCompleted = 1) as ChaptersDone,
-                                (SELECT COUNT(*) FROM Modules) as TotalChapters";
-                    }
-                    else
-                    {
-                        historyQuery = @"
-                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
-                            FROM QuizResults qr
-                            JOIN QuestionSets qs ON qr.SetId = qs.Id
-                            JOIN Modules m ON qs.ModuleId = m.Id
-                            JOIN ParentStudentLinks psl ON psl.StudentId = qr.UserId
-                            WHERE psl.ParentId = @UserId
-                            ORDER BY qr.CompletedAt ASC";
-                        compQuery = @"
-                            SELECT 
-                                (SELECT COUNT(*) FROM ModuleProgress mp JOIN ParentStudentLinks psl ON mp.UserId = psl.StudentId WHERE psl.ParentId = @UserId AND mp.IsCompleted = 1) as ChaptersDone,
-                                (SELECT COUNT(*) FROM Modules) as TotalChapters";
-                    }
-                }
-                else
-                {
-                    historyQuery = @"
-                        SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName
-                        FROM QuizResults qr
-                        JOIN QuestionSets qs ON qr.SetId = qs.Id
-                        JOIN Modules m ON qs.ModuleId = m.Id
-                        WHERE qr.UserId = @UserId
-                        ORDER BY qr.CompletedAt ASC";
-                    compQuery = @"
-                        SELECT 
-                            (SELECT COUNT(*) FROM ModuleProgress WHERE UserId = @UserId AND IsCompleted = 1) as ChaptersDone,
-                            (SELECT COUNT(*) FROM Modules) as TotalChapters";
-                }
-
-                int totalScore = 0;
-                
-                using (SqlCommand cmd = new SqlCommand(historyQuery, conn))
-                {
-                    cmd.Parameters.AddWithValue("@UserId", userId);
-                    if (!string.IsNullOrEmpty(studentId))
-                        cmd.Parameters.AddWithValue("@StudentId", studentId);
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int score = reader["Score"] != DBNull.Value ? Convert.ToInt32(reader["Score"]) : 0;
-                            int timeSec = reader["TimeTakenSec"] != DBNull.Value ? Convert.ToInt32(reader["TimeTakenSec"]) : 0;
-                            DateTime completedAt = Convert.ToDateTime(reader["CompletedAt"]);
-                            string chapter = reader["ChapterName"].ToString();
-
-                            data.QuizzesTaken++;
-                            totalScore += score;
-                            if (score > data.BestScore) data.BestScore = score;
-
-                            int stars = score >= 80 ? 3 : (score >= 50 ? 2 : 1);
-                            
-                            string timeStr = $"{timeSec / 60}:{(timeSec % 60).ToString("D2")}";
-
-                            data.History.Add(new QuizHistoryItem
-                            {
-                                date = completedAt.ToString("MM-dd"),
-                                chapter = chapter,
-                                score = score,
-                                time = timeStr,
-                                stars = stars
-                            });
-                        }
-                    }
-                }
-
-                data.AvgScore = data.QuizzesTaken > 0 ? totalScore / data.QuizzesTaken : 0;
-
-                using (SqlCommand cmd = new SqlCommand(compQuery, conn))
-                {
-                    cmd.Parameters.AddWithValue("@UserId", userId);
-                    if (!string.IsNullOrEmpty(studentId))
-                        cmd.Parameters.AddWithValue("@StudentId", studentId);
-                    
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            data.ChaptersDone = reader["ChaptersDone"] != DBNull.Value ? Convert.ToInt32(reader["ChaptersDone"]) : 0;
-                            data.TotalChapters = reader["TotalChapters"] != DBNull.Value ? Convert.ToInt32(reader["TotalChapters"]) : 0;
-                        }
-                    }
-                }
-            }
-            return data;
-        }
-    }
-}
+using System;using System.Collections.Generic;using System.Configuration;using System.Data.SqlClient;using System.Web.Services;using System.Web.UI;namespace Mathling{    public partial class Progress : Page    {        protected void Page_Load(object sender, EventArgs e)        {        }        public class ProgressData        {            public int QuizzesTaken { get; set; }            public int AvgScore { get; set; }            public int BestScore { get; set; }            public int ChaptersDone { get; set; }            public int TotalChapters { get; set; }            public List<QuizHistoryItem> History { get; set; }        }        public class QuizHistoryItem        {            public string date { get; set; }            public string chapter { get; set; }            public int score { get; set; }            public string time { get; set; }            public int stars { get; set; }        }        public class StudentItem        {            public string Id { get; set; }            public string Name { get; set; }        }        [WebMethod]        public static List<StudentItem> GetStudents(string userId, string role)        {            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;            List<StudentItem> students = new List<StudentItem>();            using (SqlConnection conn = new SqlConnection(connStr))            {                conn.Open();                string query = "";                if (role == "parent" || role == "Parent")                {                    query = @"                        SELECT u.Id, u.Name                        FROM Users u                        JOIN ParentStudentLinks psl ON u.Id = psl.StudentId                        WHERE psl.ParentId = @UserId AND u.Role = 'student'                        ORDER BY u.Name";                }                else if (role == "admin" || role == "Admin" || role == "instructor" || role == "Instructor")                {                    query = @"                        SELECT Id, Name                        FROM Users                        WHERE Role = 'student'                        ORDER BY Name";                }                else                {                    return students; 
+                }                using (SqlCommand cmd = new SqlCommand(query, conn))                {                    cmd.Parameters.AddWithValue("@UserId", userId);                    using (SqlDataReader reader = cmd.ExecuteReader())                    {                        while (reader.Read())                        {                            students.Add(new StudentItem                            {                                Id = reader["Id"].ToString(),                                Name = reader["Name"].ToString()                            });                        }                    }                }            }            return students;        }        [WebMethod]        public static ProgressData GetProgressData(string userId, string role, string studentId)        {            string connStr = ConfigurationManager.ConnectionStrings["MathlingDB"].ConnectionString;            ProgressData data = new ProgressData();            data.History = new List<QuizHistoryItem>();            using (SqlConnection conn = new SqlConnection(connStr))            {                conn.Open();                string historyQuery = "";                string compQuery = "";                if (role == "admin" || role == "Admin" || role == "instructor" || role == "Instructor")                {                    if (!string.IsNullOrEmpty(studentId))                    {                        historyQuery = @"                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName                            FROM QuizResults qr                            JOIN QuestionSets qs ON qr.SetId = qs.Id                            JOIN Modules m ON qs.ModuleId = m.Id                            WHERE qr.UserId = @StudentId                            ORDER BY qr.CompletedAt ASC";                        compQuery = @"                            SELECT                                 (SELECT COUNT(*) FROM ModuleProgress WHERE UserId = @StudentId AND IsCompleted = 1) as ChaptersDone,                                (SELECT COUNT(*) FROM Modules) as TotalChapters";                    }                    else                    {                        historyQuery = @"                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName                            FROM QuizResults qr                            JOIN QuestionSets qs ON qr.SetId = qs.Id                            JOIN Modules m ON qs.ModuleId = m.Id                            ORDER BY qr.CompletedAt ASC";                        compQuery = @"                            SELECT                                 (SELECT COUNT(*) FROM ModuleProgress WHERE IsCompleted = 1) as ChaptersDone,                                (SELECT COUNT(*) FROM Modules) as TotalChapters";                    }                }                else if (role == "parent" || role == "Parent")                {                    if (!string.IsNullOrEmpty(studentId))                    {                        historyQuery = @"                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName                            FROM QuizResults qr                            JOIN QuestionSets qs ON qr.SetId = qs.Id                            JOIN Modules m ON qs.ModuleId = m.Id                            JOIN ParentStudentLinks psl ON psl.StudentId = qr.UserId                            WHERE psl.ParentId = @UserId AND qr.UserId = @StudentId                            ORDER BY qr.CompletedAt ASC";                        compQuery = @"                            SELECT                                 (SELECT COUNT(*) FROM ModuleProgress mp JOIN ParentStudentLinks psl ON mp.UserId = psl.StudentId WHERE psl.ParentId = @UserId AND mp.UserId = @StudentId AND mp.IsCompleted = 1) as ChaptersDone,                                (SELECT COUNT(*) FROM Modules) as TotalChapters";                    }                    else                    {                        historyQuery = @"                            SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName                            FROM QuizResults qr                            JOIN QuestionSets qs ON qr.SetId = qs.Id                            JOIN Modules m ON qs.ModuleId = m.Id                            JOIN ParentStudentLinks psl ON psl.StudentId = qr.UserId                            WHERE psl.ParentId = @UserId                            ORDER BY qr.CompletedAt ASC";                        compQuery = @"                            SELECT                                 (SELECT COUNT(*) FROM ModuleProgress mp JOIN ParentStudentLinks psl ON mp.UserId = psl.StudentId WHERE psl.ParentId = @UserId AND mp.IsCompleted = 1) as ChaptersDone,                                (SELECT COUNT(*) FROM Modules) as TotalChapters";                    }                }                else                {                    historyQuery = @"                        SELECT qr.Percentage as Score, qr.TimeTakenSec, qr.CompletedAt, m.Title as ChapterName                        FROM QuizResults qr                        JOIN QuestionSets qs ON qr.SetId = qs.Id                        JOIN Modules m ON qs.ModuleId = m.Id                        WHERE qr.UserId = @UserId                        ORDER BY qr.CompletedAt ASC";                    compQuery = @"                        SELECT                             (SELECT COUNT(*) FROM ModuleProgress WHERE UserId = @UserId AND IsCompleted = 1) as ChaptersDone,                            (SELECT COUNT(*) FROM Modules) as TotalChapters";                }                int totalScore = 0;                using (SqlCommand cmd = new SqlCommand(historyQuery, conn))                {                    cmd.Parameters.AddWithValue("@UserId", userId);                    if (!string.IsNullOrEmpty(studentId))                        cmd.Parameters.AddWithValue("@StudentId", studentId);                    using (SqlDataReader reader = cmd.ExecuteReader())                    {                        while (reader.Read())                        {                            int score = reader["Score"] != DBNull.Value ? Convert.ToInt32(reader["Score"]) : 0;                            int timeSec = reader["TimeTakenSec"] != DBNull.Value ? Convert.ToInt32(reader["TimeTakenSec"]) : 0;                            DateTime completedAt = Convert.ToDateTime(reader["CompletedAt"]);                            string chapter = reader["ChapterName"].ToString();                            data.QuizzesTaken++;                            totalScore += score;                            if (score > data.BestScore) data.BestScore = score;                            int stars = score >= 80 ? 3 : (score >= 50 ? 2 : 1);                            string timeStr = $"{timeSec / 60}:{(timeSec % 60).ToString("D2")}";                            data.History.Add(new QuizHistoryItem                            {                                date = completedAt.ToString("MM-dd"),                                chapter = chapter,                                score = score,                                time = timeStr,                                stars = stars                            });                        }                    }                }                data.AvgScore = data.QuizzesTaken > 0 ? totalScore / data.QuizzesTaken : 0;                using (SqlCommand cmd = new SqlCommand(compQuery, conn))                {                    cmd.Parameters.AddWithValue("@UserId", userId);                    if (!string.IsNullOrEmpty(studentId))                        cmd.Parameters.AddWithValue("@StudentId", studentId);                    using (SqlDataReader reader = cmd.ExecuteReader())                    {                        if (reader.Read())                        {                            data.ChaptersDone = reader["ChaptersDone"] != DBNull.Value ? Convert.ToInt32(reader["ChaptersDone"]) : 0;                            data.TotalChapters = reader["TotalChapters"] != DBNull.Value ? Convert.ToInt32(reader["TotalChapters"]) : 0;                        }                    }                }            }            return data;        }    }}
